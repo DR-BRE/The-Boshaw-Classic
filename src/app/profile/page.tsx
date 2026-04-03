@@ -186,7 +186,7 @@ export default function ProfilePage() {
         </label>
         <div className="flex-1 min-w-0">
           <p className="font-label font-bold text-on-surface truncate">
-            {session?.user?.name || "Player"}
+            {player?.displayName || session?.user?.name || "Player"}
           </p>
           <p className="text-xs text-on-surface-variant truncate">
             {session?.user?.email}
