@@ -156,7 +156,7 @@ export default function ProfilePage() {
   }
 
   return (
-    <div className="px-4 py-6">
+    <div className="px-4 py-6 pb-24">
       <h2 className="font-headline text-3xl text-on-surface mb-6">Profile</h2>
 
       {/* User Card */}
