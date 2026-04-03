@@ -4,8 +4,28 @@ import LayoutShell from "@/components/LayoutShell";
 import "./globals.css";
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://the-boshaw-classic.vercel.app"),
   title: "The Boshaw Classic",
   description: "Bachelor party golf tournament — Lake Chelan 2026",
+  openGraph: {
+    title: "The Boshaw Classic",
+    description: "Bachelor party golf tournament — Lake Chelan 2026",
+    images: [
+      {
+        url: "/og-image.png",
+        width: 1200,
+        height: 635,
+        type: "image/png",
+      },
+    ],
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "The Boshaw Classic",
+    description: "Bachelor party golf tournament — Lake Chelan 2026",
+    images: ["/og-image.png"],
+  },
 };
 
 export const viewport: Viewport = {
