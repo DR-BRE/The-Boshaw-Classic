@@ -24,12 +24,9 @@ export default function TopBar() {
 
   return (
     <header className="fixed top-0 left-0 right-0 z-50 bg-[#051612] flex justify-between items-center w-full px-6 py-4">
-      <div className="flex items-center gap-4">
-        <span className="material-symbols-outlined text-primary hover:bg-surface-variant/60 transition-colors p-2 rounded-lg cursor-pointer">
+      <div className="flex items-center">
+        <Link href="/" className="material-symbols-outlined text-primary hover:bg-surface-variant/60 transition-colors p-2 rounded-lg cursor-pointer">
           menu
-        </span>
-        <Link href="/" className="font-headline text-secondary text-2xl tracking-widest uppercase">
-          BACHELOR BASH
         </Link>
       </div>
       <div className="flex items-center gap-3">
