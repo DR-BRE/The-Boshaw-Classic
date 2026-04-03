@@ -78,9 +78,12 @@ export default function ProfilePage() {
       const data = await res.json();
       if (data.url) {
         setAvatarUrl(data.url);
+      } else {
+        alert(data.error || "Upload failed");
       }
     } catch (err) {
       console.error("Upload failed:", err);
+      alert("Upload failed — check console for details");
     } finally {
       setUploading(false);
     }
