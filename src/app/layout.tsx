@@ -1,7 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import SessionProvider from "@/lib/SessionProvider";
-
-import BottomTabs from "@/components/BottomTabs";
+import LayoutShell from "@/components/LayoutShell";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -32,10 +31,7 @@ export default function RootLayout({
       </head>
       <body className="min-h-full flex flex-col bg-background text-on-surface font-body antialiased">
         <SessionProvider>
-          <main className="flex-grow pt-6 pb-32">
-            {children}
-          </main>
-          <BottomTabs />
+          <LayoutShell>{children}</LayoutShell>
         </SessionProvider>
       </body>
     </html>
