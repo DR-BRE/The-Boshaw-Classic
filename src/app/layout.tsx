@@ -33,7 +33,7 @@ export default function RootLayout({
       <body className="min-h-full flex flex-col bg-background text-on-surface font-body antialiased">
         <SessionProvider>
           <TopBar />
-          <main className="flex-grow pt-20 pb-32">
+          <main className="flex-grow pt-10 pb-32">
             {children}
           </main>
           <BottomTabs />
