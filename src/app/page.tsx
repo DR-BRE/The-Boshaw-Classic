@@ -40,13 +40,6 @@ export default function Home() {
           {/* Logo spacer */}
           <div className="h-[32vh]" />
 
-          {/* Main heading */}
-          <h1 className="font-headline text-on-surface text-5xl sm:text-6xl font-bold uppercase tracking-tight leading-none mb-6">
-            {"RYAN'S FINAL"}
-            <br />
-            ROUND
-          </h1>
-
           {/* Countdown */}
           <div className="mb-6">
             <Countdown />
