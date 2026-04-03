@@ -1,6 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import SessionProvider from "@/lib/SessionProvider";
-import TopBar from "@/components/TopBar";
+
 import BottomTabs from "@/components/BottomTabs";
 import "./globals.css";
 
@@ -32,8 +32,7 @@ export default function RootLayout({
       </head>
       <body className="min-h-full flex flex-col bg-background text-on-surface font-body antialiased">
         <SessionProvider>
-          <TopBar />
-          <main className="flex-grow pt-16 pb-32">
+          <main className="flex-grow pt-6 pb-32">
             {children}
           </main>
           <BottomTabs />
