@@ -59,12 +59,13 @@ export default function ProfilePage() {
       .catch(() => setLoading(false));
   }, [status, session]);
 
-  // Auto-generate display name from first/last
+  // Only auto-generate display name when creating a new profile
+  // (not when editing an existing one)
   useEffect(() => {
-    if (firstName && lastName) {
+    if (!player && firstName && lastName) {
       setDisplayName(`${firstName} ${lastName[0]}.`);
     }
-  }, [firstName, lastName]);
+  }, [firstName, lastName, player]);
 
   async function handleAvatarUpload(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
