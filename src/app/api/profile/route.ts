@@ -45,7 +45,6 @@ export async function PUT(request: Request) {
         firstName,
         lastName,
         handicap: handicapNum,
-        avatarUrl: session.user.image ?? null,
       },
       create: {
         userId: session.user.id,
