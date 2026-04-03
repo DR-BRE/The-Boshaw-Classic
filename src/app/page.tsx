@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useSession } from "next-auth/react";
 import Link from "next/link";
 import Countdown from "@/components/Countdown";
 import { TOURNAMENT } from "@/lib/tournament";
@@ -19,7 +18,6 @@ function toParColor(toPar: number) {
 }
 
 export default function Home() {
-  const { data: session } = useSession();
   const [topPlayers, setTopPlayers] = useState<LeaderboardEntry[]>([]);
 
   useEffect(() => {
@@ -52,28 +50,6 @@ export default function Home() {
           {/* Countdown */}
           <div className="mb-6">
             <Countdown />
-          </div>
-
-          {/* CTA Buttons — side by side */}
-          <div className="flex gap-3 max-w-sm mx-auto">
-            <Link
-              href={session ? "/scorecard" : "/api/auth/signin"}
-              className="flex-1 flex items-center justify-center gap-2 bg-secondary text-on-secondary font-label font-bold uppercase tracking-widest text-xs py-3.5 rounded-xl active:scale-95 transition-transform"
-            >
-              SCORECARD
-              <span className="material-symbols-outlined text-base">
-                scoreboard
-              </span>
-            </Link>
-            <Link
-              href="/trip"
-              className="flex-1 flex items-center justify-center gap-2 border border-white/20 bg-white/10 backdrop-blur-sm text-on-surface font-label font-bold uppercase tracking-widest text-xs py-3.5 rounded-xl active:scale-95 transition-transform"
-            >
-              TRIP INFO
-              <span className="material-symbols-outlined text-base">
-                luggage
-              </span>
-            </Link>
           </div>
         </div>
       </section>
