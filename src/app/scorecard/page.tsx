@@ -129,6 +129,9 @@ function CardView({
                   <span className="font-label text-sm font-bold text-on-surface">
                     {player.displayName}
                   </span>
+                  <span className="font-label text-[10px] text-on-surface-variant">
+                    ({player.handicap})
+                  </span>
                 </div>
                 <div className="flex items-center gap-3">
                   <span className={`font-label text-[10px] font-bold uppercase tracking-wider ${scoreLabelColor(score, par)}`}>

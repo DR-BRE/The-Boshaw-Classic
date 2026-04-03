@@ -167,7 +167,7 @@ export default function LeaderboardPage() {
                   )}
                 </p>
                 <p className="text-[11px] text-on-surface-variant uppercase tracking-wider">
-                  Group {entry.group} · {entry.roundsPlayed} {entry.roundsPlayed === 1 ? "round" : "rounds"}
+                  HCP {entry.handicap} · Group {entry.group} · {entry.roundsPlayed} {entry.roundsPlayed === 1 ? "round" : "rounds"}
                 </p>
               </div>
 
