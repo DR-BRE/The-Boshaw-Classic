@@ -9,7 +9,7 @@ const navLinks = [
   { href: "/", icon: "home", label: "Home" },
   { href: "/leaderboard", icon: "leaderboard", label: "Leaderboard" },
   { href: "/scorecard", icon: "scoreboard", label: "Scorecard" },
-  { href: "/scoring", icon: "edit_note", label: "Enter Score" },
+  { href: "/trip", icon: "luggage", label: "Trip Info" },
   { href: "/profile", icon: "person", label: "Profile" },
   { href: "/settings", icon: "settings", label: "Settings" },
 ];

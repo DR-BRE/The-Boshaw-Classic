@@ -57,21 +57,21 @@ export default function Home() {
           {/* CTA Buttons — side by side */}
           <div className="flex gap-3 max-w-sm mx-auto">
             <Link
-              href={session ? "/scoring" : "/api/auth/signin"}
+              href={session ? "/scorecard" : "/api/auth/signin"}
               className="flex-1 flex items-center justify-center gap-2 bg-secondary text-on-secondary font-label font-bold uppercase tracking-widest text-xs py-3.5 rounded-xl active:scale-95 transition-transform"
             >
-              SUBMIT SCORE
+              SCORECARD
               <span className="material-symbols-outlined text-base">
-                edit_note
+                scoreboard
               </span>
             </Link>
             <Link
-              href="/leaderboard"
+              href="/trip"
               className="flex-1 flex items-center justify-center gap-2 border border-white/20 bg-white/10 backdrop-blur-sm text-on-surface font-label font-bold uppercase tracking-widest text-xs py-3.5 rounded-xl active:scale-95 transition-transform"
             >
-              SCHEDULE
+              TRIP INFO
               <span className="material-symbols-outlined text-base">
-                calendar_month
+                luggage
               </span>
             </Link>
           </div>
