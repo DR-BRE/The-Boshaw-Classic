@@ -30,7 +30,7 @@ export default function Home() {
   return (
     <div className="flex flex-col min-h-[calc(100vh-5rem)] pb-28 -mt-6">
       {/* Hero Section */}
-      <section className="relative overflow-hidden px-6 pt-14 pb-8">
+      <section className="relative overflow-hidden px-6 pt-20 pb-8">
         {/* Hero background image */}
         <div className="absolute inset-0 bg-[url('/hero-bg.png')] bg-cover bg-center" />
         {/* Dark gradient overlay for text legibility */}
