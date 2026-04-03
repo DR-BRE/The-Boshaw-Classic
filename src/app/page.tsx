@@ -55,7 +55,7 @@ export default function Home() {
       </section>
 
       {/* Leaderboard Preview — Glassmorphism */}
-      <section className="px-6 pb-8 -mt-2">
+      <section className="px-6 pb-8 mt-2">
         <div className="flex justify-between items-end mb-4">
           <h3 className="font-headline text-2xl text-on-surface">
             Leaderboard
