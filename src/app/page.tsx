@@ -30,51 +30,52 @@ export default function Home() {
   }, []);
 
   return (
-    <div className="flex flex-col min-h-[calc(100vh-5rem)]">
+    <div className="flex flex-col min-h-[calc(100vh-5rem)] pb-28">
       {/* Hero Section */}
-      <section className="relative overflow-hidden px-6 pt-4 pb-10 min-h-[70vh]">
+      <section className="relative overflow-hidden px-6 pt-4 pb-8">
         {/* Hero background image */}
         <div className="absolute inset-0 bg-[url('/hero-bg.png')] bg-cover bg-center" />
-        <div className="absolute inset-0 bg-gradient-to-t from-background via-background/50 to-background/30" />
+        {/* Dark gradient overlay for text legibility */}
+        <div className="absolute inset-0 bg-gradient-to-b from-black/50 via-black/20 to-black/70" />
 
         <div className="relative z-10">
-          {/* Spacer to push content below the image logo */}
-          <div className="h-[45vh]" />
+          {/* Logo spacer — scaled down ~18% */}
+          <div className="h-[37vh]" />
 
           {/* Tagline */}
-          <p className="font-headline italic text-secondary/90 text-sm tracking-[0.15em] mb-2">
+          <p className="font-headline italic text-secondary/90 text-sm tracking-[0.15em] mb-3">
             The Weekend of Legends
           </p>
 
           {/* Main heading */}
-          <h1 className="font-headline text-on-surface text-5xl sm:text-6xl font-bold uppercase tracking-tight leading-none mb-8">
+          <h1 className="font-headline text-on-surface text-5xl sm:text-6xl font-bold uppercase tracking-tight leading-none mb-6">
             {"RYAN'S FINAL"}
             <br />
             ROUND
           </h1>
 
           {/* Countdown */}
-          <div className="mb-8">
+          <div className="mb-6">
             <Countdown />
           </div>
 
-          {/* CTA Buttons */}
-          <div className="space-y-3 max-w-sm mx-auto">
+          {/* CTA Buttons — side by side */}
+          <div className="flex gap-3 max-w-sm mx-auto">
             <Link
               href={session ? "/scoring" : "/api/auth/signin"}
-              className="flex items-center justify-center gap-2 w-full bg-secondary text-on-secondary font-label font-bold uppercase tracking-widest text-sm py-4 rounded-xl active:scale-95 transition-transform"
+              className="flex-1 flex items-center justify-center gap-2 bg-secondary text-on-secondary font-label font-bold uppercase tracking-widest text-xs py-3.5 rounded-xl active:scale-95 transition-transform"
             >
               SUBMIT SCORE
-              <span className="material-symbols-outlined text-lg">
+              <span className="material-symbols-outlined text-base">
                 edit_note
               </span>
             </Link>
             <Link
               href="/leaderboard"
-              className="flex items-center justify-center gap-2 w-full border border-outline-variant/40 text-on-surface font-label font-bold uppercase tracking-widest text-sm py-4 rounded-xl hover:bg-surface-container-high/50 transition-colors"
+              className="flex-1 flex items-center justify-center gap-2 border border-white/20 bg-white/10 backdrop-blur-sm text-on-surface font-label font-bold uppercase tracking-widest text-xs py-3.5 rounded-xl active:scale-95 transition-transform"
             >
-              VIEW SCHEDULE
-              <span className="material-symbols-outlined text-lg">
+              SCHEDULE
+              <span className="material-symbols-outlined text-base">
                 calendar_month
               </span>
             </Link>
@@ -82,8 +83,8 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Leaderboard Preview */}
-      <section className="px-6 pb-8">
+      {/* Leaderboard Preview — Glassmorphism */}
+      <section className="px-6 pb-8 -mt-2">
         <div className="flex justify-between items-end mb-4">
           <h3 className="font-headline text-2xl text-on-surface">
             Leaderboard
@@ -93,7 +94,7 @@ export default function Home() {
           </span>
         </div>
         {topPlayers.length > 0 ? (
-          <div className="bg-surface-container-high rounded-xl p-4">
+          <div className="bg-surface-container-high/60 backdrop-blur-xl border border-outline-variant/15 rounded-xl p-4">
             <div className="space-y-0">
               {topPlayers.map((player, i) => (
                 <div
@@ -125,7 +126,7 @@ export default function Home() {
             </Link>
           </div>
         ) : (
-          <div className="bg-surface-container-high rounded-xl p-4 text-center">
+          <div className="bg-surface-container-high/60 backdrop-blur-xl border border-outline-variant/15 rounded-xl p-4 text-center">
             <span className="material-symbols-outlined text-secondary text-3xl mb-2">
               sports_golf
             </span>
