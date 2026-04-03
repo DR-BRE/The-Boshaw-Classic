@@ -26,6 +26,8 @@ export default function ProfilePage() {
   const [lastName, setLastName] = useState("");
   const [displayName, setDisplayName] = useState("");
   const [handicap, setHandicap] = useState("");
+  const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
+  const [uploading, setUploading] = useState(false);
 
   useEffect(() => {
     if (status !== "authenticated") {
@@ -42,6 +44,7 @@ export default function ProfilePage() {
           setLastName(data.player.lastName);
           setDisplayName(data.player.displayName);
           setHandicap(String(data.player.handicap));
+          setAvatarUrl(data.player.avatarUrl);
         } else if (session?.user) {
           // Pre-fill from GitHub profile
           const parts = (session.user.name || "").split(" ");
@@ -62,6 +65,26 @@ export default function ProfilePage() {
       setDisplayName(`${firstName} ${lastName[0]}.`);
     }
   }, [firstName, lastName]);
+
+  async function handleAvatarUpload(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setUploading(true);
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
+      const res = await fetch("/api/upload", { method: "POST", body: formData });
+      const data = await res.json();
+      if (data.url) {
+        setAvatarUrl(data.url);
+      }
+    } catch (err) {
+      console.error("Upload failed:", err);
+    } finally {
+      setUploading(false);
+    }
+  }
 
   async function handleSave() {
     setSaving(true);
@@ -137,17 +160,30 @@ export default function ProfilePage() {
 
       {/* User Card */}
       <div className="bg-surface-container-high rounded-xl p-4 flex items-center gap-4 mb-6">
-        {session?.user?.image ? (
-          <img
-            src={session.user.image}
-            alt="Avatar"
-            className="w-14 h-14 rounded-full border-2 border-secondary/30 object-cover"
+        <label className="relative cursor-pointer group flex-shrink-0">
+          <input
+            type="file"
+            accept="image/*"
+            onChange={handleAvatarUpload}
+            className="hidden"
           />
-        ) : (
-          <div className="w-14 h-14 rounded-full bg-primary-container flex items-center justify-center border-2 border-secondary/30">
-            <span className="material-symbols-outlined text-primary text-2xl">person</span>
+          {avatarUrl || session?.user?.image ? (
+            <img
+              src={avatarUrl || session?.user?.image || ""}
+              alt="Avatar"
+              className="w-14 h-14 rounded-full border-2 border-secondary/30 object-cover"
+            />
+          ) : (
+            <div className="w-14 h-14 rounded-full bg-primary-container flex items-center justify-center border-2 border-secondary/30">
+              <span className="material-symbols-outlined text-primary text-2xl">person</span>
+            </div>
+          )}
+          <div className="absolute inset-0 rounded-full bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 group-active:opacity-100 transition-opacity">
+            <span className="material-symbols-outlined text-white text-lg">
+              {uploading ? "hourglass_empty" : "photo_camera"}
+            </span>
           </div>
-        )}
+        </label>
         <div className="flex-1 min-w-0">
           <p className="font-label font-bold text-on-surface truncate">
             {session?.user?.name || "Player"}
