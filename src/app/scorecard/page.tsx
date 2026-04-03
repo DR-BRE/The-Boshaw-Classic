@@ -85,7 +85,7 @@ function CardView({
               className={`flex-shrink-0 w-9 h-9 rounded-lg font-label text-xs font-bold transition-all active:scale-90 ${
                 active
                   ? "bg-secondary text-on-secondary"
-                  : "bg-surface-container-high text-on-surface-variant"
+                  : "bg-white/[0.06] text-on-surface-variant"
               }`}
             >
               {i + 1}
@@ -95,7 +95,7 @@ function CardView({
       </div>
 
       {/* Hole Info Header */}
-      <div className="bg-surface-container rounded-2xl p-5 mb-4">
+      <div className="bg-white/[0.06] backdrop-blur-xl border border-white/[0.08] rounded-2xl p-5 mb-4">
         <div className="flex justify-between items-center mb-5">
           <div>
             <p className="font-label text-xs text-on-surface-variant uppercase tracking-widest">
@@ -120,7 +120,7 @@ function CardView({
             return (
               <div
                 key={player.id}
-                className="flex items-center justify-between bg-surface rounded-xl px-4 py-3"
+                className="flex items-center justify-between bg-white/[0.04] border border-white/[0.06] rounded-xl px-4 py-3"
               >
                 <div className="flex items-center gap-2.5">
                   <span
@@ -154,7 +154,7 @@ function CardView({
         <button
           onClick={() => !isFirst && setCurrentHole(currentHole - 1)}
           disabled={isFirst}
-          className="flex-1 flex items-center justify-center gap-2 py-3 rounded-xl border border-outline-variant/40 font-label font-bold text-sm uppercase tracking-wider text-on-surface disabled:opacity-30 active:scale-95 transition-transform"
+          className="flex-1 flex items-center justify-center gap-2 py-3 rounded-xl border border-white/[0.1] bg-white/[0.04] font-label font-bold text-sm uppercase tracking-wider text-on-surface disabled:opacity-30 active:scale-95 transition-transform"
         >
           <span className="material-symbols-outlined text-lg">arrow_back</span>
           Prev
@@ -162,7 +162,7 @@ function CardView({
         <button
           onClick={() => !isLast && setCurrentHole(currentHole + 1)}
           disabled={isLast}
-          className="flex-1 flex items-center justify-center gap-2 py-3 rounded-xl border border-outline-variant/40 font-label font-bold text-sm uppercase tracking-wider text-on-surface disabled:opacity-30 active:scale-95 transition-transform"
+          className="flex-1 flex items-center justify-center gap-2 py-3 rounded-xl border border-white/[0.1] bg-white/[0.04] font-label font-bold text-sm uppercase tracking-wider text-on-surface disabled:opacity-30 active:scale-95 transition-transform"
         >
           Next
           <span className="material-symbols-outlined text-lg">arrow_forward</span>
@@ -451,14 +451,14 @@ export default function ScorecardPage() {
       </h2>
 
       {/* Round Tabs */}
-      <div className="bg-surface-container rounded-xl p-1 flex gap-1 mb-4">
+      <div className="bg-white/[0.06] backdrop-blur-lg border border-white/[0.06] rounded-xl p-1 flex gap-1 mb-4">
         {ROUNDS.map((r) => (
           <button
             key={r.value}
             onClick={() => { setRound(r.value); setCurrentHole(0); }}
             className={`flex-1 py-2.5 rounded-lg font-label text-xs font-bold uppercase tracking-wider transition-all active:scale-95 ${
               round === r.value
-                ? "bg-primary-container text-primary"
+                ? "bg-white/[0.1] text-primary"
                 : "text-on-surface-variant hover:text-on-surface"
             }`}
           >
@@ -470,15 +470,15 @@ export default function ScorecardPage() {
       {/* Loading State */}
       {loading && (
         <div className="space-y-4">
-          <div className="bg-surface-container-high animate-pulse rounded-xl h-10" />
-          <div className="bg-surface-container-high animate-pulse rounded-xl h-64" />
-          <div className="bg-surface-container-high animate-pulse rounded-xl h-64" />
+          <div className="bg-white/[0.06] animate-pulse rounded-xl h-10" />
+          <div className="bg-white/[0.06] animate-pulse rounded-xl h-64" />
+          <div className="bg-white/[0.06] animate-pulse rounded-xl h-64" />
         </div>
       )}
 
       {/* Empty State */}
       {!loading && !data && (
-        <div className="bg-surface-container-high rounded-xl p-8 text-center">
+        <div className="bg-white/[0.06] backdrop-blur-xl border border-white/[0.08] rounded-xl p-8 text-center">
           <span className="material-symbols-outlined text-secondary text-3xl mb-2">
             scoreboard
           </span>
@@ -506,12 +506,12 @@ export default function ScorecardPage() {
             </div>
 
             {/* View Toggle */}
-            <div className="bg-surface-container rounded-lg p-0.5 flex">
+            <div className="bg-white/[0.06] border border-white/[0.06] rounded-lg p-0.5 flex">
               <button
                 onClick={() => setView("card")}
                 className={`px-3 py-1.5 rounded-md font-label text-[10px] font-bold uppercase tracking-wider transition-all ${
                   view === "card"
-                    ? "bg-primary-container text-primary"
+                    ? "bg-white/[0.1] text-primary"
                     : "text-on-surface-variant"
                 }`}
               >
@@ -521,7 +521,7 @@ export default function ScorecardPage() {
                 onClick={() => setView("classic")}
                 className={`px-3 py-1.5 rounded-md font-label text-[10px] font-bold uppercase tracking-wider transition-all ${
                   view === "classic"
-                    ? "bg-primary-container text-primary"
+                    ? "bg-white/[0.1] text-primary"
                     : "text-on-surface-variant"
                 }`}
               >

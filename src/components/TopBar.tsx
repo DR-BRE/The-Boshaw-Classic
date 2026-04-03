@@ -23,7 +23,7 @@ export default function TopBar() {
   const profileImage = avatarUrl || session?.user?.image;
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 flex justify-between items-center w-full px-4 py-2">
+    <header className="fixed top-0 left-0 right-0 z-50 flex justify-between items-center w-full px-4 py-2 bg-white/[0.06] backdrop-blur-xl border-b border-white/[0.06]">
       <div className="flex items-center">
         <Link href="/" className="material-symbols-outlined text-primary hover:bg-surface-variant/60 transition-colors p-1.5 rounded-lg cursor-pointer text-xl">
           menu

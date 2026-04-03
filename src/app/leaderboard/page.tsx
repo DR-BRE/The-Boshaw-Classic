@@ -68,7 +68,7 @@ function PlayerAvatar({ name, avatarUrl }: { name: string; avatarUrl: string | n
 }
 
 function SkeletonRow() {
-  return <div className="bg-surface-container-high animate-pulse rounded-xl h-[76px] mb-3" />;
+  return <div className="bg-white/[0.06] animate-pulse rounded-xl h-[76px] mb-3" />;
 }
 
 export default function LeaderboardPage() {
@@ -104,14 +104,14 @@ export default function LeaderboardPage() {
       </div>
 
       {/* Round Tabs */}
-      <div className="bg-surface-container rounded-xl p-1 flex gap-1 mb-6">
+      <div className="bg-white/[0.06] backdrop-blur-lg border border-white/[0.06] rounded-xl p-1 flex gap-1 mb-6">
         {ROUNDS.map((r) => (
           <button
             key={r.value}
             onClick={() => setRound(r.value)}
             className={`flex-1 py-2.5 rounded-lg font-label text-xs font-bold uppercase tracking-wider transition-all active:scale-95 ${
               round === r.value
-                ? "bg-primary-container text-primary"
+                ? "bg-white/[0.1] text-primary"
                 : "text-on-surface-variant hover:text-on-surface"
             }`}
           >
@@ -131,7 +131,7 @@ export default function LeaderboardPage() {
 
       {/* Empty State */}
       {!loading && entries.length === 0 && (
-        <div className="bg-surface-container-high rounded-xl p-8 text-center">
+        <div className="bg-white/[0.06] backdrop-blur-xl border border-white/[0.08] rounded-xl p-8 text-center">
           <span className="material-symbols-outlined text-secondary text-3xl mb-2">sports_golf</span>
           <p className="font-headline text-lg text-on-surface">No scores yet</p>
           <p className="text-xs text-on-surface-variant mt-1">
@@ -146,8 +146,8 @@ export default function LeaderboardPage() {
           {entries.map((entry) => (
             <div
               key={entry.playerId}
-              className={`bg-surface-container-high rounded-xl p-4 flex items-center gap-3 ${
-                entry.rank === 1 ? "border border-secondary/30" : ""
+              className={`bg-white/[0.06] backdrop-blur-xl border rounded-xl p-4 flex items-center gap-3 ${
+                entry.rank === 1 ? "border-secondary/30" : "border-white/[0.08]"
               }`}
             >
               {/* Rank */}

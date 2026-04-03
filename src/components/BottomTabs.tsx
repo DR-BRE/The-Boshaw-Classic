@@ -15,7 +15,7 @@ export default function BottomTabs() {
   const pathname = usePathname();
 
   return (
-    <nav className="fixed bottom-0 left-0 w-full z-50 flex justify-around items-end px-2 pb-5 pt-2 bg-[#263833]/60 backdrop-blur-xl rounded-t-2xl shadow-[0px_24px_48px_-12px_rgba(1,17,13,0.4)]">
+    <nav className="fixed bottom-0 left-0 w-full z-50 flex justify-around items-end px-2 pb-5 pt-2 bg-white/[0.06] backdrop-blur-xl border-t border-white/[0.06] rounded-t-2xl shadow-[0_-4px_30px_rgba(0,0,0,0.3)]">
       {tabs.map((tab) => {
         const isActive =
           tab.href === "/"
@@ -29,8 +29,8 @@ export default function BottomTabs() {
               tab.highlight
                 ? "bg-[#e9c349] text-[#3c2f00] rounded-xl px-3 py-1.5 shadow-md shadow-[#e9c349]/20"
                 : isActive
-                  ? "bg-[#062b21] text-[#e9c349] rounded-lg px-2.5 py-1"
-                  : "text-[#a9cfbf]/60 hover:bg-[#1b2d29] px-2.5 py-1 rounded-lg"
+                  ? "bg-white/[0.1] text-[#e9c349] rounded-lg px-2.5 py-1"
+                  : "text-[#a9cfbf]/60 hover:bg-white/[0.06] px-2.5 py-1 rounded-lg"
             }`}
           >
             <span

@@ -117,7 +117,7 @@ export default function ProfilePage() {
     return (
       <div className="px-4 py-6">
         <h2 className="font-headline text-3xl text-on-surface mb-2">Profile</h2>
-        <div className="bg-surface-container-high rounded-xl p-8 text-center mt-4">
+        <div className="bg-white/[0.06] backdrop-blur-xl border border-white/[0.08] rounded-xl p-8 text-center mt-4">
           <span
             className="material-symbols-outlined text-secondary text-4xl mb-3"
             style={{ fontVariationSettings: '"FILL" 1' }}
@@ -148,8 +148,8 @@ export default function ProfilePage() {
       <div className="px-4 py-6">
         <h2 className="font-headline text-3xl text-on-surface mb-6">Profile</h2>
         <div className="space-y-4">
-          <div className="bg-surface-container-high animate-pulse rounded-xl h-24" />
-          <div className="bg-surface-container-high animate-pulse rounded-xl h-48" />
+          <div className="bg-white/[0.06] animate-pulse rounded-xl h-24" />
+          <div className="bg-white/[0.06] animate-pulse rounded-xl h-48" />
         </div>
       </div>
     );
@@ -160,7 +160,7 @@ export default function ProfilePage() {
       <h2 className="font-headline text-3xl text-on-surface mb-6">Profile</h2>
 
       {/* User Card */}
-      <div className="bg-surface-container-high rounded-xl p-4 flex items-center gap-4 mb-6">
+      <div className="bg-white/[0.06] backdrop-blur-xl border border-white/[0.08] rounded-xl p-4 flex items-center gap-4 mb-6">
         <label className="relative cursor-pointer group flex-shrink-0">
           <input
             type="file"
@@ -202,7 +202,7 @@ export default function ProfilePage() {
       </div>
 
       {/* Profile Form */}
-      <div className="bg-surface-container rounded-xl p-5">
+      <div className="bg-white/[0.06] backdrop-blur-xl border border-white/[0.08] rounded-2xl p-5">
         <h3 className="font-headline text-lg text-on-surface mb-4">
           {player ? "Edit Profile" : "Set Up Profile"}
         </h3>
@@ -217,7 +217,7 @@ export default function ProfilePage() {
               type="text"
               value={firstName}
               onChange={(e) => setFirstName(e.target.value)}
-              className="w-full bg-surface-container-high border border-outline-variant/40 rounded-lg px-4 py-3 text-on-surface font-body text-sm focus:outline-none focus:border-primary transition-colors"
+              className="w-full bg-white/[0.04] border border-white/[0.08] rounded-lg px-4 py-3 text-on-surface font-body text-sm focus:outline-none focus:border-primary transition-colors"
               placeholder="Ryan"
             />
           </div>
@@ -231,7 +231,7 @@ export default function ProfilePage() {
               type="text"
               value={lastName}
               onChange={(e) => setLastName(e.target.value)}
-              className="w-full bg-surface-container-high border border-outline-variant/40 rounded-lg px-4 py-3 text-on-surface font-body text-sm focus:outline-none focus:border-primary transition-colors"
+              className="w-full bg-white/[0.04] border border-white/[0.08] rounded-lg px-4 py-3 text-on-surface font-body text-sm focus:outline-none focus:border-primary transition-colors"
               placeholder="Boshaw"
             />
           </div>
@@ -245,7 +245,7 @@ export default function ProfilePage() {
               type="text"
               value={displayName}
               onChange={(e) => setDisplayName(e.target.value)}
-              className="w-full bg-surface-container-high border border-outline-variant/40 rounded-lg px-4 py-3 text-on-surface font-body text-sm focus:outline-none focus:border-primary transition-colors"
+              className="w-full bg-white/[0.04] border border-white/[0.08] rounded-lg px-4 py-3 text-on-surface font-body text-sm focus:outline-none focus:border-primary transition-colors"
               placeholder="Ryan B."
             />
             <p className="text-[11px] text-on-surface-variant mt-1">
@@ -264,7 +264,7 @@ export default function ProfilePage() {
               max="54"
               value={handicap}
               onChange={(e) => setHandicap(e.target.value)}
-              className="w-full bg-surface-container-high border border-outline-variant/40 rounded-lg px-4 py-3 text-on-surface font-body text-sm focus:outline-none focus:border-primary transition-colors"
+              className="w-full bg-white/[0.04] border border-white/[0.08] rounded-lg px-4 py-3 text-on-surface font-body text-sm focus:outline-none focus:border-primary transition-colors"
               placeholder="18"
             />
             <p className="text-[11px] text-on-surface-variant mt-1">
@@ -288,14 +288,14 @@ export default function ProfilePage() {
 
       {/* Stats Card (if registered) */}
       {player && player.group > 0 && (
-        <div className="bg-surface-container-high rounded-xl p-4 mt-6">
+        <div className="bg-white/[0.06] backdrop-blur-xl border border-white/[0.08] rounded-xl p-4 mt-6">
           <h3 className="font-headline text-lg text-on-surface mb-3">Tournament Info</h3>
           <div className="grid grid-cols-2 gap-3">
-            <div className="bg-surface-container rounded-lg p-3 text-center">
+            <div className="bg-white/[0.04] border border-white/[0.06] rounded-lg p-3 text-center">
               <p className="text-xs text-on-surface-variant uppercase tracking-wider mb-1">Group</p>
               <p className="font-headline text-xl text-secondary">{player.group}</p>
             </div>
-            <div className="bg-surface-container rounded-lg p-3 text-center">
+            <div className="bg-white/[0.04] border border-white/[0.06] rounded-lg p-3 text-center">
               <p className="text-xs text-on-surface-variant uppercase tracking-wider mb-1">Handicap</p>
               <p className="font-headline text-xl text-on-surface">{player.handicap}</p>
             </div>
@@ -306,7 +306,7 @@ export default function ProfilePage() {
       {/* Sign Out */}
       <button
         onClick={() => signOut()}
-        className="mt-6 w-full flex items-center justify-center gap-2 border border-outline-variant/40 text-on-surface-variant font-label font-bold uppercase tracking-widest text-xs py-3 rounded-xl hover:bg-surface-container-high/50 transition-colors"
+        className="mt-6 w-full flex items-center justify-center gap-2 border border-white/[0.1] bg-white/[0.04] text-on-surface-variant font-label font-bold uppercase tracking-widest text-xs py-3 rounded-xl hover:bg-white/[0.08] transition-colors"
       >
         Sign Out
         <span className="material-symbols-outlined text-base">logout</span>

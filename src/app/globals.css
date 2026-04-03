@@ -114,13 +114,10 @@ body {
   font-variation-settings: "FILL" 0, "wght" 400, "GRAD" 0, "opsz" 24;
 }
 
-/* Glass nav effect */
-.glass-nav {
-  background: rgba(38, 56, 51, 0.6);
-  backdrop-filter: blur(20px);
-}
-
-/* Recessed card background */
-.recessed-card {
-  background-color: #01110d;
+/* Glass card utility with Safari fallback */
+.glass-card {
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
 }
