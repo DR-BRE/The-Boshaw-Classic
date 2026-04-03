@@ -1,10 +1,26 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
 import Link from "next/link";
 
 export default function TopBar() {
-  const { data: session } = useSession();
+  const { data: session, status } = useSession();
+  const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (status !== "authenticated") return;
+    fetch("/api/profile")
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.player?.avatarUrl) {
+          setAvatarUrl(data.player.avatarUrl);
+        }
+      })
+      .catch(() => {});
+  }, [status]);
+
+  const profileImage = avatarUrl || session?.user?.image;
 
   return (
     <header className="fixed top-0 left-0 right-0 z-50 bg-[#051612] flex justify-between items-center w-full px-6 py-4">
@@ -17,10 +33,10 @@ export default function TopBar() {
         </Link>
       </div>
       <div className="flex items-center gap-3">
-        {session?.user?.image ? (
+        {profileImage ? (
           <Link href="/profile">
             <img
-              src={session.user.image}
+              src={profileImage}
               alt="Profile"
               className="w-10 h-10 rounded-full border border-outline-variant/30 object-cover"
             />
