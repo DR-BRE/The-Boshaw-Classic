@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useSession } from "next-auth/react";
 import type { ScorecardData, ScorecardPlayer } from "@/lib/types/scorecard";
 
 type ViewMode = "card" | "classic";
@@ -57,116 +58,245 @@ function scoreLabelColor(score: number | null, par: number) {
 
 // ─── Card View ─────────────────────────────────────────
 
+function formatToPar(n: number) {
+  if (n === 0) return "E";
+  return n > 0 ? `+${n}` : `${n}`;
+}
+
+function toParColor(n: number) {
+  if (n < 0) return "text-primary";
+  if (n > 0) return "text-on-error-container";
+  return "text-on-surface";
+}
+
+function HoleRow({
+  hole,
+  par,
+  score,
+  isOwnCard,
+  onIncrement,
+  onDecrement,
+}: {
+  hole: number;
+  par: number;
+  score: number | null;
+  isOwnCard: boolean;
+  onIncrement: () => void;
+  onDecrement: () => void;
+}) {
+  const diff = score !== null ? score - par : null;
+
+  return (
+    <div className="flex items-center py-3 px-4 border-b border-white/[0.04]">
+      {/* Hole number */}
+      <span className="w-8 font-headline text-lg font-bold text-on-surface tabular-nums">
+        {hole}
+      </span>
+
+      {/* Par info */}
+      <div className="w-16">
+        <p className="font-label text-sm font-bold text-on-surface">Par {par}</p>
+      </div>
+
+      {/* Score display */}
+      <span className={`w-10 text-center font-headline text-lg font-bold tabular-nums ${score !== null ? scoreColor(score, par) : "text-on-surface-variant"}`}>
+        {score !== null ? score : "—"}
+      </span>
+
+      {/* +/- buttons (only for own card) */}
+      {isOwnCard ? (
+        <div className="flex items-center gap-2 ml-auto">
+          <button
+            onClick={onDecrement}
+            disabled={score === null || score <= 1}
+            className="w-10 h-10 rounded-full bg-white/[0.06] border border-white/[0.08] flex items-center justify-center active:scale-90 transition-transform disabled:opacity-30"
+          >
+            <span className="material-symbols-outlined text-on-surface text-lg">remove</span>
+          </button>
+          <span className={`w-6 text-center font-headline text-lg font-bold tabular-nums ${score !== null ? scoreColor(score, par) : "text-on-surface-variant"}`}>
+            {score !== null ? score : "·"}
+          </span>
+          <button
+            onClick={onIncrement}
+            disabled={score !== null && score >= 15}
+            className="w-10 h-10 rounded-full bg-white/[0.06] border border-white/[0.08] flex items-center justify-center active:scale-90 transition-transform disabled:opacity-30"
+          >
+            <span className="material-symbols-outlined text-on-surface text-lg">add</span>
+          </button>
+        </div>
+      ) : (
+        <span className="ml-auto w-10" />
+      )}
+
+      {/* +/- to par */}
+      <span className={`w-10 text-right font-label text-sm font-bold tabular-nums ${diff !== null ? (diff < 0 ? "text-primary" : diff > 0 ? "text-on-error-container" : "text-on-surface-variant") : "text-on-surface-variant"}`}>
+        {diff !== null ? (diff === 0 ? "E" : diff > 0 ? `+${diff}` : diff) : "—"}
+      </span>
+    </div>
+  );
+}
+
 function CardView({
   players,
   holePars,
-  currentHole,
-  setCurrentHole,
+  selectedPlayer,
+  setSelectedPlayer,
+  currentUserId,
+  onScoreChange,
 }: {
   players: ScorecardPlayer[];
   holePars: number[];
-  currentHole: number;
-  setCurrentHole: (h: number) => void;
+  selectedPlayer: number;
+  setSelectedPlayer: (i: number) => void;
+  currentUserId: string | null;
+  onScoreChange: (playerIdx: number, holeIdx: number, delta: number) => void;
 }) {
-  const par = holePars[currentHole];
-  const isFirst = currentHole === 0;
-  const isLast = currentHole === 17;
+  const player = players[selectedPlayer];
+  if (!player) return null;
+
+  const isOwnCard = player.id === currentUserId;
+  const frontPars = holePars.slice(0, 9);
+  const backPars = holePars.slice(9);
+  const frontPar = frontPars.reduce((s, p) => s + p, 0);
+  const backPar = backPars.reduce((s, p) => s + p, 0);
+
+  const frontScores = player.scores.slice(0, 9);
+  const backScores = player.scores.slice(9);
+  const frontTotal = frontScores.every((s) => s !== null)
+    ? frontScores.reduce((s, v) => s! + v!, 0)
+    : null;
+  const backTotal = backScores.every((s) => s !== null)
+    ? backScores.reduce((s, v) => s! + v!, 0)
+    : null;
+  const gross = frontTotal !== null && backTotal !== null ? frontTotal + backTotal : null;
+  const toPar = gross !== null ? gross - (frontPar + backPar) : null;
+  const net = player.net;
 
   return (
     <div>
-      {/* Hole Selector Pills */}
-      <div className="flex gap-1.5 overflow-x-auto pb-3 mb-4 -mx-1 px-1">
-        {Array.from({ length: 18 }, (_, i) => {
-          const active = i === currentHole;
+      {/* Player Selector — horizontal scroll */}
+      <p className="font-label text-xs text-on-surface-variant uppercase tracking-widest mb-2">
+        Your Scorecard
+      </p>
+      <div className="flex gap-2 overflow-x-auto pb-3 mb-4 -mx-1 px-1">
+        {players.map((p, i) => {
+          const active = i === selectedPlayer;
+          const initials = p.displayName
+            .split(" ")
+            .map((n) => n[0])
+            .join("")
+            .toUpperCase();
           return (
             <button
-              key={i}
-              onClick={() => setCurrentHole(i)}
-              className={`flex-shrink-0 w-9 h-9 rounded-lg font-label text-xs font-bold transition-all active:scale-90 ${
+              key={p.id}
+              onClick={() => setSelectedPlayer(i)}
+              className={`flex-shrink-0 flex flex-col items-center gap-1 px-3 py-2 rounded-xl transition-all active:scale-95 min-w-[72px] ${
                 active
-                  ? "bg-secondary text-on-secondary"
-                  : "bg-white/[0.06] text-on-surface-variant"
+                  ? "bg-white/[0.1] border border-secondary/40"
+                  : "bg-white/[0.04] border border-white/[0.06]"
               }`}
             >
-              {i + 1}
+              <div
+                className={`w-9 h-9 rounded-full flex items-center justify-center text-xs font-bold ${
+                  active
+                    ? "bg-secondary text-on-secondary"
+                    : "bg-white/[0.08] text-on-surface-variant"
+                }`}
+              >
+                {initials}
+              </div>
+              <span
+                className={`font-label text-[9px] font-bold truncate max-w-[64px] ${
+                  active ? "text-secondary" : "text-on-surface-variant"
+                }`}
+              >
+                {p.displayName}
+              </span>
             </button>
           );
         })}
       </div>
 
-      {/* Hole Info Header */}
-      <div className="bg-white/[0.06] backdrop-blur-xl border border-white/[0.08] rounded-2xl p-5 mb-4">
-        <div className="flex justify-between items-center mb-5">
+      {/* Summary Bar */}
+      <div className="bg-white/[0.06] backdrop-blur-xl border border-white/[0.08] rounded-xl p-3 mb-4">
+        <div className="flex justify-around text-center">
           <div>
-            <p className="font-label text-xs text-on-surface-variant uppercase tracking-widest">
-              {currentHole < 9 ? "Front 9" : "Back 9"}
+            <p className="font-label text-[10px] text-on-surface-variant uppercase tracking-widest">Front</p>
+            <p className={`font-headline text-lg font-bold tabular-nums ${frontTotal !== null ? "text-on-surface" : "text-on-surface-variant"}`}>
+              {frontTotal !== null ? frontTotal : "—"}
             </p>
-            <h3 className="font-headline text-3xl text-on-surface">
-              Hole {currentHole + 1}
-            </h3>
           </div>
-          <div className="text-right">
-            <p className="font-label text-xs text-on-surface-variant uppercase tracking-widest">
-              Par
+          <div>
+            <p className="font-label text-[10px] text-on-surface-variant uppercase tracking-widest">Back</p>
+            <p className={`font-headline text-lg font-bold tabular-nums ${backTotal !== null ? "text-on-surface" : "text-on-surface-variant"}`}>
+              {backTotal !== null ? backTotal : "—"}
             </p>
-            <p className="font-headline text-3xl text-secondary">{par}</p>
           </div>
-        </div>
-
-        {/* Player Scores */}
-        <div className="space-y-2.5">
-          {players.map((player) => {
-            const score = player.scores[currentHole];
-            return (
-              <div
-                key={player.id}
-                className="flex items-center justify-between bg-white/[0.04] border border-white/[0.06] rounded-xl px-4 py-3"
-              >
-                <div className="flex items-center gap-2.5">
-                  <span
-                    className={`w-2.5 h-2.5 rounded-full flex-shrink-0 ${groupDotColor(player.group)}`}
-                  />
-                  <span className="font-label text-sm font-bold text-on-surface">
-                    {player.displayName}
-                  </span>
-                  <span className="font-label text-[10px] text-on-surface-variant">
-                    ({player.handicap})
-                  </span>
-                </div>
-                <div className="flex items-center gap-3">
-                  <span className={`font-label text-[10px] font-bold uppercase tracking-wider ${scoreLabelColor(score, par)}`}>
-                    {scoreLabel(score, par)}
-                  </span>
-                  <div className={`w-10 h-10 rounded-lg border flex items-center justify-center ${scoreBg(score, par)}`}>
-                    <span className={`font-headline text-lg font-bold tabular-nums ${scoreColor(score, par)}`}>
-                      {score !== null ? score : "—"}
-                    </span>
-                  </div>
-                </div>
-              </div>
-            );
-          })}
+          <div>
+            <p className="font-label text-[10px] text-on-surface-variant uppercase tracking-widest">+/−</p>
+            <p className={`font-headline text-lg font-bold tabular-nums ${toPar !== null ? toParColor(toPar) : "text-on-surface-variant"}`}>
+              {toPar !== null ? formatToPar(toPar) : "—"}
+            </p>
+          </div>
+          <div>
+            <p className="font-label text-[10px] text-on-surface-variant uppercase tracking-widest">Gross</p>
+            <p className={`font-headline text-lg font-bold tabular-nums ${gross !== null ? "text-on-surface" : "text-on-surface-variant"}`}>
+              {gross !== null ? gross : "—"}
+            </p>
+          </div>
+          <div>
+            <p className="font-label text-[10px] text-on-surface-variant uppercase tracking-widest">Net</p>
+            <p className={`font-headline text-lg font-bold tabular-nums ${net !== null ? "text-on-surface" : "text-on-surface-variant"}`}>
+              {net !== null ? net : "—"}
+            </p>
+          </div>
         </div>
       </div>
 
-      {/* Navigation */}
-      <div className="flex gap-3">
-        <button
-          onClick={() => !isFirst && setCurrentHole(currentHole - 1)}
-          disabled={isFirst}
-          className="flex-1 flex items-center justify-center gap-2 py-3 rounded-xl border border-white/[0.1] bg-white/[0.04] font-label font-bold text-sm uppercase tracking-wider text-on-surface disabled:opacity-30 active:scale-95 transition-transform"
-        >
-          <span className="material-symbols-outlined text-lg">arrow_back</span>
-          Prev
-        </button>
-        <button
-          onClick={() => !isLast && setCurrentHole(currentHole + 1)}
-          disabled={isLast}
-          className="flex-1 flex items-center justify-center gap-2 py-3 rounded-xl border border-white/[0.1] bg-white/[0.04] font-label font-bold text-sm uppercase tracking-wider text-on-surface disabled:opacity-30 active:scale-95 transition-transform"
-        >
-          Next
-          <span className="material-symbols-outlined text-lg">arrow_forward</span>
-        </button>
+      {/* Front 9 */}
+      <div className="bg-white/[0.06] backdrop-blur-xl border border-white/[0.08] rounded-2xl overflow-hidden mb-4">
+        <div className="flex justify-between items-center bg-secondary px-4 py-2">
+          <h3 className="font-headline text-on-secondary text-sm font-bold uppercase tracking-wider">
+            Front 9
+          </h3>
+          <span className="font-headline text-on-secondary text-sm font-bold">
+            par {frontPar}
+          </span>
+        </div>
+        {frontPars.map((par, i) => (
+          <HoleRow
+            key={i}
+            hole={i + 1}
+            par={par}
+            score={player.scores[i]}
+            isOwnCard={isOwnCard}
+            onIncrement={() => onScoreChange(selectedPlayer, i, 1)}
+            onDecrement={() => onScoreChange(selectedPlayer, i, -1)}
+          />
+        ))}
+      </div>
+
+      {/* Back 9 */}
+      <div className="bg-white/[0.06] backdrop-blur-xl border border-white/[0.08] rounded-2xl overflow-hidden mb-4">
+        <div className="flex justify-between items-center bg-secondary px-4 py-2">
+          <h3 className="font-headline text-on-secondary text-sm font-bold uppercase tracking-wider">
+            Back 9
+          </h3>
+          <span className="font-headline text-on-secondary text-sm font-bold">
+            par {backPar}
+          </span>
+        </div>
+        {backPars.map((par, i) => (
+          <HoleRow
+            key={i + 9}
+            hole={i + 10}
+            par={par}
+            score={player.scores[i + 9]}
+            isOwnCard={isOwnCard}
+            onIncrement={() => onScoreChange(selectedPlayer, i + 9, 1)}
+            onDecrement={() => onScoreChange(selectedPlayer, i + 9, -1)}
+          />
+        ))}
       </div>
     </div>
   );
@@ -419,11 +549,25 @@ function SummaryTable({
 }
 
 export default function ScorecardPage() {
+  const { data: session } = useSession();
   const [view, setView] = useState<ViewMode>("card");
   const [round, setRound] = useState("1");
-  const [currentHole, setCurrentHole] = useState(0);
+  const [selectedPlayer, setSelectedPlayer] = useState(0);
   const [data, setData] = useState<ScorecardData | null>(null);
   const [loading, setLoading] = useState(true);
+  const [currentUserId, setCurrentUserId] = useState<string | null>(null);
+  const [saving, setSaving] = useState(false);
+
+  // Fetch current user's player ID
+  useEffect(() => {
+    if (!session) return;
+    fetch("/api/profile")
+      .then((res) => res.json())
+      .then((d) => {
+        if (d.player?.id) setCurrentUserId(d.player.id);
+      })
+      .catch(() => {});
+  }, [session]);
 
   useEffect(() => {
     setLoading(true);
@@ -431,10 +575,47 @@ export default function ScorecardPage() {
       .then((res) => res.json())
       .then((d) => {
         setData(d);
+        setSelectedPlayer(0);
         setLoading(false);
       })
       .catch(() => setLoading(false));
   }, [round]);
+
+  // Handle score change from card view +/- buttons
+  function handleScoreChange(playerIdx: number, holeIdx: number, delta: number) {
+    if (!data) return;
+    const player = data.players[playerIdx];
+    if (player.id !== currentUserId) return; // only edit own scores
+    const current = player.scores[holeIdx];
+    if (current === null) return;
+    const next = Math.max(1, Math.min(15, current + delta));
+    if (next === current) return;
+
+    // Optimistic update
+    const newPlayers = data.players.map((p, pi) => {
+      if (pi !== playerIdx) return p;
+      const newScores = [...p.scores];
+      newScores[holeIdx] = next;
+      const front9 = newScores.slice(0, 9).every((s) => s !== null)
+        ? newScores.slice(0, 9).reduce((sum, s) => sum! + s!, 0)
+        : null;
+      const back9 = newScores.slice(9).every((s) => s !== null)
+        ? newScores.slice(9).reduce((sum, s) => sum! + s!, 0)
+        : null;
+      const gross = front9 !== null && back9 !== null ? front9 + back9 : null;
+      return { ...p, scores: newScores, front9, back9, gross };
+    });
+    setData({ ...data, players: newPlayers });
+
+    // Save to server (debounced-ish: fire and forget)
+    const allScores = newPlayers[playerIdx].scores as number[];
+    setSaving(true);
+    fetch("/api/scores", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ round: Number(round), holes: allScores }),
+    }).finally(() => setSaving(false));
+  }
 
   const frontPar = data
     ? data.course.holes.slice(0, 9).reduce((s, p) => s + p, 0)
@@ -455,7 +636,7 @@ export default function ScorecardPage() {
         {ROUNDS.map((r) => (
           <button
             key={r.value}
-            onClick={() => { setRound(r.value); setCurrentHole(0); }}
+            onClick={() => { setRound(r.value); setSelectedPlayer(0); }}
             className={`flex-1 py-2.5 rounded-lg font-label text-xs font-bold uppercase tracking-wider transition-all active:scale-95 ${
               round === r.value
                 ? "bg-white/[0.1] text-primary"
@@ -535,8 +716,10 @@ export default function ScorecardPage() {
             <CardView
               players={data.players}
               holePars={data.course.holes}
-              currentHole={currentHole}
-              setCurrentHole={setCurrentHole}
+              selectedPlayer={selectedPlayer}
+              setSelectedPlayer={setSelectedPlayer}
+              currentUserId={currentUserId}
+              onScoreChange={handleScoreChange}
             />
           ) : (
             <>
