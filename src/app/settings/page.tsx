@@ -1,0 +1,243 @@
+"use client";
+
+import { useEffect, useState } from "react";
+
+type Settings = {
+  defaultRound: "1" | "2";
+  scorecardView: "card" | "classic";
+  notifyLeaderboard: boolean;
+  notifyScores: boolean;
+};
+
+const DEFAULT_SETTINGS: Settings = {
+  defaultRound: "1",
+  scorecardView: "card",
+  notifyLeaderboard: true,
+  notifyScores: true,
+};
+
+function loadSettings(): Settings {
+  if (typeof window === "undefined") return DEFAULT_SETTINGS;
+  try {
+    const raw = localStorage.getItem("boshaw-settings");
+    if (raw) return { ...DEFAULT_SETTINGS, ...JSON.parse(raw) };
+  } catch {}
+  return DEFAULT_SETTINGS;
+}
+
+function saveSettings(settings: Settings) {
+  localStorage.setItem("boshaw-settings", JSON.stringify(settings));
+}
+
+function Toggle({
+  enabled,
+  onChange,
+}: {
+  enabled: boolean;
+  onChange: (v: boolean) => void;
+}) {
+  return (
+    <button
+      onClick={() => onChange(!enabled)}
+      className={`relative w-11 h-6 rounded-full transition-colors duration-200 ${
+        enabled ? "bg-secondary" : "bg-white/[0.1]"
+      }`}
+    >
+      <div
+        className={`absolute top-0.5 left-0.5 w-5 h-5 rounded-full bg-white shadow transition-transform duration-200 ${
+          enabled ? "translate-x-5" : "translate-x-0"
+        }`}
+      />
+    </button>
+  );
+}
+
+function SegmentedToggle({
+  options,
+  value,
+  onChange,
+}: {
+  options: { label: string; value: string }[];
+  value: string;
+  onChange: (v: string) => void;
+}) {
+  return (
+    <div className="bg-white/[0.06] border border-white/[0.06] rounded-xl p-1 flex gap-1">
+      {options.map((opt) => (
+        <button
+          key={opt.value}
+          onClick={() => onChange(opt.value)}
+          className={`flex-1 py-2 rounded-lg font-label text-xs font-bold uppercase tracking-wider transition-all active:scale-95 ${
+            value === opt.value
+              ? "bg-white/[0.1] text-primary"
+              : "text-on-surface-variant"
+          }`}
+        >
+          {opt.label}
+        </button>
+      ))}
+    </div>
+  );
+}
+
+export default function SettingsPage() {
+  const [settings, setSettings] = useState<Settings>(DEFAULT_SETTINGS);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setSettings(loadSettings());
+    setMounted(true);
+  }, []);
+
+  function update(patch: Partial<Settings>) {
+    const next = { ...settings, ...patch };
+    setSettings(next);
+    saveSettings(next);
+  }
+
+  if (!mounted) {
+    return (
+      <div className="px-4 py-6">
+        <h2 className="font-headline text-3xl text-on-surface mb-6">
+          Settings
+        </h2>
+        <div className="bg-white/[0.06] animate-pulse rounded-xl h-48" />
+      </div>
+    );
+  }
+
+  return (
+    <div className="px-4 py-6 pb-24">
+      <h2 className="font-headline text-3xl text-on-surface mb-6">Settings</h2>
+
+      {/* Preferences */}
+      <div className="bg-white/[0.06] backdrop-blur-xl border border-white/[0.08] rounded-2xl p-5 mb-5">
+        <h3 className="font-headline text-lg text-on-surface mb-4">
+          Preferences
+        </h3>
+
+        <div className="space-y-5">
+          {/* Default Round */}
+          <div>
+            <label className="block font-label text-xs text-on-surface-variant uppercase tracking-widest mb-2">
+              Default Round
+            </label>
+            <SegmentedToggle
+              options={[
+                { label: "Round 1", value: "1" },
+                { label: "Round 2", value: "2" },
+              ]}
+              value={settings.defaultRound}
+              onChange={(v) => update({ defaultRound: v as "1" | "2" })}
+            />
+            <p className="text-[11px] text-on-surface-variant mt-1.5">
+              Which round to show by default on scorecard and scoring pages
+            </p>
+          </div>
+
+          {/* Scorecard View */}
+          <div>
+            <label className="block font-label text-xs text-on-surface-variant uppercase tracking-widest mb-2">
+              Scorecard View
+            </label>
+            <SegmentedToggle
+              options={[
+                { label: "Card", value: "card" },
+                { label: "Classic", value: "classic" },
+              ]}
+              value={settings.scorecardView}
+              onChange={(v) =>
+                update({ scorecardView: v as "card" | "classic" })
+              }
+            />
+            <p className="text-[11px] text-on-surface-variant mt-1.5">
+              Your preferred scorecard layout
+            </p>
+          </div>
+        </div>
+      </div>
+
+      {/* Notifications */}
+      <div className="bg-white/[0.06] backdrop-blur-xl border border-white/[0.08] rounded-2xl p-5 mb-5">
+        <h3 className="font-headline text-lg text-on-surface mb-4">
+          Notifications
+        </h3>
+
+        <div className="space-y-4">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="font-label text-sm font-bold text-on-surface">
+                Leaderboard Updates
+              </p>
+              <p className="text-[11px] text-on-surface-variant">
+                When someone takes the lead
+              </p>
+            </div>
+            <Toggle
+              enabled={settings.notifyLeaderboard}
+              onChange={(v) => update({ notifyLeaderboard: v })}
+            />
+          </div>
+
+          <div className="border-t border-white/[0.06]" />
+
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="font-label text-sm font-bold text-on-surface">
+                Score Submissions
+              </p>
+              <p className="text-[11px] text-on-surface-variant">
+                When a player submits their round
+              </p>
+            </div>
+            <Toggle
+              enabled={settings.notifyScores}
+              onChange={(v) => update({ notifyScores: v })}
+            />
+          </div>
+        </div>
+      </div>
+
+      {/* About */}
+      <div className="bg-white/[0.06] backdrop-blur-xl border border-white/[0.08] rounded-2xl p-5">
+        <h3 className="font-headline text-lg text-on-surface mb-4">About</h3>
+
+        <div className="space-y-3">
+          <div className="flex justify-between items-center">
+            <span className="font-label text-sm text-on-surface-variant">
+              Tournament
+            </span>
+            <span className="font-label text-sm text-on-surface">
+              The Boshaw Classic
+            </span>
+          </div>
+          <div className="border-t border-white/[0.06]" />
+          <div className="flex justify-between items-center">
+            <span className="font-label text-sm text-on-surface-variant">
+              Location
+            </span>
+            <span className="font-label text-sm text-on-surface">
+              Lake Chelan, WA
+            </span>
+          </div>
+          <div className="border-t border-white/[0.06]" />
+          <div className="flex justify-between items-center">
+            <span className="font-label text-sm text-on-surface-variant">
+              Date
+            </span>
+            <span className="font-label text-sm text-on-surface">
+              May 2026
+            </span>
+          </div>
+          <div className="border-t border-white/[0.06]" />
+          <div className="flex justify-between items-center">
+            <span className="font-label text-sm text-on-surface-variant">
+              Version
+            </span>
+            <span className="font-label text-sm text-on-surface">v1.0</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}

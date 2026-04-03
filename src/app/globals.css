@@ -1,0 +1,123 @@
+@import "tailwindcss";
+
+:root {
+  /* M3 Surface */
+  --background: #051612;
+  --surface: #051612;
+  --surface-dim: #051612;
+  --surface-container-lowest: #01110d;
+  --surface-container-low: #0d1f1a;
+  --surface-container: #11231e;
+  --surface-container-high: #1b2d29;
+  --surface-container-highest: #263833;
+  --surface-bright: #2b3d38;
+  --surface-variant: #263833;
+
+  /* M3 Primary */
+  --primary: #a9cfbf;
+  --primary-container: #062b21;
+  --primary-fixed: #c5ebdb;
+  --primary-fixed-dim: #a9cfbf;
+  --on-primary: #13362c;
+  --on-primary-container: #709486;
+  --on-primary-fixed: #002118;
+  --inverse-primary: #436559;
+
+  /* M3 Secondary (Gold) */
+  --secondary: #e9c349;
+  --secondary-container: #af8d11;
+  --secondary-fixed: #ffe088;
+  --on-secondary: #3c2f00;
+  --on-secondary-container: #342800;
+  --on-secondary-fixed: #241a00;
+  --on-secondary-fixed-variant: #574500;
+
+  /* M3 Tertiary */
+  --tertiary: #c6c6c7;
+  --tertiary-fixed: #e2e2e2;
+  --tertiary-fixed-dim: #c6c6c7;
+  --on-tertiary: #2f3131;
+  --on-tertiary-fixed: #1a1c1c;
+  --on-tertiary-fixed-variant: #454747;
+
+  /* M3 Surface text */
+  --on-surface: #d2e7e0;
+  --on-surface-variant: #c1c8c3;
+  --inverse-surface: #d2e7e0;
+  --inverse-on-surface: #22342f;
+
+  /* M3 Outline */
+  --outline: #8b928e;
+  --outline-variant: #414845;
+
+  /* M3 Error */
+  --on-error: #690005;
+  --on-error-container: #ffdad6;
+
+  /* Surface tint */
+  --surface-tint: #a9cfbf;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-surface: var(--surface);
+  --color-surface-dim: var(--surface-dim);
+  --color-surface-container-lowest: var(--surface-container-lowest);
+  --color-surface-container-low: var(--surface-container-low);
+  --color-surface-container: var(--surface-container);
+  --color-surface-container-high: var(--surface-container-high);
+  --color-surface-container-highest: var(--surface-container-highest);
+  --color-surface-bright: var(--surface-bright);
+  --color-surface-variant: var(--surface-variant);
+
+  --color-primary: var(--primary);
+  --color-primary-container: var(--primary-container);
+  --color-on-primary: var(--on-primary);
+  --color-on-primary-container: var(--on-primary-container);
+
+  --color-secondary: var(--secondary);
+  --color-secondary-container: var(--secondary-container);
+  --color-on-secondary: var(--on-secondary);
+  --color-on-secondary-container: var(--on-secondary-container);
+
+  --color-tertiary: var(--tertiary);
+  --color-on-tertiary: var(--on-tertiary);
+
+  --color-on-surface: var(--on-surface);
+  --color-on-surface-variant: var(--on-surface-variant);
+  --color-inverse-surface: var(--inverse-surface);
+  --color-inverse-on-surface: var(--inverse-on-surface);
+
+  --color-outline: var(--outline);
+  --color-outline-variant: var(--outline-variant);
+
+  --color-on-error: var(--on-error);
+  --color-on-error-container: var(--on-error-container);
+
+  --color-surface-tint: var(--surface-tint);
+
+  --font-headline: "Noto Serif", serif;
+  --font-body: "Manrope", sans-serif;
+  --font-label: "Manrope", sans-serif;
+}
+
+body {
+  background: var(--background);
+  color: var(--on-surface);
+  font-family: var(--font-body);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Material Symbols config */
+.material-symbols-outlined {
+  font-variation-settings: "FILL" 0, "wght" 400, "GRAD" 0, "opsz" 24;
+}
+
+/* Glass card utility with Safari fallback */
+.glass-card {
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+}
