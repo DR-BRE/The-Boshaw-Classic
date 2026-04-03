@@ -37,6 +37,7 @@ export async function GET(request: Request) {
         return {
           id: player.id,
           displayName: player.displayName,
+          avatarUrl: player.avatarUrl,
           handicap: player.handicap,
           group: player.group,
           scores: Array(18).fill(null),
@@ -56,6 +57,7 @@ export async function GET(request: Request) {
       return {
         id: player.id,
         displayName: player.displayName,
+        avatarUrl: player.avatarUrl,
         handicap: player.handicap,
         group: player.group,
         scores: holes,

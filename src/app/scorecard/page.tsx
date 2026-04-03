@@ -187,15 +187,25 @@ function CardView({
                   : "bg-white/[0.04] border border-white/[0.06]"
               }`}
             >
-              <div
-                className={`w-9 h-9 rounded-full flex items-center justify-center text-xs font-bold ${
-                  active
-                    ? "bg-secondary text-on-secondary"
-                    : "bg-white/[0.08] text-on-surface-variant"
-                }`}
-              >
-                {initials}
-              </div>
+              {p.avatarUrl ? (
+                <img
+                  src={p.avatarUrl}
+                  alt={p.displayName}
+                  className={`w-9 h-9 rounded-full object-cover border-2 ${
+                    active ? "border-secondary" : "border-white/[0.08]"
+                  }`}
+                />
+              ) : (
+                <div
+                  className={`w-9 h-9 rounded-full flex items-center justify-center text-xs font-bold ${
+                    active
+                      ? "bg-secondary text-on-secondary"
+                      : "bg-white/[0.08] text-on-surface-variant"
+                  }`}
+                >
+                  {initials}
+                </div>
+              )}
               <span
                 className={`font-label text-[9px] font-bold truncate max-w-[64px] ${
                   active ? "text-secondary" : "text-on-surface-variant"

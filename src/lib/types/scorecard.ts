@@ -1,6 +1,7 @@
 export interface ScorecardPlayer {
   id: string;
   displayName: string;
+  avatarUrl: string | null;
   handicap: number;
   group: number;
   scores: (number | null)[];
