@@ -42,11 +42,6 @@ export default function Home() {
           {/* Logo spacer — scaled down ~18% */}
           <div className="h-[37vh]" />
 
-          {/* Tagline */}
-          <p className="font-headline italic text-secondary/90 text-sm tracking-[0.15em] mb-3">
-            The Weekend of Legends
-          </p>
-
           {/* Main heading */}
           <h1 className="font-headline text-on-surface text-5xl sm:text-6xl font-bold uppercase tracking-tight leading-none mb-6">
             {"RYAN'S FINAL"}
