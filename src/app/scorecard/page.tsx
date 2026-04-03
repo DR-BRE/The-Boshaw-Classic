@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
 import type { ScorecardData, ScorecardPlayer } from "@/lib/types/scorecard";
+import { COURSE_PARS } from "@/lib/tournament";
 
 type ViewMode = "card" | "classic";
 
@@ -147,12 +148,14 @@ function HoleRow({
 function CardView({
   players,
   holePars,
+  strokeIndices,
   selectedPlayer,
   setSelectedPlayer,
   onScoreChange,
 }: {
   players: ScorecardPlayer[];
   holePars: number[];
+  strokeIndices: readonly number[];
   selectedPlayer: number;
   setSelectedPlayer: (i: number) => void;
   onScoreChange: (playerIdx: number, holeIdx: number, delta: number) => void;
@@ -162,6 +165,8 @@ function CardView({
 
   const frontPars = holePars.slice(0, 9);
   const backPars = holePars.slice(9);
+  const frontIndices = strokeIndices.slice(0, 9);
+  const backIndices = strokeIndices.slice(9);
   const frontPar = frontPars.reduce((s, p) => s + p, 0);
   const backPar = backPars.reduce((s, p) => s + p, 0);
 
@@ -285,7 +290,7 @@ function CardView({
             hole={i + 1}
             par={par}
             score={player.scores[i]}
-            handicap={player.handicap}
+            handicap={frontIndices[i]}
             onIncrement={() => onScoreChange(selectedPlayer, i, 1)}
             onDecrement={() => onScoreChange(selectedPlayer, i, -1)}
           />
@@ -309,7 +314,7 @@ function CardView({
             hole={i + 10}
             par={par}
             score={player.scores[i + 9]}
-            handicap={player.handicap}
+            handicap={backIndices[i]}
             onIncrement={() => onScoreChange(selectedPlayer, i + 9, 1)}
             onDecrement={() => onScoreChange(selectedPlayer, i + 9, -1)}
           />
@@ -733,6 +738,7 @@ export default function ScorecardPage() {
             <CardView
               players={data.players}
               holePars={data.course.holes}
+              strokeIndices={COURSE_PARS[data.course.name as keyof typeof COURSE_PARS].strokeIndex}
               selectedPlayer={selectedPlayer}
               setSelectedPlayer={setSelectedPlayer}
               onScoreChange={handleScoreChange}
