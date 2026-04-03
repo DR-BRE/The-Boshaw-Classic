@@ -15,7 +15,7 @@ export default function BottomTabs() {
   const pathname = usePathname();
 
   return (
-    <nav className="fixed bottom-0 left-0 w-full z-50 flex justify-around items-end px-2 pb-5 pt-2 bg-white/[0.06] backdrop-blur-xl border-t border-white/[0.06] rounded-t-2xl shadow-[0_-4px_30px_rgba(0,0,0,0.3)]">
+    <nav className="fixed bottom-0 left-0 w-full z-50 flex justify-around items-end px-2 pb-4 pt-1.5 bg-[#0d1f1a] border-t border-white/[0.06] rounded-t-2xl">
       {tabs.map((tab) => {
         const isActive =
           tab.href === "/"
