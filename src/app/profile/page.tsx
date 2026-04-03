@@ -110,7 +110,7 @@ export default function ProfilePage() {
             href="/api/auth/signin"
             className="inline-flex items-center gap-2 bg-secondary text-on-secondary font-label font-bold uppercase tracking-widest text-sm px-6 py-3 rounded-xl active:scale-95 transition-transform"
           >
-            Sign In with GitHub
+            Sign In with Google
             <span className="material-symbols-outlined text-lg">login</span>
           </Link>
         </div>
