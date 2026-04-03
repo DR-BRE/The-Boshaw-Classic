@@ -1,65 +1,147 @@
-import Image from "next/image";
+"use client";
+
+import { useEffect, useState } from "react";
+import { useSession } from "next-auth/react";
+import Link from "next/link";
+import Countdown from "@/components/Countdown";
+import { TOURNAMENT } from "@/lib/tournament";
+import type { LeaderboardEntry } from "@/lib/types/leaderboard";
+
+function formatToPar(toPar: number) {
+  if (toPar === 0) return "E";
+  return toPar > 0 ? `+${toPar}` : `${toPar}`;
+}
+
+function toParColor(toPar: number) {
+  if (toPar < 0) return "text-primary";
+  if (toPar > 0) return "text-on-error-container";
+  return "text-on-surface";
+}
 
 export default function Home() {
+  const { data: session } = useSession();
+  const [topPlayers, setTopPlayers] = useState<LeaderboardEntry[]>([]);
+
+  useEffect(() => {
+    fetch("/api/leaderboard")
+      .then((res) => res.json())
+      .then((data: LeaderboardEntry[]) => setTopPlayers(data.slice(0, 3)))
+      .catch(() => {});
+  }, []);
+
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
+    <div className="flex flex-col min-h-[calc(100vh-5rem)]">
+      {/* Hero Section */}
+      <section className="relative overflow-hidden px-6 pt-4 pb-10 min-h-[70vh]">
+        {/* Hero background image */}
+        <div className="absolute inset-0 bg-[url('/hero-bg.png')] bg-cover bg-center" />
+        <div className="absolute inset-0 bg-gradient-to-t from-background via-background/50 to-background/30" />
+
+        <div className="relative z-10">
+          {/* Spacer to push content below the image logo */}
+          <div className="h-[45vh]" />
+
+          {/* Tagline */}
+          <p className="font-headline italic text-secondary/90 text-sm tracking-[0.15em] mb-2">
+            The Weekend of Legends
           </p>
+
+          {/* Main heading */}
+          <h1 className="font-headline text-on-surface text-5xl sm:text-6xl font-bold uppercase tracking-tight leading-none mb-8">
+            {"RYAN'S FINAL"}
+            <br />
+            ROUND
+          </h1>
+
+          {/* Countdown */}
+          <div className="mb-8">
+            <Countdown />
+          </div>
+
+          {/* CTA Buttons */}
+          <div className="space-y-3 max-w-sm mx-auto">
+            <Link
+              href={session ? "/scoring" : "/api/auth/signin"}
+              className="flex items-center justify-center gap-2 w-full bg-secondary text-on-secondary font-label font-bold uppercase tracking-widest text-sm py-4 rounded-xl active:scale-95 transition-transform"
+            >
+              SUBMIT SCORE
+              <span className="material-symbols-outlined text-lg">
+                edit_note
+              </span>
+            </Link>
+            <Link
+              href="/leaderboard"
+              className="flex items-center justify-center gap-2 w-full border border-outline-variant/40 text-on-surface font-label font-bold uppercase tracking-widest text-sm py-4 rounded-xl hover:bg-surface-container-high/50 transition-colors"
+            >
+              VIEW SCHEDULE
+              <span className="material-symbols-outlined text-lg">
+                calendar_month
+              </span>
+            </Link>
+          </div>
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+      </section>
+
+      {/* Leaderboard Preview */}
+      <section className="px-6 pb-8">
+        <div className="flex justify-between items-end mb-4">
+          <h3 className="font-headline text-2xl text-on-surface">
+            Leaderboard
+          </h3>
+          <span className="text-xs font-label text-primary uppercase tracking-widest bg-primary-container px-3 py-1 rounded-full">
+            Live Updates
+          </span>
         </div>
-      </main>
+        {topPlayers.length > 0 ? (
+          <div className="bg-surface-container-high rounded-xl p-4">
+            <div className="space-y-0">
+              {topPlayers.map((player, i) => (
+                <div
+                  key={player.playerId}
+                  className={`flex items-center justify-between py-3 ${
+                    i < topPlayers.length - 1 ? "border-b border-outline-variant/20" : ""
+                  }`}
+                >
+                  <div className="flex items-center gap-3">
+                    <span className="w-6 text-center font-label font-bold text-sm text-secondary">
+                      {i === 0 ? "\u{1F3C6}" : i === 1 ? "\u{1F948}" : "\u{1F949}"}
+                    </span>
+                    <span className="font-label font-medium text-on-surface text-sm">
+                      {player.displayName}
+                    </span>
+                  </div>
+                  <span className={`font-headline font-bold text-base ${toParColor(player.totalToPar)}`}>
+                    {formatToPar(player.totalToPar)}
+                  </span>
+                </div>
+              ))}
+            </div>
+            <Link
+              href="/leaderboard"
+              className="flex items-center justify-center gap-1 mt-3 pt-3 border-t border-outline-variant/20 text-primary font-label font-bold text-xs uppercase tracking-widest"
+            >
+              View Full Leaderboard
+              <span className="material-symbols-outlined text-sm">arrow_forward</span>
+            </Link>
+          </div>
+        ) : (
+          <div className="bg-surface-container-high rounded-xl p-4 text-center">
+            <span className="material-symbols-outlined text-secondary text-3xl mb-2">
+              sports_golf
+            </span>
+            <p className="font-headline text-lg text-on-surface">
+              Tournament starts{" "}
+              {TOURNAMENT.date.toLocaleDateString("en-US", {
+                month: "long",
+                day: "numeric",
+              })}
+            </p>
+            <p className="text-xs text-on-surface-variant mt-1">
+              {TOURNAMENT.courses.join(" & ")} &middot; {TOURNAMENT.location}
+            </p>
+          </div>
+        )}
+      </section>
     </div>
   );
 }
