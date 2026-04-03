@@ -23,27 +23,27 @@ export default function TopBar() {
   const profileImage = avatarUrl || session?.user?.image;
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 bg-[#051612] flex justify-between items-center w-full px-6 py-4">
+    <header className="fixed top-0 left-0 right-0 z-50 bg-[#051612] flex justify-between items-center w-full px-4 py-2">
       <div className="flex items-center">
-        <Link href="/" className="material-symbols-outlined text-primary hover:bg-surface-variant/60 transition-colors p-2 rounded-lg cursor-pointer">
+        <Link href="/" className="material-symbols-outlined text-primary hover:bg-surface-variant/60 transition-colors p-1.5 rounded-lg cursor-pointer text-xl">
           menu
         </Link>
       </div>
-      <div className="flex items-center gap-3">
+      <div className="flex items-center">
         {profileImage ? (
           <Link href="/profile">
             <img
               src={profileImage}
               alt="Profile"
-              className="w-10 h-10 rounded-full border border-outline-variant/30 object-cover"
+              className="w-8 h-8 rounded-full border border-outline-variant/30 object-cover"
             />
           </Link>
         ) : session ? (
           <Link
             href="/profile"
-            className="w-10 h-10 rounded-full bg-surface-container-high border border-outline-variant/30 flex items-center justify-center"
+            className="w-8 h-8 rounded-full bg-surface-container-high border border-outline-variant/30 flex items-center justify-center"
           >
-            <span className="material-symbols-outlined text-primary text-xl">
+            <span className="material-symbols-outlined text-primary text-lg">
               person
             </span>
           </Link>
