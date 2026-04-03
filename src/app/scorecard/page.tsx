@@ -69,16 +69,30 @@ function toParColor(n: number) {
   return "text-on-surface";
 }
 
+function ColumnHeaders() {
+  return (
+    <div className="flex items-center py-2 px-4 border-b border-white/[0.06] bg-white/[0.02]">
+      <span className="w-8 font-label text-[10px] font-bold text-on-surface-variant uppercase tracking-widest">Hole</span>
+      <span className="w-14 font-label text-[10px] font-bold text-on-surface-variant uppercase tracking-widest">Par</span>
+      <span className="w-8 text-center font-label text-[10px] font-bold text-on-surface-variant uppercase tracking-widest">HCP</span>
+      <span className="ml-auto font-label text-[10px] font-bold text-on-surface-variant uppercase tracking-widest text-center" style={{ width: "118px" }}>Score</span>
+      <span className="w-10 text-right font-label text-[10px] font-bold text-on-surface-variant uppercase tracking-widest">+/−</span>
+    </div>
+  );
+}
+
 function HoleRow({
   hole,
   par,
   score,
+  handicap,
   onIncrement,
   onDecrement,
 }: {
   hole: number;
   par: number;
   score: number | null;
+  handicap: number;
   onIncrement: () => void;
   onDecrement: () => void;
 }) {
@@ -96,9 +110,9 @@ function HoleRow({
         <p className="font-label text-sm font-bold text-on-surface">Par {par}</p>
       </div>
 
-      {/* Score display */}
-      <span className={`w-8 text-center font-headline text-lg font-bold tabular-nums ${score !== null ? scoreColor(score, par) : "text-on-surface-variant"}`}>
-        {score !== null ? score : "—"}
+      {/* Handicap */}
+      <span className="w-8 text-center font-label text-sm text-on-surface-variant tabular-nums">
+        {handicap}
       </span>
 
       {/* +/- buttons — always visible */}
@@ -264,13 +278,14 @@ function CardView({
             par {frontPar}
           </span>
         </div>
+        <ColumnHeaders />
         {frontPars.map((par, i) => (
           <HoleRow
             key={i}
             hole={i + 1}
             par={par}
             score={player.scores[i]}
-
+            handicap={player.handicap}
             onIncrement={() => onScoreChange(selectedPlayer, i, 1)}
             onDecrement={() => onScoreChange(selectedPlayer, i, -1)}
           />
@@ -287,13 +302,14 @@ function CardView({
             par {backPar}
           </span>
         </div>
+        <ColumnHeaders />
         {backPars.map((par, i) => (
           <HoleRow
             key={i + 9}
             hole={i + 10}
             par={par}
             score={player.scores[i + 9]}
-
+            handicap={player.handicap}
             onIncrement={() => onScoreChange(selectedPlayer, i + 9, 1)}
             onDecrement={() => onScoreChange(selectedPlayer, i + 9, -1)}
           />
