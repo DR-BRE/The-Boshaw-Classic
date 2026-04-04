@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { useSession } from "next-auth/react";
 import SideDrawer from "@/components/SideDrawer";
 import BottomTabs from "@/components/BottomTabs";
@@ -13,8 +14,10 @@ export default function LayoutShell({
 }) {
   const [drawerOpen, setDrawerOpen] = useState(false);
   const { data: session } = useSession();
+  const pathname = usePathname();
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
 
+  // Re-fetch avatar on every page navigation (catches profile updates)
   useEffect(() => {
     if (session?.user) {
       fetch("/api/profile")
@@ -26,7 +29,7 @@ export default function LayoutShell({
         })
         .catch(() => {});
     }
-  }, [session]);
+  }, [session, pathname]);
 
   return (
     <>
