@@ -50,25 +50,32 @@ export async function PUT(request: Request) {
   }
 }
 
-export async function DELETE() {
+export async function DELETE(request: Request) {
   try {
     const session = await getServerSession(authOptions);
     if (!session?.user?.email || session.user.email !== ADMIN_EMAIL) {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 
-    // Find admin's player record to exclude
-    const adminPlayer = await prisma.player.findUnique({
-      where: { userId: session.user.id },
-    });
+    const { searchParams } = new URL(request.url);
+    const playerId = searchParams.get("playerId");
 
-    // Delete scores for non-admin players, then delete the players
-    await prisma.score.deleteMany({
-      where: adminPlayer ? { playerId: { not: adminPlayer.id } } : {},
-    });
-    await prisma.player.deleteMany({
-      where: adminPlayer ? { id: { not: adminPlayer.id } } : {},
-    });
+    if (playerId) {
+      // Delete a single player and their scores
+      await prisma.score.deleteMany({ where: { playerId } });
+      await prisma.player.delete({ where: { id: playerId } });
+    } else {
+      // Delete all non-admin players
+      const adminPlayer = await prisma.player.findUnique({
+        where: { userId: session.user.id },
+      });
+      await prisma.score.deleteMany({
+        where: adminPlayer ? { playerId: { not: adminPlayer.id } } : {},
+      });
+      await prisma.player.deleteMany({
+        where: adminPlayer ? { id: { not: adminPlayer.id } } : {},
+      });
+    }
 
     return NextResponse.json({ success: true });
   } catch (error) {

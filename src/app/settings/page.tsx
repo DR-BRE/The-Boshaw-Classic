@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useSession } from "next-auth/react";
 
 type Settings = {
@@ -77,6 +77,75 @@ function SegmentedToggle({
           {opt.label}
         </button>
       ))}
+    </div>
+  );
+}
+
+function SwipeableRow({
+  children,
+  onDelete,
+}: {
+  children: React.ReactNode;
+  onDelete: () => void;
+}) {
+  const rowRef = useRef<HTMLDivElement>(null);
+  const startX = useRef(0);
+  const currentX = useRef(0);
+  const swiping = useRef(false);
+
+  function handleTouchStart(e: React.TouchEvent) {
+    startX.current = e.touches[0].clientX;
+    currentX.current = 0;
+    swiping.current = false;
+  }
+
+  function handleTouchMove(e: React.TouchEvent) {
+    const dx = e.touches[0].clientX - startX.current;
+    if (dx < -10) swiping.current = true;
+    const offset = Math.min(0, Math.max(-80, dx));
+    currentX.current = offset;
+    if (rowRef.current) {
+      rowRef.current.style.transform = `translateX(${offset}px)`;
+    }
+  }
+
+  function handleTouchEnd() {
+    if (currentX.current < -40) {
+      if (rowRef.current) rowRef.current.style.transform = "translateX(-80px)";
+    } else {
+      if (rowRef.current) rowRef.current.style.transform = "translateX(0)";
+    }
+  }
+
+  function handleClick(e: React.MouseEvent) {
+    if (swiping.current) {
+      e.stopPropagation();
+      e.preventDefault();
+    }
+  }
+
+  return (
+    <div className="relative overflow-hidden rounded-xl">
+      <div className="absolute inset-y-0 right-0 w-20 bg-red-500 flex items-center justify-center">
+        <button
+          onClick={onDelete}
+          className="w-full h-full flex items-center justify-center"
+        >
+          <span className="material-symbols-outlined text-white text-xl">
+            delete
+          </span>
+        </button>
+      </div>
+      <div
+        ref={rowRef}
+        onTouchStart={handleTouchStart}
+        onTouchMove={handleTouchMove}
+        onTouchEnd={handleTouchEnd}
+        onClickCapture={handleClick}
+        className="relative z-10 transition-transform duration-150"
+      >
+        {children}
+      </div>
     </div>
   );
 }
@@ -235,42 +304,51 @@ export default function SettingsPage() {
 
           <div className="space-y-2">
             {players.map((p) => (
-              <button
+              <SwipeableRow
                 key={p.id}
-                onClick={() => {
-                  const nextGroup = (p.group + 1) % 3;
-                  if (nextGroup > 0) {
-                    const count = players.filter(
-                      (pl) => pl.id !== p.id && pl.group === nextGroup
-                    ).length;
-                    if (count >= 4) return;
-                  }
-                  setPlayers((prev) =>
-                    prev.map((pl) =>
-                      pl.id === p.id
-                        ? { ...pl, group: nextGroup }
-                        : pl
-                    )
-                  );
-                  setGroupsDirty(true);
+                onDelete={async () => {
+                  try {
+                    await fetch(`/api/groups?playerId=${p.id}`, { method: "DELETE" });
+                    setPlayers((prev) => prev.filter((pl) => pl.id !== p.id));
+                  } catch {}
                 }}
-                className="w-full flex items-center justify-between px-4 py-3 rounded-xl bg-white/[0.04] border border-white/[0.06] active:scale-[0.98] transition-transform"
               >
-                <span className="font-label text-sm font-bold text-on-surface">
-                  {p.displayName}
-                </span>
-                <span
-                  className={`font-label text-xs font-bold uppercase tracking-wider px-3 py-1 rounded-full ${
-                    p.group === 1
-                      ? "bg-secondary/20 text-secondary"
-                      : p.group === 2
-                      ? "bg-primary/20 text-primary"
-                      : "bg-white/[0.06] text-on-surface-variant"
-                  }`}
+                <button
+                  onClick={() => {
+                    const nextGroup = (p.group + 1) % 3;
+                    if (nextGroup > 0) {
+                      const count = players.filter(
+                        (pl) => pl.id !== p.id && pl.group === nextGroup
+                      ).length;
+                      if (count >= 4) return;
+                    }
+                    setPlayers((prev) =>
+                      prev.map((pl) =>
+                        pl.id === p.id
+                          ? { ...pl, group: nextGroup }
+                          : pl
+                      )
+                    );
+                    setGroupsDirty(true);
+                  }}
+                  className="w-full flex items-center justify-between px-4 py-3 rounded-xl bg-white/[0.04] border border-white/[0.06] active:scale-[0.98] transition-transform"
                 >
-                  {GROUP_LABELS[p.group]}
-                </span>
-              </button>
+                  <span className="font-label text-sm font-bold text-on-surface">
+                    {p.displayName}
+                  </span>
+                  <span
+                    className={`font-label text-xs font-bold uppercase tracking-wider px-3 py-1 rounded-full ${
+                      p.group === 1
+                        ? "bg-secondary/20 text-secondary"
+                        : p.group === 2
+                        ? "bg-primary/20 text-primary"
+                        : "bg-white/[0.06] text-on-surface-variant"
+                    }`}
+                  >
+                    {GROUP_LABELS[p.group]}
+                  </span>
+                </button>
+              </SwipeableRow>
             ))}
           </div>
 
