@@ -87,6 +87,7 @@ function HoleRow({
   par,
   score,
   handicap,
+  editable,
   onIncrement,
   onDecrement,
 }: {
@@ -94,6 +95,7 @@ function HoleRow({
   par: number;
   score: number | null;
   handicap: number;
+  editable: boolean;
   onIncrement: () => void;
   onDecrement: () => void;
 }) {
@@ -116,25 +118,29 @@ function HoleRow({
         {handicap}
       </span>
 
-      {/* +/- buttons — always visible */}
+      {/* +/- buttons or read-only score */}
       <div className="flex items-center gap-2 ml-auto">
-        <button
-          onClick={onDecrement}
-          disabled={score !== null && score <= 1}
-          className="w-10 h-10 rounded-full bg-white/[0.06] border border-white/[0.08] flex items-center justify-center active:scale-90 transition-transform disabled:opacity-30"
-        >
-          <span className="material-symbols-outlined text-on-surface text-lg">remove</span>
-        </button>
+        {editable && (
+          <button
+            onClick={onDecrement}
+            disabled={score !== null && score <= 1}
+            className="w-10 h-10 rounded-full bg-white/[0.06] border border-white/[0.08] flex items-center justify-center active:scale-90 transition-transform disabled:opacity-30"
+          >
+            <span className="material-symbols-outlined text-on-surface text-lg">remove</span>
+          </button>
+        )}
         <span className={`w-6 text-center font-headline text-lg font-bold tabular-nums ${score !== null ? scoreColor(score, par) : "text-on-surface-variant"}`}>
           {score !== null ? score : "·"}
         </span>
-        <button
-          onClick={onIncrement}
-          disabled={score !== null && score >= 15}
-          className="w-10 h-10 rounded-full bg-white/[0.06] border border-white/[0.08] flex items-center justify-center active:scale-90 transition-transform disabled:opacity-30"
-        >
-          <span className="material-symbols-outlined text-on-surface text-lg">add</span>
-        </button>
+        {editable && (
+          <button
+            onClick={onIncrement}
+            disabled={score !== null && score >= 15}
+            className="w-10 h-10 rounded-full bg-white/[0.06] border border-white/[0.08] flex items-center justify-center active:scale-90 transition-transform disabled:opacity-30"
+          >
+            <span className="material-symbols-outlined text-on-surface text-lg">add</span>
+          </button>
+        )}
       </div>
 
       {/* +/- to par */}
@@ -152,6 +158,7 @@ function CardView({
   selectedPlayer,
   setSelectedPlayer,
   onScoreChange,
+  currentPlayerId,
 }: {
   players: ScorecardPlayer[];
   holePars: number[];
@@ -159,8 +166,10 @@ function CardView({
   selectedPlayer: number;
   setSelectedPlayer: (i: number) => void;
   onScoreChange: (playerIdx: number, holeIdx: number, delta: number) => void;
+  currentPlayerId: string | null;
 }) {
   const player = players[selectedPlayer];
+  const isOwnCard = player?.id === currentPlayerId;
   if (!player) return null;
 
   const frontPars = holePars.slice(0, 9);
@@ -291,6 +300,7 @@ function CardView({
             par={par}
             score={player.scores[i]}
             handicap={frontIndices[i]}
+            editable={isOwnCard}
             onIncrement={() => onScoreChange(selectedPlayer, i, 1)}
             onDecrement={() => onScoreChange(selectedPlayer, i, -1)}
           />
@@ -315,6 +325,7 @@ function CardView({
             par={par}
             score={player.scores[i + 9]}
             handicap={backIndices[i]}
+            editable={isOwnCard}
             onIncrement={() => onScoreChange(selectedPlayer, i + 9, 1)}
             onDecrement={() => onScoreChange(selectedPlayer, i + 9, -1)}
           />
@@ -891,6 +902,7 @@ export default function ScorecardPage() {
               selectedPlayer={selectedPlayer}
               setSelectedPlayer={setSelectedPlayer}
               onScoreChange={handleScoreChange}
+              currentPlayerId={currentUserId}
             />
           ) : (
             <>
