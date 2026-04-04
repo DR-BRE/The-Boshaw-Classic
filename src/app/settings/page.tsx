@@ -126,7 +126,7 @@ export default function SettingsPage() {
         <h2 className="font-headline text-3xl text-on-surface mb-6">
           Settings
         </h2>
-        <div className="bg-white/[0.06] animate-pulse rounded-xl h-48" />
+        <div className="bg-white/[0.06] rounded-xl h-48" />
       </div>
     );
   }
