@@ -65,7 +65,7 @@ export default function LayoutShell({
       <SideDrawer isOpen={drawerOpen} onClose={() => setDrawerOpen(false)} />
 
       {/* Main Content */}
-      <main className="flex-grow pt-6 pb-32">{children}</main>
+      <main className="pt-6 pb-32">{children}</main>
 
       {/* Bottom Navigation */}
       <BottomTabs />
