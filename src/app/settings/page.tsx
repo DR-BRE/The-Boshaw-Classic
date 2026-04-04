@@ -236,10 +236,17 @@ export default function SettingsPage() {
               <button
                 key={p.id}
                 onClick={() => {
+                  const nextGroup = (p.group + 1) % 3;
+                  if (nextGroup > 0) {
+                    const count = players.filter(
+                      (pl) => pl.id !== p.id && pl.group === nextGroup
+                    ).length;
+                    if (count >= 4) return;
+                  }
                   setPlayers((prev) =>
                     prev.map((pl) =>
                       pl.id === p.id
-                        ? { ...pl, group: (pl.group + 1) % 3 }
+                        ? { ...pl, group: nextGroup }
                         : pl
                     )
                   );
