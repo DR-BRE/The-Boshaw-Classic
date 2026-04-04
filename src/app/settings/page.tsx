@@ -95,6 +95,8 @@ export default function SettingsPage() {
   const [players, setPlayers] = useState<PlayerGroup[]>([]);
   const [groupsDirty, setGroupsDirty] = useState(false);
   const [groupsSaving, setGroupsSaving] = useState(false);
+  const [confirmClear, setConfirmClear] = useState(false);
+  const [clearing, setClearing] = useState(false);
 
   useEffect(() => {
     setSettings(loadSettings());
@@ -296,6 +298,61 @@ export default function SettingsPage() {
             >
               {groupsSaving ? "Saving…" : "Save Groups"}
             </button>
+          )}
+        </div>
+      )}
+
+      {/* Clear Players (admin only) */}
+      {isAdmin && (
+        <div className="bg-white/[0.06] backdrop-blur-xl border border-white/[0.08] rounded-2xl p-5 mb-5">
+          <h3 className="font-headline text-lg text-on-surface mb-2">
+            Clear Players
+          </h3>
+          <p className="text-[11px] text-on-surface-variant mb-4">
+            Delete all player accounts and scores except yours. Use this before going live.
+          </p>
+          {!confirmClear ? (
+            <button
+              onClick={() => setConfirmClear(true)}
+              className="w-full py-3 rounded-xl bg-red-500/20 text-red-400 font-label text-sm font-bold uppercase tracking-wider active:scale-[0.97] transition-transform"
+            >
+              Clear All Players
+            </button>
+          ) : (
+            <div className="flex gap-3">
+              <button
+                onClick={() => setConfirmClear(false)}
+                className="flex-1 py-3 rounded-xl bg-white/[0.06] text-on-surface-variant font-label text-sm font-bold uppercase tracking-wider active:scale-[0.97] transition-transform"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={async () => {
+                  setClearing(true);
+                  try {
+                    await fetch("/api/groups", { method: "DELETE" });
+                    setPlayers((prev) =>
+                      prev.filter(
+                        (p) =>
+                          players.find(
+                            (pl) => pl.id === p.id && pl.displayName === session?.user?.name
+                          ) !== undefined
+                      )
+                    );
+                    // Re-fetch to get accurate state
+                    const res = await fetch("/api/groups");
+                    const data = await res.json();
+                    if (data.players) setPlayers(data.players);
+                  } catch {}
+                  setClearing(false);
+                  setConfirmClear(false);
+                }}
+                disabled={clearing}
+                className="flex-1 py-3 rounded-xl bg-red-500 text-white font-label text-sm font-bold uppercase tracking-wider active:scale-[0.97] transition-transform disabled:opacity-50"
+              >
+                {clearing ? "Clearing…" : "Confirm"}
+              </button>
+            </div>
           )}
         </div>
       )}
