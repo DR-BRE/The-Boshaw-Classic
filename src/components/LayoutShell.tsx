@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useSession } from "next-auth/react";
 import SideDrawer from "@/components/SideDrawer";
@@ -13,6 +13,20 @@ export default function LayoutShell({
 }) {
   const [drawerOpen, setDrawerOpen] = useState(false);
   const { data: session } = useSession();
+  const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (session?.user) {
+      fetch("/api/profile")
+        .then((res) => res.json())
+        .then((data) => {
+          if (data.player?.avatarUrl) {
+            setAvatarUrl(data.player.avatarUrl);
+          }
+        })
+        .catch(() => {});
+    }
+  }, [session]);
 
   return (
     <>
@@ -31,9 +45,9 @@ export default function LayoutShell({
         href="/profile"
         className="fixed top-3 right-3 z-40 w-10 h-10 rounded-full bg-white/[0.06] backdrop-blur-xl border border-white/[0.06] flex items-center justify-center active:scale-90 transition-transform overflow-hidden"
       >
-        {session?.user?.image ? (
+        {avatarUrl || session?.user?.image ? (
           <img
-            src={session.user.image}
+            src={avatarUrl || session?.user?.image || ""}
             alt="Profile"
             className="w-full h-full object-cover"
           />
