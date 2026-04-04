@@ -510,7 +510,7 @@ function NineHoleGrid({
                       key={i}
                       className={`px-1 py-2 text-center font-label tabular-nums ${scoreColor(score, holePars[i])} ${
                         isCurrentUser ? "text-base font-extrabold" : "text-sm font-bold"
-                      } ${isCurrentUser && onScoreTap ? "cursor-pointer active:bg-white/[0.1] rounded" : ""}`}
+                      } ${isCurrentUser && onScoreTap ? "cursor-pointer active:bg-white/[0.15] rounded-md bg-white/[0.06] border border-white/[0.1]" : ""}`}
                       onClick={isCurrentUser && onScoreTap ? () => onScoreTap(player.id, startHole + i) : undefined}
                     >
                       {score !== null ? score : "—"}
