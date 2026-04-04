@@ -38,7 +38,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className="dark">
+    <html lang="en" className="dark overflow-hidden h-dvh">
       <head>
         <link
           href="https://fonts.googleapis.com/css2?family=Noto+Serif:wght@400;700&family=Manrope:wght@300;400;500;600;700;800&display=swap"
@@ -49,7 +49,7 @@ export default function RootLayout({
           rel="stylesheet"
         />
       </head>
-      <body className="min-h-dvh flex flex-col bg-background text-on-surface font-body antialiased">
+      <body className="h-dvh overflow-y-auto bg-background text-on-surface font-body antialiased">
         <SessionProvider>
           <LayoutShell>{children}</LayoutShell>
         </SessionProvider>
