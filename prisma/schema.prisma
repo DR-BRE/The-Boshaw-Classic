@@ -101,3 +101,14 @@ model Score {
 
   @@unique([playerId, round])
 }
+
+model WolfOrder {
+  id        String   @id @default(cuid())
+  round     Int
+  group     Int
+  order     String   // JSON array of player IDs
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([round, group])
+}

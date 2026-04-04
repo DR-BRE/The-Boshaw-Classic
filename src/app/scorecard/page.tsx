@@ -115,6 +115,7 @@ function HoleRow({
   editable,
   onIncrement,
   onDecrement,
+  isWolf,
 }: {
   hole: number;
   par: number;
@@ -123,14 +124,15 @@ function HoleRow({
   editable: boolean;
   onIncrement: () => void;
   onDecrement: () => void;
+  isWolf?: boolean;
 }) {
   const diff = score !== null ? score - par : null;
 
   return (
-    <div className="flex items-center py-3 px-4 border-b border-white/[0.04]">
+    <div className={`flex items-center py-3 px-4 border-b border-white/[0.04] ${isWolf ? "bg-yellow-500/10" : ""}`}>
       {/* Hole number */}
       <span className="w-8 font-headline text-lg font-bold text-on-surface tabular-nums">
-        {hole}
+        {isWolf ? "🐺" : hole}
       </span>
 
       {/* Par info */}
@@ -184,6 +186,7 @@ function CardView({
   setSelectedPlayer,
   onScoreChange,
   currentPlayerId,
+  wolfOrder,
 }: {
   players: ScorecardPlayer[];
   holePars: number[];
@@ -192,6 +195,7 @@ function CardView({
   setSelectedPlayer: (i: number) => void;
   onScoreChange: (playerIdx: number, holeIdx: number, delta: number) => void;
   currentPlayerId: string | null;
+  wolfOrder?: string[] | null;
 }) {
   const player = players[selectedPlayer];
   const isOwnCard = player?.id === currentPlayerId;
@@ -328,6 +332,7 @@ function CardView({
             editable={isOwnCard}
             onIncrement={() => onScoreChange(selectedPlayer, i, 1)}
             onDecrement={() => onScoreChange(selectedPlayer, i, -1)}
+            isWolf={getWolfForHole(wolfOrder ?? null, i + 1) === player.id}
           />
         ))}
       </div>
@@ -353,6 +358,7 @@ function CardView({
             editable={isOwnCard}
             onIncrement={() => onScoreChange(selectedPlayer, i + 9, 1)}
             onDecrement={() => onScoreChange(selectedPlayer, i + 9, -1)}
+            isWolf={getWolfForHole(wolfOrder ?? null, i + 10) === player.id}
           />
         ))}
       </div>
@@ -415,6 +421,11 @@ function ScoreInput({
   );
 }
 
+function getWolfForHole(wolfOrder: string[] | null, holeNumber: number): string | null {
+  if (!wolfOrder || holeNumber > 16) return null;
+  return wolfOrder[(holeNumber - 1) % 4];
+}
+
 function NineHoleGrid({
   label,
   totalLabel,
@@ -423,6 +434,7 @@ function NineHoleGrid({
   players,
   currentPlayerId,
   onScoreTap,
+  wolfOrder,
 }: {
   label: string;
   totalLabel: string;
@@ -431,6 +443,7 @@ function NineHoleGrid({
   players: ScorecardPlayer[];
   currentPlayerId: string | null;
   onScoreTap?: (playerId: string, holeIdx: number) => void;
+  wolfOrder?: string[] | null;
 }) {
   const parTotal = holePars.reduce((sum, p) => sum + p, 0);
 
@@ -525,17 +538,22 @@ function NineHoleGrid({
                         </span>
                       </div>
                     </td>
-                    {nineScores.map((score, i) => (
-                      <td
-                        key={i}
-                        className={`px-1 py-2 text-center font-label tabular-nums ${scoreColor(score, holePars[i])} ${
-                          isCurrentUser ? "text-base font-extrabold" : "text-sm font-bold"
-                        } ${isCurrentUser && onScoreTap ? "cursor-pointer active:bg-white/[0.15] rounded-md bg-white/[0.06] border border-white/[0.1]" : ""}`}
-                        onClick={isCurrentUser && onScoreTap ? () => onScoreTap(player.id, startHole + i) : undefined}
-                      >
-                        {score !== null ? score : "—"}
-                      </td>
-                    ))}
+                    {nineScores.map((score, i) => {
+                      const holeNum = startHole + i + 1;
+                      const isWolf = getWolfForHole(wolfOrder ?? null, holeNum) === player.id;
+                      return (
+                        <td
+                          key={i}
+                          className={`px-1 py-2 text-center font-label tabular-nums ${scoreColor(score, holePars[i])} ${
+                            isCurrentUser ? "text-base font-extrabold" : "text-sm font-bold"
+                          } ${isCurrentUser && onScoreTap ? "cursor-pointer active:bg-white/[0.15] rounded-md bg-white/[0.06] border border-white/[0.1]" : ""} ${isWolf ? "bg-yellow-500/10" : ""}`}
+                          onClick={isCurrentUser && onScoreTap ? () => onScoreTap(player.id, startHole + i) : undefined}
+                        >
+                          {isWolf && <div className="text-[8px] leading-none">🐺</div>}
+                          {score !== null ? score : "—"}
+                        </td>
+                      );
+                    })}
                     <td
                       className={`px-2 py-2 text-center font-label tabular-nums ${
                         isCurrentUser ? "text-base font-extrabold" : "text-sm font-bold"
@@ -732,6 +750,8 @@ export default function ScorecardPage() {
   const [editingHole, setEditingHole] = useState<{ playerId: string; holeIdx: number } | null>(null);
   const [gameMode, setGameMode] = useState<GameMode>("scorecard");
   const [gameModeOpen, setGameModeOpen] = useState(false);
+  const [wolfOrder, setWolfOrder] = useState<string[] | null>(null);
+  const isAdmin = session?.user?.email === "brettwfrancoeur@gmail.com";
 
   // Load saved settings from localStorage on mount
   useEffect(() => {
@@ -750,6 +770,53 @@ export default function ScorecardPage() {
       })
       .catch(() => {});
   }, [session]);
+
+  // Fetch wolf order when wolf mode is active
+  const currentUserGroup = data?.players.find((p) => p.id === currentUserId)?.group ?? 0;
+  useEffect(() => {
+    if (gameMode !== "wolf" || !currentUserGroup) {
+      setWolfOrder(null);
+      return;
+    }
+    fetch(`/api/wolf?round=${round}&group=${currentUserGroup}`)
+      .then((res) => res.json())
+      .then((d) => {
+        if (d.order) {
+          setWolfOrder(d.order);
+        } else if (isAdmin) {
+          // Auto-create wolf order for admin
+          fetch("/api/wolf", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ round: Number(round), group: currentUserGroup }),
+          })
+            .then((res) => res.json())
+            .then((d) => { if (d.order) setWolfOrder(d.order); })
+            .catch(() => {});
+        }
+      })
+      .catch(() => {});
+
+    const interval = setInterval(() => {
+      fetch(`/api/wolf?round=${round}&group=${currentUserGroup}`)
+        .then((res) => res.json())
+        .then((d) => { if (d.order) setWolfOrder(d.order); })
+        .catch(() => {});
+    }, 5000);
+    return () => clearInterval(interval);
+  }, [gameMode, round, currentUserGroup, isAdmin]);
+
+  function shuffleWolf() {
+    if (!currentUserGroup) return;
+    fetch("/api/wolf", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ round: Number(round), group: currentUserGroup }),
+    })
+      .then((res) => res.json())
+      .then((d) => { if (d.order) setWolfOrder(d.order); })
+      .catch(() => {});
+  }
 
   const savingRef = React.useRef(false);
   React.useEffect(() => { savingRef.current = saving; }, [saving]);
@@ -899,6 +966,19 @@ export default function ScorecardPage() {
         </div>
       </div>
 
+      {/* Wolf Shuffle Button (admin only) */}
+      {gameMode === "wolf" && isAdmin && wolfOrder && (
+        <button
+          onClick={shuffleWolf}
+          className="mb-4 flex items-center gap-2 bg-white/[0.06] border border-white/[0.08] rounded-xl px-4 py-2.5 active:scale-95 transition-transform"
+        >
+          <span className="material-symbols-outlined text-secondary text-lg">shuffle</span>
+          <span className="font-label text-xs font-bold text-on-surface uppercase tracking-wider">
+            Shuffle Wolf Order
+          </span>
+        </button>
+      )}
+
       {/* Round Tabs */}
       <div className="bg-white/[0.06] backdrop-blur-lg border border-white/[0.06] rounded-xl p-1 flex gap-1 mb-4">
         {ROUNDS.map((r) => (
@@ -989,6 +1069,7 @@ export default function ScorecardPage() {
               setSelectedPlayer={setSelectedPlayer}
               onScoreChange={handleScoreChange}
               currentPlayerId={currentUserId}
+              wolfOrder={wolfOrder}
             />
           ) : (
             <>
@@ -1001,6 +1082,7 @@ export default function ScorecardPage() {
                 players={data.players}
                 currentPlayerId={currentUserId}
                 onScoreTap={(playerId, holeIdx) => setEditingHole({ playerId, holeIdx })}
+                wolfOrder={wolfOrder}
               />
 
               {/* Back 9 */}
@@ -1012,6 +1094,7 @@ export default function ScorecardPage() {
                 players={data.players}
                 currentPlayerId={currentUserId}
                 onScoreTap={(playerId, holeIdx) => setEditingHole({ playerId, holeIdx })}
+                wolfOrder={wolfOrder}
               />
 
               {/* Summary */}
