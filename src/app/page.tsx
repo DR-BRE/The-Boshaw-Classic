@@ -26,6 +26,14 @@ export default function Home() {
       .then((res) => res.json())
       .then((data: LeaderboardEntry[]) => setTopPlayers(data.slice(0, 3)))
       .catch(() => {});
+
+    const interval = setInterval(() => {
+      fetch("/api/leaderboard")
+        .then((res) => res.json())
+        .then((data: LeaderboardEntry[]) => setTopPlayers(data.slice(0, 3)))
+        .catch(() => {});
+    }, 5000);
+    return () => clearInterval(interval);
   }, []);
 
   return (

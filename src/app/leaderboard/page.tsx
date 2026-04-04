@@ -86,6 +86,14 @@ export default function LeaderboardPage() {
         setLoading(false);
       })
       .catch(() => setLoading(false));
+
+    const interval = setInterval(() => {
+      fetch(`/api/leaderboard${params}`)
+        .then((res) => res.json())
+        .then((data) => setEntries(data))
+        .catch(() => {});
+    }, 5000);
+    return () => clearInterval(interval);
   }, [round]);
 
   return (

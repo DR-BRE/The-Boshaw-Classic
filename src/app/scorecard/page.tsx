@@ -751,6 +751,9 @@ export default function ScorecardPage() {
       .catch(() => {});
   }, [session]);
 
+  const savingRef = React.useRef(false);
+  React.useEffect(() => { savingRef.current = saving; }, [saving]);
+
   useEffect(() => {
     setLoading(true);
     fetch(`/api/scorecard?round=${round}`)
@@ -761,6 +764,15 @@ export default function ScorecardPage() {
         setLoading(false);
       })
       .catch(() => setLoading(false));
+
+    const interval = setInterval(() => {
+      if (savingRef.current) return;
+      fetch(`/api/scorecard?round=${round}`)
+        .then((res) => res.json())
+        .then((d) => setData(d))
+        .catch(() => {});
+    }, 5000);
+    return () => clearInterval(interval);
   }, [round]);
 
   // Handle score change from card view +/- buttons
