@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import Countdown from "@/components/Countdown";
+import Weather from "@/components/Weather";
 import { TOURNAMENT } from "@/lib/tournament";
 import type { LeaderboardEntry } from "@/lib/types/leaderboard";
 
@@ -42,6 +43,17 @@ export default function Home() {
             <Countdown />
           </div>
         </div>
+      </section>
+
+      {/* Weather Widget */}
+      <section className="px-6 mt-4">
+        <div className="flex items-center gap-2 mb-3">
+          <span className="material-symbols-outlined text-secondary text-lg" style={{ fontVariationSettings: '"FILL" 1' }}>
+            partly_cloudy_day
+          </span>
+          <h3 className="font-headline text-2xl text-on-surface">Weather</h3>
+        </div>
+        <Weather />
       </section>
 
       {/* Leaderboard Preview — Glassmorphism */}
