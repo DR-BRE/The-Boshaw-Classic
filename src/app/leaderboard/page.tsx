@@ -166,6 +166,9 @@ export default function LeaderboardPage() {
                     </span>
                   )}
                 </p>
+                <p className="text-[11px] text-on-surface-variant">
+                  {entry.firstName} {entry.lastName.charAt(0)}.
+                </p>
                 <p className="text-[11px] text-on-surface-variant uppercase tracking-wider">
                   HCP {entry.handicap} · Group {entry.group} · {entry.roundsPlayed} {entry.roundsPlayed === 1 ? "round" : "rounds"}
                 </p>

@@ -9,6 +9,8 @@ export type LeaderboardEntry = {
   rank: number;
   playerId: string;
   displayName: string;
+  firstName: string;
+  lastName: string;
   avatarUrl: string | null;
   group: number;
   handicap: number;

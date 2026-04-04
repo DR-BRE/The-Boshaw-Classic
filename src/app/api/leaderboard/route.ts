@@ -23,6 +23,8 @@ export async function GET(request: Request) {
     return {
       playerId: player.id,
       displayName: player.displayName,
+      firstName: player.firstName,
+      lastName: player.lastName,
       avatarUrl: player.avatarUrl,
       group: player.group,
       handicap: player.handicap,
