@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useSession } from "next-auth/react";
 import type { ScorecardData, ScorecardPlayer } from "@/lib/types/scorecard";
 import { COURSE_PARS } from "@/lib/tournament";
@@ -326,20 +326,90 @@ function CardView({
 
 // ─── Classic View (Grid) ──────────────────────────────
 
+function ScoreInput({
+  value,
+  holeIdx,
+  onSubmit,
+  onClose,
+}: {
+  value: number | null;
+  holeIdx: number;
+  onSubmit: (holeIdx: number, score: number) => void;
+  onClose: () => void;
+}) {
+  const inputRef = useRef<HTMLInputElement>(null);
+  const [inputValue, setInputValue] = useState(value !== null ? String(value) : "");
+
+  useEffect(() => {
+    setTimeout(() => inputRef.current?.focus(), 50);
+  }, []);
+
+  function handleSubmit() {
+    const num = parseInt(inputValue);
+    if (num >= 1 && num <= 15) {
+      onSubmit(holeIdx, num);
+    }
+    onClose();
+  }
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60" onClick={onClose}>
+      <div
+        className="bg-surface-container-high border border-white/[0.1] rounded-2xl p-5 w-48 text-center"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <p className="font-label text-xs text-on-surface-variant uppercase tracking-widest mb-3">
+          Hole {holeIdx + 1}
+        </p>
+        <input
+          ref={inputRef}
+          type="number"
+          inputMode="numeric"
+          pattern="[0-9]*"
+          min={1}
+          max={15}
+          value={inputValue}
+          onChange={(e) => setInputValue(e.target.value)}
+          onKeyDown={(e) => e.key === "Enter" && handleSubmit()}
+          className="w-full text-center font-headline text-3xl font-bold text-on-surface bg-white/[0.06] border border-white/[0.1] rounded-xl py-3 mb-3 outline-none focus:border-secondary"
+        />
+        <button
+          onClick={handleSubmit}
+          className="w-full py-2.5 bg-secondary text-on-secondary font-label text-sm font-bold uppercase tracking-wider rounded-xl active:scale-95 transition-transform"
+        >
+          Save
+        </button>
+      </div>
+    </div>
+  );
+}
+
 function NineHoleGrid({
   label,
   totalLabel,
   startHole,
   holePars,
   players,
+  currentPlayerId,
+  onScoreTap,
 }: {
   label: string;
   totalLabel: string;
   startHole: number;
   holePars: number[];
   players: ScorecardPlayer[];
+  currentPlayerId: string | null;
+  onScoreTap?: (playerId: string, holeIdx: number) => void;
 }) {
   const parTotal = holePars.reduce((sum, p) => sum + p, 0);
+
+  // Sort: current user first, then everyone else in original order
+  const sortedPlayers = currentPlayerId
+    ? [
+        ...players.filter((p) => p.id === currentPlayerId),
+        ...players.filter((p) => p.id !== currentPlayerId),
+      ]
+    : players;
 
   return (
     <div className="mb-6">
@@ -393,25 +463,37 @@ function NineHoleGrid({
             </tr>
 
             {/* Player Rows */}
-            {players.map((player, pIdx) => {
+            {sortedPlayers.map((player, pIdx) => {
+              const isCurrentUser = player.id === currentPlayerId;
               const nineScores = player.scores.slice(startHole, startHole + 9);
               const nineTotal =
                 nineScores.every((s) => s !== null)
                   ? nineScores.reduce((sum, s) => sum! + s!, 0)
                   : null;
-              const rowBg =
-                pIdx % 2 === 0 ? "bg-surface" : "bg-surface-container-low";
+              const rowBg = isCurrentUser
+                ? "bg-secondary/10"
+                : pIdx % 2 === 0
+                  ? "bg-surface"
+                  : "bg-surface-container-low";
 
               return (
                 <tr key={player.id} className={rowBg}>
                   <td
-                    className={`sticky left-0 z-10 ${rowBg} px-3 py-2 shadow-[2px_0_4px_rgba(0,0,0,0.3)]`}
+                    className={`sticky left-0 z-10 ${rowBg} px-3 py-2 shadow-[2px_0_4px_rgba(0,0,0,0.3)] ${isCurrentUser ? "border-l-2 border-secondary" : ""}`}
                   >
                     <div className="flex items-center gap-2">
-                      <span
-                        className={`w-2 h-2 rounded-full flex-shrink-0 ${groupDotColor(player.group)}`}
-                      />
-                      <span className="font-label text-xs font-bold text-on-surface truncate max-w-[90px]">
+                      {isCurrentUser && player.avatarUrl ? (
+                        <img
+                          src={player.avatarUrl}
+                          alt={player.displayName}
+                          className="w-5 h-5 rounded-full object-cover flex-shrink-0"
+                        />
+                      ) : (
+                        <span
+                          className={`w-2 h-2 rounded-full flex-shrink-0 ${groupDotColor(player.group)}`}
+                        />
+                      )}
+                      <span className={`font-label font-bold text-on-surface truncate max-w-[90px] ${isCurrentUser ? "text-sm text-secondary" : "text-xs"}`}>
                         {player.displayName}
                       </span>
                     </div>
@@ -419,13 +501,18 @@ function NineHoleGrid({
                   {nineScores.map((score, i) => (
                     <td
                       key={i}
-                      className={`px-1 py-2 text-center font-label text-sm font-bold tabular-nums ${scoreColor(score, holePars[i])}`}
+                      className={`px-1 py-2 text-center font-label tabular-nums ${scoreColor(score, holePars[i])} ${
+                        isCurrentUser ? "text-base font-extrabold" : "text-sm font-bold"
+                      } ${isCurrentUser && onScoreTap ? "cursor-pointer active:bg-white/[0.1] rounded" : ""}`}
+                      onClick={isCurrentUser && onScoreTap ? () => onScoreTap(player.id, startHole + i) : undefined}
                     >
                       {score !== null ? score : "—"}
                     </td>
                   ))}
                   <td
-                    className={`px-2 py-2 text-center font-label text-sm font-bold tabular-nums ${
+                    className={`px-2 py-2 text-center font-label tabular-nums ${
+                      isCurrentUser ? "text-base font-extrabold" : "text-sm font-bold"
+                    } ${
                       nineTotal !== null
                         ? nineTotal < parTotal
                           ? "text-primary"
@@ -452,12 +539,20 @@ function SummaryTable({
   coursePar,
   frontPar,
   backPar,
+  currentPlayerId,
 }: {
   players: ScorecardPlayer[];
   coursePar: number;
   frontPar: number;
   backPar: number;
+  currentPlayerId: string | null;
 }) {
+  const sortedPlayers = currentPlayerId
+    ? [
+        ...players.filter((p) => p.id === currentPlayerId),
+        ...players.filter((p) => p.id !== currentPlayerId),
+      ]
+    : players;
   return (
     <div className="mb-6">
       <div className="overflow-x-auto">
@@ -508,19 +603,23 @@ function SummaryTable({
             </tr>
 
             {/* Player Rows */}
-            {players.map((player, pIdx) => {
-              const rowBg =
-                pIdx % 2 === 0 ? "bg-surface" : "bg-surface-container-low";
+            {sortedPlayers.map((player, pIdx) => {
+              const isCurrentUser = player.id === currentPlayerId;
+              const rowBg = isCurrentUser
+                ? "bg-secondary/10"
+                : pIdx % 2 === 0
+                  ? "bg-surface"
+                  : "bg-surface-container-low";
               return (
                 <tr key={player.id} className={rowBg}>
                   <td
-                    className={`sticky left-0 z-10 ${rowBg} px-3 py-2 shadow-[2px_0_4px_rgba(0,0,0,0.3)]`}
+                    className={`sticky left-0 z-10 ${rowBg} px-3 py-2 shadow-[2px_0_4px_rgba(0,0,0,0.3)] ${isCurrentUser ? "border-l-2 border-secondary" : ""}`}
                   >
                     <div className="flex items-center gap-2">
                       <span
                         className={`w-2 h-2 rounded-full flex-shrink-0 ${groupDotColor(player.group)}`}
                       />
-                      <span className="font-label text-xs font-bold text-on-surface truncate max-w-[90px]">
+                      <span className={`font-label font-bold text-on-surface truncate max-w-[90px] ${isCurrentUser ? "text-sm text-secondary" : "text-xs"}`}>
                         {player.displayName}
                       </span>
                     </div>
@@ -529,7 +628,7 @@ function SummaryTable({
                     {player.handicap}
                   </td>
                   <td
-                    className={`px-2 py-2 text-center font-label text-sm font-bold tabular-nums ${
+                    className={`px-2 py-2 text-center font-label tabular-nums ${isCurrentUser ? "text-base font-extrabold" : "text-sm font-bold"} ${
                       player.front9 !== null
                         ? scoreColor(player.front9, frontPar)
                         : "text-on-surface-variant"
@@ -538,7 +637,7 @@ function SummaryTable({
                     {player.front9 !== null ? player.front9 : "—"}
                   </td>
                   <td
-                    className={`px-2 py-2 text-center font-label text-sm font-bold tabular-nums ${
+                    className={`px-2 py-2 text-center font-label tabular-nums ${isCurrentUser ? "text-base font-extrabold" : "text-sm font-bold"} ${
                       player.back9 !== null
                         ? scoreColor(player.back9, backPar)
                         : "text-on-surface-variant"
@@ -547,7 +646,7 @@ function SummaryTable({
                     {player.back9 !== null ? player.back9 : "—"}
                   </td>
                   <td
-                    className={`px-2 py-2 text-center font-label text-sm font-bold tabular-nums ${
+                    className={`px-2 py-2 text-center font-label tabular-nums ${isCurrentUser ? "text-base font-extrabold" : "text-sm font-bold"} ${
                       player.gross !== null
                         ? scoreColor(player.gross, coursePar)
                         : "text-on-surface-variant"
@@ -556,7 +655,7 @@ function SummaryTable({
                     {player.gross !== null ? player.gross : "—"}
                   </td>
                   <td
-                    className={`px-2 py-2 text-center font-headline text-sm font-bold tabular-nums ${netColor(player.net, coursePar)}`}
+                    className={`px-2 py-2 text-center font-headline tabular-nums ${isCurrentUser ? "text-base font-extrabold" : "text-sm font-bold"} ${netColor(player.net, coursePar)}`}
                   >
                     {player.net !== null ? player.net : "—"}
                   </td>
@@ -594,6 +693,7 @@ export default function ScorecardPage() {
   const [loading, setLoading] = useState(true);
   const [currentUserId, setCurrentUserId] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
+  const [editingHole, setEditingHole] = useState<{ playerId: string; holeIdx: number } | null>(null);
 
   // Load saved settings from localStorage on mount
   useEffect(() => {
@@ -652,6 +752,36 @@ export default function ScorecardPage() {
     setData({ ...data, players: newPlayers });
 
     // Save to server (debounced-ish: fire and forget)
+    const allScores = newPlayers[playerIdx].scores as number[];
+    setSaving(true);
+    fetch("/api/scores", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ round: Number(round), holes: allScores }),
+    }).finally(() => setSaving(false));
+  }
+
+  // Handle direct score entry from classic view number pad
+  function handleDirectScoreChange(holeIdx: number, score: number) {
+    if (!data) return;
+    const playerIdx = data.players.findIndex((p) => p.id === currentUserId);
+    if (playerIdx === -1) return;
+
+    const newPlayers = data.players.map((p, pi) => {
+      if (pi !== playerIdx) return p;
+      const newScores = [...p.scores];
+      newScores[holeIdx] = score;
+      const front9 = newScores.slice(0, 9).every((s) => s !== null)
+        ? newScores.slice(0, 9).reduce((sum, s) => sum! + s!, 0)
+        : null;
+      const back9 = newScores.slice(9).every((s) => s !== null)
+        ? newScores.slice(9).reduce((sum, s) => sum! + s!, 0)
+        : null;
+      const gross = front9 !== null && back9 !== null ? front9 + back9 : null;
+      return { ...p, scores: newScores, front9, back9, gross };
+    });
+    setData({ ...data, players: newPlayers });
+
     const allScores = newPlayers[playerIdx].scores as number[];
     setSaving(true);
     fetch("/api/scores", {
@@ -774,6 +904,8 @@ export default function ScorecardPage() {
                 startHole={0}
                 holePars={data.course.holes.slice(0, 9)}
                 players={data.players}
+                currentPlayerId={currentUserId}
+                onScoreTap={(playerId, holeIdx) => setEditingHole({ playerId, holeIdx })}
               />
 
               {/* Back 9 */}
@@ -783,6 +915,8 @@ export default function ScorecardPage() {
                 startHole={9}
                 holePars={data.course.holes.slice(9)}
                 players={data.players}
+                currentPlayerId={currentUserId}
+                onScoreTap={(playerId, holeIdx) => setEditingHole({ playerId, holeIdx })}
               />
 
               {/* Summary */}
@@ -796,10 +930,21 @@ export default function ScorecardPage() {
                 coursePar={data.course.par}
                 frontPar={frontPar}
                 backPar={backPar}
+                currentPlayerId={currentUserId}
               />
             </>
           )}
         </>
+      )}
+
+      {/* Score Input Modal */}
+      {editingHole && data && (
+        <ScoreInput
+          value={data.players.find((p) => p.id === editingHole.playerId)?.scores[editingHole.holeIdx] ?? null}
+          holeIdx={editingHole.holeIdx}
+          onSubmit={handleDirectScoreChange}
+          onClose={() => setEditingHole(null)}
+        />
       )}
     </div>
   );
