@@ -570,6 +570,21 @@ function SummaryTable({
   );
 }
 
+function loadSettings() {
+  if (typeof window === "undefined") return { defaultRound: "1", scorecardView: "card" };
+  try {
+    const raw = localStorage.getItem("boshaw-settings");
+    if (raw) {
+      const parsed = JSON.parse(raw);
+      return {
+        defaultRound: parsed.defaultRound || "1",
+        scorecardView: parsed.scorecardView || "card",
+      };
+    }
+  } catch {}
+  return { defaultRound: "1", scorecardView: "card" };
+}
+
 export default function ScorecardPage() {
   const { data: session } = useSession();
   const [view, setView] = useState<ViewMode>("card");
@@ -579,6 +594,13 @@ export default function ScorecardPage() {
   const [loading, setLoading] = useState(true);
   const [currentUserId, setCurrentUserId] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
+
+  // Load saved settings from localStorage on mount
+  useEffect(() => {
+    const settings = loadSettings();
+    setView(settings.scorecardView as ViewMode);
+    setRound(settings.defaultRound);
+  }, []);
 
   // Fetch current user's player ID
   useEffect(() => {
