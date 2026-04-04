@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
 import type { ScorecardData, ScorecardPlayer } from "@/lib/types/scorecard";
 import { COURSE_PARS } from "@/lib/tournament";
@@ -337,12 +337,7 @@ function ScoreInput({
   onSubmit: (holeIdx: number, score: number) => void;
   onClose: () => void;
 }) {
-  const inputRef = useRef<HTMLInputElement>(null);
   const [inputValue, setInputValue] = useState(value !== null ? String(value) : "");
-
-  useEffect(() => {
-    setTimeout(() => inputRef.current?.focus(), 50);
-  }, []);
 
   function handleSubmit() {
     const num = parseInt(inputValue);
@@ -362,7 +357,7 @@ function ScoreInput({
           Hole {holeIdx + 1}
         </p>
         <input
-          ref={inputRef}
+          autoFocus
           type="number"
           inputMode="numeric"
           pattern="[0-9]*"
