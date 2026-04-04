@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useSession } from "next-auth/react";
 
 type Settings = {
   defaultRound: "1" | "2";
@@ -80,14 +81,36 @@ function SegmentedToggle({
   );
 }
 
+const ADMIN_EMAIL = "brettwfrancoeur@gmail.com";
+const GROUP_LABELS = ["Unassigned", "Group 1", "Group 2"] as const;
+
+type PlayerGroup = { id: string; displayName: string; group: number };
+
 export default function SettingsPage() {
   const [settings, setSettings] = useState<Settings>(DEFAULT_SETTINGS);
   const [mounted, setMounted] = useState(false);
+  const { data: session } = useSession();
+  const isAdmin = session?.user?.email === ADMIN_EMAIL;
+
+  const [players, setPlayers] = useState<PlayerGroup[]>([]);
+  const [groupsDirty, setGroupsDirty] = useState(false);
+  const [groupsSaving, setGroupsSaving] = useState(false);
 
   useEffect(() => {
     setSettings(loadSettings());
     setMounted(true);
   }, []);
+
+  useEffect(() => {
+    if (isAdmin) {
+      fetch("/api/groups")
+        .then((res) => res.json())
+        .then((data) => {
+          if (data.players) setPlayers(data.players);
+        })
+        .catch(() => {});
+    }
+  }, [isAdmin]);
 
   function update(patch: Partial<Settings>) {
     const next = { ...settings, ...patch };
@@ -197,6 +220,78 @@ export default function SettingsPage() {
           </div>
         </div>
       </div>
+
+      {/* Manage Groups (admin only) */}
+      {isAdmin && players.length > 0 && (
+        <div className="bg-white/[0.06] backdrop-blur-xl border border-white/[0.08] rounded-2xl p-5 mb-5">
+          <h3 className="font-headline text-lg text-on-surface mb-4">
+            Manage Groups
+          </h3>
+          <p className="text-[11px] text-on-surface-variant mb-4">
+            Tap a player to cycle: Unassigned → Group 1 → Group 2
+          </p>
+
+          <div className="space-y-2">
+            {players.map((p) => (
+              <button
+                key={p.id}
+                onClick={() => {
+                  setPlayers((prev) =>
+                    prev.map((pl) =>
+                      pl.id === p.id
+                        ? { ...pl, group: (pl.group + 1) % 3 }
+                        : pl
+                    )
+                  );
+                  setGroupsDirty(true);
+                }}
+                className="w-full flex items-center justify-between px-4 py-3 rounded-xl bg-white/[0.04] border border-white/[0.06] active:scale-[0.98] transition-transform"
+              >
+                <span className="font-label text-sm font-bold text-on-surface">
+                  {p.displayName}
+                </span>
+                <span
+                  className={`font-label text-xs font-bold uppercase tracking-wider px-3 py-1 rounded-full ${
+                    p.group === 1
+                      ? "bg-secondary/20 text-secondary"
+                      : p.group === 2
+                      ? "bg-primary/20 text-primary"
+                      : "bg-white/[0.06] text-on-surface-variant"
+                  }`}
+                >
+                  {GROUP_LABELS[p.group]}
+                </span>
+              </button>
+            ))}
+          </div>
+
+          {groupsDirty && (
+            <button
+              onClick={async () => {
+                setGroupsSaving(true);
+                try {
+                  await fetch("/api/groups", {
+                    method: "PUT",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                      assignments: players.map((p) => ({
+                        playerId: p.id,
+                        group: p.group,
+                      })),
+                    }),
+                  });
+                  setGroupsDirty(false);
+                } catch {}
+                setGroupsSaving(false);
+              }}
+              disabled={groupsSaving}
+              className="mt-4 w-full py-3 rounded-xl bg-secondary text-on-secondary font-label text-sm font-bold uppercase tracking-wider active:scale-[0.97] transition-transform disabled:opacity-50"
+            >
+              {groupsSaving ? "Saving…" : "Save Groups"}
+            </button>
+          )}
+        </div>
+      )}
 
       {/* About */}
       <div className="bg-white/[0.06] backdrop-blur-xl border border-white/[0.08] rounded-2xl p-5">
