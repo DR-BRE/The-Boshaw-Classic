@@ -73,17 +73,40 @@ export default function ProfilePage() {
 
     setUploading(true);
     try {
+      // If no player profile exists yet, create one first
+      if (!player) {
+        const profileRes = await fetch("/api/profile", {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            displayName: displayName || firstName || "Player",
+            firstName: firstName || "",
+            lastName: lastName || "",
+            handicap: Number(handicap) || 0,
+          }),
+        });
+        const profileData = await profileRes.json();
+        if (profileData.player) {
+          setPlayer(profileData.player);
+        }
+      }
+
       const formData = new FormData();
       formData.append("file", file);
       const res = await fetch("/api/upload", { method: "POST", body: formData });
       const data = await res.json();
       if (data.url) {
         setAvatarUrl(data.url);
+      } else if (data.error) {
+        alert(`Upload failed: ${data.error}`);
       }
     } catch (err) {
       console.error("Upload failed:", err);
+      alert("Upload failed. Please try again.");
     } finally {
       setUploading(false);
+      // Reset the input so the same file can be re-selected
+      e.target.value = "";
     }
   }
 
@@ -179,7 +202,7 @@ export default function ProfilePage() {
               <span className="material-symbols-outlined text-primary text-2xl">person</span>
             </div>
           )}
-          <div className="absolute inset-0 rounded-full bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 group-active:opacity-100 transition-opacity">
+          <div className="absolute inset-0 rounded-full bg-black/40 flex items-center justify-center opacity-60 sm:opacity-0 sm:group-hover:opacity-100 group-active:opacity-100 transition-opacity">
             <span className="material-symbols-outlined text-white text-lg">
               {uploading ? "hourglass_empty" : "photo_camera"}
             </span>
