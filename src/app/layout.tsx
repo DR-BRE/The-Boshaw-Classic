@@ -49,7 +49,7 @@ export default function RootLayout({
           rel="stylesheet"
         />
       </head>
-      <body className="min-h-full flex flex-col bg-background text-on-surface font-body antialiased">
+      <body className="min-h-dvh flex flex-col bg-background text-on-surface font-body antialiased">
         <SessionProvider>
           <LayoutShell>{children}</LayoutShell>
         </SessionProvider>
