@@ -6,6 +6,13 @@ import type { ScorecardData, ScorecardPlayer } from "@/lib/types/scorecard";
 import { COURSE_PARS } from "@/lib/tournament";
 
 type ViewMode = "card" | "classic";
+type GameMode = "scorecard" | "wolf" | "high-low";
+
+const GAME_MODES: { label: string; value: GameMode; icon: string }[] = [
+  { label: "Scorecard", value: "scorecard", icon: "scoreboard" },
+  { label: "Wolf", value: "wolf", icon: "pets" },
+  { label: "High-Low", value: "high-low", icon: "swap_vert" },
+];
 
 const ROUNDS = [
   { label: "Round 1", value: "1" },
@@ -702,6 +709,8 @@ export default function ScorecardPage() {
   const [currentUserId, setCurrentUserId] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
   const [editingHole, setEditingHole] = useState<{ playerId: string; holeIdx: number } | null>(null);
+  const [gameMode, setGameMode] = useState<GameMode>("scorecard");
+  const [gameModeOpen, setGameModeOpen] = useState(false);
 
   // Load saved settings from localStorage on mount
   useEffect(() => {
@@ -808,10 +817,49 @@ export default function ScorecardPage() {
 
   return (
     <div className="px-4 py-6">
-      {/* Header */}
-      <h2 className="font-headline text-3xl text-on-surface mb-5">
-        Scorecard
-      </h2>
+      {/* Header + Game Mode Dropdown */}
+      <div className="flex items-center justify-between mb-5">
+        <h2 className="font-headline text-3xl text-on-surface">
+          {GAME_MODES.find((m) => m.value === gameMode)?.label}
+        </h2>
+        <div className="relative">
+          <button
+            onClick={() => setGameModeOpen(!gameModeOpen)}
+            className="flex items-center gap-1.5 bg-white/[0.06] border border-white/[0.08] rounded-xl px-3 py-2 active:scale-95 transition-transform"
+          >
+            <span className="material-symbols-outlined text-secondary text-lg">
+              {GAME_MODES.find((m) => m.value === gameMode)?.icon}
+            </span>
+            <span className="font-label text-xs font-bold text-on-surface uppercase tracking-wider">
+              {GAME_MODES.find((m) => m.value === gameMode)?.label}
+            </span>
+            <span className="material-symbols-outlined text-on-surface-variant text-sm">
+              {gameModeOpen ? "expand_less" : "expand_more"}
+            </span>
+          </button>
+          {gameModeOpen && (
+            <>
+              <div className="fixed inset-0 z-40" onClick={() => setGameModeOpen(false)} />
+              <div className="absolute right-0 top-full mt-1 z-50 bg-surface-container-high border border-white/[0.1] rounded-xl overflow-hidden shadow-lg min-w-[160px]">
+                {GAME_MODES.map((mode) => (
+                  <button
+                    key={mode.value}
+                    onClick={() => { setGameMode(mode.value); setGameModeOpen(false); }}
+                    className={`w-full flex items-center gap-2.5 px-4 py-3 text-left transition-colors ${
+                      gameMode === mode.value
+                        ? "bg-secondary/15 text-secondary"
+                        : "text-on-surface hover:bg-white/[0.06]"
+                    }`}
+                  >
+                    <span className="material-symbols-outlined text-lg">{mode.icon}</span>
+                    <span className="font-label text-sm font-bold">{mode.label}</span>
+                  </button>
+                ))}
+              </div>
+            </>
+          )}
+        </div>
+      </div>
 
       {/* Round Tabs */}
       <div className="bg-white/[0.06] backdrop-blur-lg border border-white/[0.06] rounded-xl p-1 flex gap-1 mb-4">
