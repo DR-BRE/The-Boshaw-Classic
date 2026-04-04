@@ -28,17 +28,17 @@ export default function Home() {
   }, []);
 
   return (
-    <div className="flex flex-col min-h-[calc(100vh-5rem)] pb-28 -mt-8">
+    <div className="flex flex-col min-h-[calc(100vh-5rem)] min-h-[calc(100dvh-5rem)] pb-28 -mt-6">
       {/* Hero Section — fills most of the viewport so leaderboard sits near bottom */}
       <section className="relative px-6 pb-8 flex-1 flex flex-col justify-end">
         {/* Hero background image — extends well above section to prevent logo clipping */}
-        <div className="absolute -top-24 left-0 right-0 bottom-0 bg-[url('/hero-bg.png')] bg-cover bg-[center_top]" />
+        <div className="absolute -top-24 left-0 right-0 bottom-0 bg-[url('/hero-bg.png')] bg-cover bg-[center_0.75rem]" />
         {/* Dark gradient overlay for text legibility */}
         <div className="absolute -top-24 left-0 right-0 bottom-0 bg-gradient-to-b from-black/50 via-transparent to-black/70" />
 
         <div className="relative z-10">
           {/* Logo spacer — tall enough so logo is fully visible */}
-          <div className="h-[38vh] sm:h-[50vh]" />
+          <div className="h-[28vh] sm:h-[42vh]" />
 
           {/* Countdown */}
           <div className="mb-6">
