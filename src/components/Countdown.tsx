@@ -32,12 +32,12 @@ function getTimeLeft(): TimeLeft | "live" | "over" {
 function TimeUnit({ value, label }: { value: number; label: string }) {
   return (
     <div className="flex flex-col items-center">
-      <div className="bg-black/40 backdrop-blur-sm border border-white/10 rounded-xl w-14 h-14 sm:w-16 sm:h-16 flex items-center justify-center">
-        <span className="text-xl sm:text-2xl font-headline font-bold text-secondary tabular-nums">
+      <div className="bg-black/60 backdrop-blur-sm border border-white/20 rounded-xl w-14 h-14 sm:w-16 sm:h-16 flex items-center justify-center">
+        <span className="text-xl sm:text-2xl font-headline font-bold text-white tabular-nums">
           {String(value).padStart(2, "0")}
         </span>
       </div>
-      <span className="mt-1.5 text-[9px] font-label font-bold uppercase tracking-widest text-white/70">
+      <span className="mt-1.5 text-[9px] font-label font-bold uppercase tracking-widest text-white/90">
         {label}
       </span>
     </div>
