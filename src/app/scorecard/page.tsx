@@ -475,11 +475,12 @@ function NineHoleGrid({
                 : pIdx % 2 === 0
                   ? "bg-surface"
                   : "bg-surface-container-low";
+              const stickyBg = isCurrentUser ? "bg-[#1c2718]" : rowBg;
 
               return (
                 <tr key={player.id} className={rowBg}>
                   <td
-                    className={`sticky left-0 z-10 ${rowBg} px-3 py-2 shadow-[2px_0_4px_rgba(0,0,0,0.3)] ${isCurrentUser ? "border-l-2 border-secondary" : ""}`}
+                    className={`sticky left-0 z-10 ${stickyBg} px-3 py-2 shadow-[2px_0_4px_rgba(0,0,0,0.3)] ${isCurrentUser ? "border-l-2 border-secondary" : ""}`}
                   >
                     <div className="flex items-center gap-2">
                       {isCurrentUser && player.avatarUrl ? (
@@ -610,10 +611,11 @@ function SummaryTable({
                 : pIdx % 2 === 0
                   ? "bg-surface"
                   : "bg-surface-container-low";
+              const stickyBg = isCurrentUser ? "bg-[#1c2718]" : rowBg;
               return (
                 <tr key={player.id} className={rowBg}>
                   <td
-                    className={`sticky left-0 z-10 ${rowBg} px-3 py-2 shadow-[2px_0_4px_rgba(0,0,0,0.3)] ${isCurrentUser ? "border-l-2 border-secondary" : ""}`}
+                    className={`sticky left-0 z-10 ${stickyBg} px-3 py-2 shadow-[2px_0_4px_rgba(0,0,0,0.3)] ${isCurrentUser ? "border-l-2 border-secondary" : ""}`}
                   >
                     <div className="flex items-center gap-2">
                       <span
