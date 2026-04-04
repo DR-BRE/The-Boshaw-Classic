@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
 import type { ScorecardData, ScorecardPlayer } from "@/lib/types/scorecard";
 import { COURSE_PARS } from "@/lib/tournament";
@@ -35,6 +35,24 @@ function netColor(net: number | null, coursePar: number) {
 
 function groupDotColor(group: number) {
   return group === 1 ? "bg-primary" : "bg-secondary";
+}
+
+function sortPlayersByGroup(
+  players: ScorecardPlayer[],
+  currentPlayerId: string | null
+) {
+  const currentUser = players.find((p) => p.id === currentPlayerId);
+  const userGroup = currentUser?.group ?? 0;
+
+  const self = players.filter((p) => p.id === currentPlayerId);
+  const sameGroup = players.filter(
+    (p) => p.id !== currentPlayerId && p.group === userGroup && userGroup > 0
+  );
+  const otherGroup = players.filter(
+    (p) => p.id !== currentPlayerId && (p.group !== userGroup || userGroup === 0)
+  );
+
+  return { sorted: [...self, ...sameGroup, ...otherGroup], dividerAfter: self.length + sameGroup.length };
 }
 
 function scoreBg(score: number | null, par: number) {
@@ -416,13 +434,7 @@ function NineHoleGrid({
 }) {
   const parTotal = holePars.reduce((sum, p) => sum + p, 0);
 
-  // Sort: current user first, then everyone else in original order
-  const sortedPlayers = currentPlayerId
-    ? [
-        ...players.filter((p) => p.id === currentPlayerId),
-        ...players.filter((p) => p.id !== currentPlayerId),
-      ]
-    : players;
+  const { sorted: sortedPlayers, dividerAfter } = sortPlayersByGroup(players, currentPlayerId);
 
   return (
     <div className="mb-6">
@@ -491,54 +503,61 @@ function NineHoleGrid({
               const stickyBg = isCurrentUser ? "bg-[#1c2718]" : rowBg;
 
               return (
-                <tr key={player.id} className={rowBg}>
-                  <td
-                    className={`sticky left-0 z-10 ${stickyBg} px-3 py-2 shadow-[2px_0_4px_rgba(0,0,0,0.3)] ${isCurrentUser ? "border-l-2 border-secondary" : ""}`}
-                  >
-                    <div className="flex items-center gap-2">
-                      {isCurrentUser && player.avatarUrl ? (
-                        <img
-                          src={player.avatarUrl}
-                          alt={player.displayName}
-                          className="w-5 h-5 rounded-full object-cover flex-shrink-0"
-                        />
-                      ) : (
-                        <span
-                          className={`w-2 h-2 rounded-full flex-shrink-0 ${groupDotColor(player.group)}`}
-                        />
-                      )}
-                      <span className={`font-label font-bold text-on-surface truncate max-w-[90px] ${isCurrentUser ? "text-sm text-secondary" : "text-xs"}`}>
-                        {player.displayName}
-                      </span>
-                    </div>
-                  </td>
-                  {nineScores.map((score, i) => (
+                <React.Fragment key={player.id}>
+                  <tr className={rowBg}>
                     <td
-                      key={i}
-                      className={`px-1 py-2 text-center font-label tabular-nums ${scoreColor(score, holePars[i])} ${
-                        isCurrentUser ? "text-base font-extrabold" : "text-sm font-bold"
-                      } ${isCurrentUser && onScoreTap ? "cursor-pointer active:bg-white/[0.15] rounded-md bg-white/[0.06] border border-white/[0.1]" : ""}`}
-                      onClick={isCurrentUser && onScoreTap ? () => onScoreTap(player.id, startHole + i) : undefined}
+                      className={`sticky left-0 z-10 ${stickyBg} px-3 py-2 shadow-[2px_0_4px_rgba(0,0,0,0.3)] ${isCurrentUser ? "border-l-2 border-secondary" : ""}`}
                     >
-                      {score !== null ? score : "—"}
+                      <div className="flex items-center gap-2">
+                        {isCurrentUser && player.avatarUrl ? (
+                          <img
+                            src={player.avatarUrl}
+                            alt={player.displayName}
+                            className="w-5 h-5 rounded-full object-cover flex-shrink-0"
+                          />
+                        ) : (
+                          <span
+                            className={`w-2 h-2 rounded-full flex-shrink-0 ${groupDotColor(player.group)}`}
+                          />
+                        )}
+                        <span className={`font-label font-bold text-on-surface truncate max-w-[90px] ${isCurrentUser ? "text-sm text-secondary" : "text-xs"}`}>
+                          {player.displayName}
+                        </span>
+                      </div>
                     </td>
-                  ))}
-                  <td
-                    className={`px-2 py-2 text-center font-label tabular-nums ${
-                      isCurrentUser ? "text-base font-extrabold" : "text-sm font-bold"
-                    } ${
-                      nineTotal !== null
-                        ? nineTotal < parTotal
-                          ? "text-primary"
-                          : nineTotal > parTotal
-                            ? "text-on-error-container"
-                            : "text-on-surface"
-                        : "text-on-surface-variant"
-                    }`}
-                  >
-                    {nineTotal !== null ? nineTotal : "—"}
-                  </td>
-                </tr>
+                    {nineScores.map((score, i) => (
+                      <td
+                        key={i}
+                        className={`px-1 py-2 text-center font-label tabular-nums ${scoreColor(score, holePars[i])} ${
+                          isCurrentUser ? "text-base font-extrabold" : "text-sm font-bold"
+                        } ${isCurrentUser && onScoreTap ? "cursor-pointer active:bg-white/[0.15] rounded-md bg-white/[0.06] border border-white/[0.1]" : ""}`}
+                        onClick={isCurrentUser && onScoreTap ? () => onScoreTap(player.id, startHole + i) : undefined}
+                      >
+                        {score !== null ? score : "—"}
+                      </td>
+                    ))}
+                    <td
+                      className={`px-2 py-2 text-center font-label tabular-nums ${
+                        isCurrentUser ? "text-base font-extrabold" : "text-sm font-bold"
+                      } ${
+                        nineTotal !== null
+                          ? nineTotal < parTotal
+                            ? "text-primary"
+                            : nineTotal > parTotal
+                              ? "text-on-error-container"
+                              : "text-on-surface"
+                          : "text-on-surface-variant"
+                      }`}
+                    >
+                      {nineTotal !== null ? nineTotal : "—"}
+                    </td>
+                  </tr>
+                  {pIdx + 1 === dividerAfter && pIdx + 1 < sortedPlayers.length && (
+                    <tr>
+                      <td colSpan={holePars.length + 2} className="py-0.5 bg-white/[0.08]" />
+                    </tr>
+                  )}
+                </React.Fragment>
               );
             })}
           </tbody>
@@ -561,12 +580,7 @@ function SummaryTable({
   backPar: number;
   currentPlayerId: string | null;
 }) {
-  const sortedPlayers = currentPlayerId
-    ? [
-        ...players.filter((p) => p.id === currentPlayerId),
-        ...players.filter((p) => p.id !== currentPlayerId),
-      ]
-    : players;
+  const { sorted: sortedPlayers, dividerAfter } = sortPlayersByGroup(players, currentPlayerId);
   return (
     <div className="mb-6">
       <div className="overflow-x-auto">
@@ -626,55 +640,62 @@ function SummaryTable({
                   : "bg-surface-container-low";
               const stickyBg = isCurrentUser ? "bg-[#1c2718]" : rowBg;
               return (
-                <tr key={player.id} className={rowBg}>
-                  <td
-                    className={`sticky left-0 z-10 ${stickyBg} px-3 py-2 shadow-[2px_0_4px_rgba(0,0,0,0.3)] ${isCurrentUser ? "border-l-2 border-secondary" : ""}`}
-                  >
-                    <div className="flex items-center gap-2">
-                      <span
-                        className={`w-2 h-2 rounded-full flex-shrink-0 ${groupDotColor(player.group)}`}
-                      />
-                      <span className={`font-label font-bold text-on-surface truncate max-w-[90px] ${isCurrentUser ? "text-sm text-secondary" : "text-xs"}`}>
-                        {player.displayName}
-                      </span>
-                    </div>
-                  </td>
-                  <td className="px-2 py-2 text-center font-label text-sm text-on-surface tabular-nums">
-                    {player.handicap}
-                  </td>
-                  <td
-                    className={`px-2 py-2 text-center font-label tabular-nums ${isCurrentUser ? "text-base font-extrabold" : "text-sm font-bold"} ${
-                      player.front9 !== null
-                        ? scoreColor(player.front9, frontPar)
-                        : "text-on-surface-variant"
-                    }`}
-                  >
-                    {player.front9 !== null ? player.front9 : "—"}
-                  </td>
-                  <td
-                    className={`px-2 py-2 text-center font-label tabular-nums ${isCurrentUser ? "text-base font-extrabold" : "text-sm font-bold"} ${
-                      player.back9 !== null
-                        ? scoreColor(player.back9, backPar)
-                        : "text-on-surface-variant"
-                    }`}
-                  >
-                    {player.back9 !== null ? player.back9 : "—"}
-                  </td>
-                  <td
-                    className={`px-2 py-2 text-center font-label tabular-nums ${isCurrentUser ? "text-base font-extrabold" : "text-sm font-bold"} ${
-                      player.gross !== null
-                        ? scoreColor(player.gross, coursePar)
-                        : "text-on-surface-variant"
-                    }`}
-                  >
-                    {player.gross !== null ? player.gross : "—"}
-                  </td>
-                  <td
-                    className={`px-2 py-2 text-center font-headline tabular-nums ${isCurrentUser ? "text-base font-extrabold" : "text-sm font-bold"} ${netColor(player.net, coursePar)}`}
-                  >
-                    {player.net !== null ? player.net : "—"}
-                  </td>
-                </tr>
+                <React.Fragment key={player.id}>
+                  <tr className={rowBg}>
+                    <td
+                      className={`sticky left-0 z-10 ${stickyBg} px-3 py-2 shadow-[2px_0_4px_rgba(0,0,0,0.3)] ${isCurrentUser ? "border-l-2 border-secondary" : ""}`}
+                    >
+                      <div className="flex items-center gap-2">
+                        <span
+                          className={`w-2 h-2 rounded-full flex-shrink-0 ${groupDotColor(player.group)}`}
+                        />
+                        <span className={`font-label font-bold text-on-surface truncate max-w-[90px] ${isCurrentUser ? "text-sm text-secondary" : "text-xs"}`}>
+                          {player.displayName}
+                        </span>
+                      </div>
+                    </td>
+                    <td className="px-2 py-2 text-center font-label text-sm text-on-surface tabular-nums">
+                      {player.handicap}
+                    </td>
+                    <td
+                      className={`px-2 py-2 text-center font-label tabular-nums ${isCurrentUser ? "text-base font-extrabold" : "text-sm font-bold"} ${
+                        player.front9 !== null
+                          ? scoreColor(player.front9, frontPar)
+                          : "text-on-surface-variant"
+                      }`}
+                    >
+                      {player.front9 !== null ? player.front9 : "—"}
+                    </td>
+                    <td
+                      className={`px-2 py-2 text-center font-label tabular-nums ${isCurrentUser ? "text-base font-extrabold" : "text-sm font-bold"} ${
+                        player.back9 !== null
+                          ? scoreColor(player.back9, backPar)
+                          : "text-on-surface-variant"
+                      }`}
+                    >
+                      {player.back9 !== null ? player.back9 : "—"}
+                    </td>
+                    <td
+                      className={`px-2 py-2 text-center font-label tabular-nums ${isCurrentUser ? "text-base font-extrabold" : "text-sm font-bold"} ${
+                        player.gross !== null
+                          ? scoreColor(player.gross, coursePar)
+                          : "text-on-surface-variant"
+                      }`}
+                    >
+                      {player.gross !== null ? player.gross : "—"}
+                    </td>
+                    <td
+                      className={`px-2 py-2 text-center font-headline tabular-nums ${isCurrentUser ? "text-base font-extrabold" : "text-sm font-bold"} ${netColor(player.net, coursePar)}`}
+                    >
+                      {player.net !== null ? player.net : "—"}
+                    </td>
+                  </tr>
+                  {pIdx + 1 === dividerAfter && pIdx + 1 < sortedPlayers.length && (
+                    <tr>
+                      <td colSpan={6} className="py-0.5 bg-white/[0.08]" />
+                    </tr>
+                  )}
+                </React.Fragment>
               );
             })}
           </tbody>
@@ -745,7 +766,10 @@ export default function ScorecardPage() {
   // Handle score change from card view +/- buttons
   function handleScoreChange(playerIdx: number, holeIdx: number, delta: number) {
     if (!data) return;
-    const player = data.players[playerIdx];
+    // playerIdx refers to the sorted array, so look up by sorted order
+    const sortedCards = sortPlayersByGroup(data.players, currentUserId).sorted;
+    const player = sortedCards[playerIdx];
+    if (!player) return;
     const current = player.scores[holeIdx];
     // If no score yet, initialize to par then apply delta
     const base = current !== null ? current : data.course.holes[holeIdx];
@@ -753,8 +777,8 @@ export default function ScorecardPage() {
     if (current !== null && next === current) return;
 
     // Optimistic update
-    const newPlayers = data.players.map((p, pi) => {
-      if (pi !== playerIdx) return p;
+    const newPlayers = data.players.map((p) => {
+      if (p.id !== player.id) return p;
       const newScores = [...p.scores];
       newScores[holeIdx] = next;
       const front9 = newScores.slice(0, 9).every((s) => s !== null)
@@ -769,7 +793,9 @@ export default function ScorecardPage() {
     setData({ ...data, players: newPlayers });
 
     // Save to server (debounced-ish: fire and forget)
-    const allScores = newPlayers[playerIdx].scores as number[];
+    const updatedPlayer = newPlayers.find((p) => p.id === player.id);
+    if (!updatedPlayer) return;
+    const allScores = updatedPlayer.scores as number[];
     setSaving(true);
     fetch("/api/scores", {
       method: "POST",
@@ -944,7 +970,7 @@ export default function ScorecardPage() {
           {/* Views */}
           {view === "card" ? (
             <CardView
-              players={data.players}
+              players={sortPlayersByGroup(data.players, currentUserId).sorted}
               holePars={data.course.holes}
               strokeIndices={COURSE_PARS[data.course.name as keyof typeof COURSE_PARS].strokeIndex}
               selectedPlayer={selectedPlayer}
