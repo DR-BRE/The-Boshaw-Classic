@@ -1,6 +1,10 @@
 "use client";
 
+import { useSession } from "next-auth/react";
+
 export default function TripPage() {
+  const { data: session } = useSession();
+
   return (
     <div className="px-4 py-6 pb-24">
       <h2 className="font-headline text-3xl text-on-surface mb-2">
@@ -10,6 +14,16 @@ export default function TripPage() {
         Lake Chelan, WA — May 2026
       </p>
 
+      {!session ? (
+        <div className="bg-white/[0.06] backdrop-blur-xl border border-white/[0.08] rounded-2xl p-6 text-center">
+          <span className="material-symbols-outlined text-secondary text-4xl mb-3 block">lock</span>
+          <p className="font-headline text-lg text-on-surface mb-1">Sign in to view trip details</p>
+          <p className="font-label text-sm text-on-surface-variant">
+            Accommodation info, amenities, and more are available once you're signed in.
+          </p>
+        </div>
+      ) : (
+      <>
       {/* Accommodation Card */}
       <div className="bg-white/[0.06] backdrop-blur-xl border border-white/[0.08] rounded-2xl overflow-hidden mb-4">
         <div className="bg-secondary px-4 py-2">
@@ -146,6 +160,8 @@ export default function TripPage() {
         </svg>
         View on Airbnb
       </a>
+      </>
+      )}
     </div>
   );
 }
