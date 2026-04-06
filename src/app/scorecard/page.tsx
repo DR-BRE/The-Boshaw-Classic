@@ -187,6 +187,7 @@ function CardView({
   onScoreChange,
   currentPlayerId,
   wolfOrder,
+  isAdmin,
 }: {
   players: ScorecardPlayer[];
   holePars: number[];
@@ -196,9 +197,10 @@ function CardView({
   onScoreChange: (playerIdx: number, holeIdx: number, delta: number) => void;
   currentPlayerId: string | null;
   wolfOrder?: string[] | null;
+  isAdmin?: boolean;
 }) {
   const player = players[selectedPlayer];
-  const isOwnCard = player?.id === currentPlayerId;
+  const canEdit = player?.id === currentPlayerId || !!isAdmin;
   if (!player) return null;
 
   const frontPars = holePars.slice(0, 9);
@@ -329,7 +331,7 @@ function CardView({
             par={par}
             score={player.scores[i]}
             handicap={frontIndices[i]}
-            editable={isOwnCard}
+            editable={canEdit}
             onIncrement={() => onScoreChange(selectedPlayer, i, 1)}
             onDecrement={() => onScoreChange(selectedPlayer, i, -1)}
             isWolf={getWolfForHole(wolfOrder ?? null, i + 1) === player.id}
@@ -355,7 +357,7 @@ function CardView({
             par={par}
             score={player.scores[i + 9]}
             handicap={backIndices[i]}
-            editable={isOwnCard}
+            editable={canEdit}
             onIncrement={() => onScoreChange(selectedPlayer, i + 9, 1)}
             onDecrement={() => onScoreChange(selectedPlayer, i + 9, -1)}
             isWolf={getWolfForHole(wolfOrder ?? null, i + 10) === player.id}
@@ -876,11 +878,20 @@ export default function ScorecardPage() {
     if (!updatedPlayer) return;
     const allScores = updatedPlayer.scores as number[];
     setSaving(true);
-    fetch("/api/scores", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ round: Number(round), holes: allScores }),
-    }).finally(() => setSaving(false));
+    const isOtherPlayer = player.id !== currentUserId;
+    if (isAdmin && isOtherPlayer) {
+      fetch("/api/admin/scores", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ playerId: player.id, round: Number(round), holes: allScores }),
+      }).finally(() => setSaving(false));
+    } else {
+      fetch("/api/scores", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ round: Number(round), holes: allScores }),
+      }).finally(() => setSaving(false));
+    }
   }
 
   // Handle direct score entry from classic view number pad
@@ -1070,6 +1081,7 @@ export default function ScorecardPage() {
               onScoreChange={handleScoreChange}
               currentPlayerId={currentUserId}
               wolfOrder={wolfOrder}
+              isAdmin={isAdmin}
             />
           ) : (
             <>

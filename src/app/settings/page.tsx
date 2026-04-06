@@ -87,23 +87,10 @@ const GROUP_LABELS = ["Unassigned", "Group 1", "Group 2"] as const;
 
 type PlayerGroup = { id: string; displayName: string; group: number };
 
-type ScoreRecord = {
-  id: string;
-  round: number;
-  course: string;
-  hole1: number; hole2: number; hole3: number; hole4: number;
-  hole5: number; hole6: number; hole7: number; hole8: number;
-  hole9: number; hole10: number; hole11: number; hole12: number;
-  hole13: number; hole14: number; hole15: number; hole16: number;
-  hole17: number; hole18: number;
-  totalStrokes: number;
-  toPar: number;
-};
-
 type PlayerWithScores = {
   id: string;
   displayName: string;
-  scores: ScoreRecord[];
+  scores: unknown[];
 };
 
 export default function SettingsPage() {
@@ -125,13 +112,8 @@ export default function SettingsPage() {
   const [newHandicap, setNewHandicap] = useState("0");
   const [addingPlayer, setAddingPlayer] = useState(false);
 
-  // Admin score editing
+  // For refreshing after add player
   const [allPlayers, setAllPlayers] = useState<PlayerWithScores[]>([]);
-  const [editPlayerId, setEditPlayerId] = useState<string | null>(null);
-  const [editRound, setEditRound] = useState(1);
-  const [editHoles, setEditHoles] = useState<number[]>(Array(18).fill(4));
-  const [scoreSaving, setScoreSaving] = useState(false);
-  const [scoreMsg, setScoreMsg] = useState("");
 
   useEffect(() => {
     setSettings(loadSettings());
@@ -155,62 +137,7 @@ export default function SettingsPage() {
     }
   }, [isAdmin]);
 
-  function loadScoreForEdit(playerId: string, round: number) {
-    const player = allPlayers.find((p) => p.id === playerId);
-    const score = player?.scores.find((s) => s.round === round);
-    if (score) {
-      setEditHoles([
-        score.hole1, score.hole2, score.hole3, score.hole4,
-        score.hole5, score.hole6, score.hole7, score.hole8,
-        score.hole9, score.hole10, score.hole11, score.hole12,
-        score.hole13, score.hole14, score.hole15, score.hole16,
-        score.hole17, score.hole18,
-      ]);
-    } else {
-      // Default to par for the course
-      const pars = round === 1
-        ? [4,4,3,4,5,4,3,5,4,4,3,4,4,5,4,4,3,5]
-        : [4,4,5,3,4,4,5,3,4,5,4,4,4,3,5,3,4,4];
-      setEditHoles([...pars]);
-    }
-    setEditPlayerId(playerId);
-    setEditRound(round);
-    setScoreMsg("");
-  }
 
-  async function saveAdminScore() {
-    if (!editPlayerId) return;
-    setScoreSaving(true);
-    setScoreMsg("");
-    try {
-      const res = await fetch("/api/admin/scores", {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ playerId: editPlayerId, round: editRound, holes: editHoles }),
-      });
-      if (!res.ok) throw new Error("Failed to save");
-      // Refresh data
-      const refreshRes = await fetch("/api/admin/scores");
-      const data = await refreshRes.json();
-      if (data.players) setAllPlayers(data.players);
-      setScoreMsg("Saved!");
-    } catch {
-      setScoreMsg("Error saving score");
-    }
-    setScoreSaving(false);
-  }
-
-  async function deleteAdminScore(playerId: string, round: number) {
-    try {
-      await fetch(`/api/admin/scores?playerId=${playerId}&round=${round}`, { method: "DELETE" });
-      const res = await fetch("/api/admin/scores");
-      const data = await res.json();
-      if (data.players) setAllPlayers(data.players);
-      if (editPlayerId === playerId && editRound === round) {
-        setEditPlayerId(null);
-      }
-    } catch {}
-  }
 
   function update(patch: Partial<Settings>) {
     const next = { ...settings, ...patch };
@@ -489,162 +416,6 @@ export default function SettingsPage() {
             >
               {groupsSaving ? "Saving…" : "Save Groups"}
             </button>
-          )}
-        </div>
-      )}
-
-      {/* Edit Scores (admin only) */}
-      {isAdmin && allPlayers.length > 0 && (
-        <div className="bg-white/[0.06] backdrop-blur-xl border border-white/[0.08] rounded-2xl p-5 mb-5">
-          <h3 className="font-headline text-lg text-on-surface mb-4">
-            Edit Scores
-          </h3>
-          <p className="text-[11px] text-on-surface-variant mb-4">
-            Select a player and round to view or edit their scorecard.
-          </p>
-
-          {/* Player list with score summary */}
-          <div className="space-y-2 mb-4">
-            {allPlayers.map((p) => (
-              <div key={p.id} className="rounded-xl bg-[#1a2e28] border border-white/[0.06] p-3">
-                <p className="font-label text-sm font-bold text-on-surface mb-2">{p.displayName}</p>
-                <div className="flex gap-2">
-                  {[1, 2].map((r) => {
-                    const score = p.scores.find((s) => s.round === r);
-                    const isActive = editPlayerId === p.id && editRound === r;
-                    return (
-                      <button
-                        key={r}
-                        onClick={() => loadScoreForEdit(p.id, r)}
-                        className={`flex-1 py-2 rounded-lg font-label text-xs font-bold uppercase tracking-wider transition-all active:scale-95 ${
-                          isActive
-                            ? "bg-secondary text-on-secondary"
-                            : score
-                            ? "bg-primary/20 text-primary"
-                            : "bg-white/[0.06] text-on-surface-variant"
-                        }`}
-                      >
-                        R{r}: {score ? `${score.totalStrokes} (${score.toPar > 0 ? "+" : ""}${score.toPar})` : "No score"}
-                      </button>
-                    );
-                  })}
-                </div>
-              </div>
-            ))}
-          </div>
-
-          {/* Score editor */}
-          {editPlayerId && (
-            <div className="rounded-xl bg-[#0d1f1a] border border-white/[0.08] p-4">
-              <div className="flex items-center justify-between mb-3">
-                <p className="font-label text-sm font-bold text-on-surface">
-                  {allPlayers.find((p) => p.id === editPlayerId)?.displayName} — Round {editRound}
-                </p>
-                <button
-                  onClick={() => setEditPlayerId(null)}
-                  className="material-symbols-outlined text-on-surface-variant text-lg"
-                >
-                  close
-                </button>
-              </div>
-
-              {/* Hole grid */}
-              <div className="grid grid-cols-9 gap-1 mb-3">
-                {/* Front 9 */}
-                {editHoles.slice(0, 9).map((val, i) => (
-                  <div key={i} className="text-center">
-                    <p className="font-label text-[9px] text-on-surface-variant mb-1">{i + 1}</p>
-                    <div className="flex flex-col items-center gap-0.5">
-                      <button
-                        onClick={() => {
-                          const next = [...editHoles];
-                          next[i]++;
-                          setEditHoles(next);
-                          setScoreMsg("");
-                        }}
-                        className="w-full text-[10px] text-on-surface-variant active:scale-90"
-                      >
-                        +
-                      </button>
-                      <span className="font-label text-xs font-bold text-on-surface tabular-nums">{val}</span>
-                      <button
-                        onClick={() => {
-                          const next = [...editHoles];
-                          if (next[i] > 1) next[i]--;
-                          setEditHoles(next);
-                          setScoreMsg("");
-                        }}
-                        className="w-full text-[10px] text-on-surface-variant active:scale-90"
-                      >
-                        −
-                      </button>
-                    </div>
-                  </div>
-                ))}
-              </div>
-              <div className="grid grid-cols-9 gap-1 mb-3">
-                {/* Back 9 */}
-                {editHoles.slice(9, 18).map((val, i) => (
-                  <div key={i + 9} className="text-center">
-                    <p className="font-label text-[9px] text-on-surface-variant mb-1">{i + 10}</p>
-                    <div className="flex flex-col items-center gap-0.5">
-                      <button
-                        onClick={() => {
-                          const next = [...editHoles];
-                          next[i + 9]++;
-                          setEditHoles(next);
-                          setScoreMsg("");
-                        }}
-                        className="w-full text-[10px] text-on-surface-variant active:scale-90"
-                      >
-                        +
-                      </button>
-                      <span className="font-label text-xs font-bold text-on-surface tabular-nums">{val}</span>
-                      <button
-                        onClick={() => {
-                          const next = [...editHoles];
-                          if (next[i + 9] > 1) next[i + 9]--;
-                          setEditHoles(next);
-                          setScoreMsg("");
-                        }}
-                        className="w-full text-[10px] text-on-surface-variant active:scale-90"
-                      >
-                        −
-                      </button>
-                    </div>
-                  </div>
-                ))}
-              </div>
-
-              <div className="flex items-center justify-between mb-3">
-                <p className="font-label text-xs text-on-surface-variant">
-                  Total: <span className="text-on-surface font-bold">{editHoles.reduce((a, b) => a + b, 0)}</span>
-                </p>
-                {scoreMsg && (
-                  <p className={`font-label text-xs font-bold ${scoreMsg === "Saved!" ? "text-primary" : "text-on-error-container"}`}>
-                    {scoreMsg}
-                  </p>
-                )}
-              </div>
-
-              <div className="flex gap-2">
-                <button
-                  onClick={saveAdminScore}
-                  disabled={scoreSaving}
-                  className="flex-1 py-3 rounded-xl bg-secondary text-on-secondary font-label text-sm font-bold uppercase tracking-wider active:scale-[0.97] transition-transform disabled:opacity-50"
-                >
-                  {scoreSaving ? "Saving…" : "Save Score"}
-                </button>
-                {allPlayers.find((p) => p.id === editPlayerId)?.scores.find((s) => s.round === editRound) && (
-                  <button
-                    onClick={() => deleteAdminScore(editPlayerId, editRound)}
-                    className="px-4 py-3 rounded-xl bg-red-500/20 text-red-400 font-label text-sm font-bold uppercase tracking-wider active:scale-[0.97] transition-transform"
-                  >
-                    Delete
-                  </button>
-                )}
-              </div>
-            </div>
           )}
         </div>
       )}
