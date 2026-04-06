@@ -90,18 +90,32 @@ function SwipeableRow({
 }) {
   const rowRef = useRef<HTMLDivElement>(null);
   const startX = useRef(0);
+  const startY = useRef(0);
   const currentX = useRef(0);
   const swiping = useRef(false);
+  const direction = useRef<"none" | "horizontal" | "vertical">("none");
 
   function handleTouchStart(e: React.TouchEvent) {
     startX.current = e.touches[0].clientX;
+    startY.current = e.touches[0].clientY;
     currentX.current = 0;
     swiping.current = false;
+    direction.current = "none";
   }
 
   function handleTouchMove(e: React.TouchEvent) {
     const dx = e.touches[0].clientX - startX.current;
-    if (dx < -10) swiping.current = true;
+    const dy = e.touches[0].clientY - startY.current;
+
+    // Lock direction on first significant movement
+    if (direction.current === "none" && (Math.abs(dx) > 10 || Math.abs(dy) > 10)) {
+      direction.current = Math.abs(dy) > Math.abs(dx) ? "vertical" : "horizontal";
+    }
+
+    // Only allow horizontal swipe if locked to horizontal
+    if (direction.current !== "horizontal") return;
+
+    if (dx < -30) swiping.current = true;
     const offset = Math.min(0, Math.max(-80, dx));
     currentX.current = offset;
     if (rowRef.current) {
@@ -110,11 +124,12 @@ function SwipeableRow({
   }
 
   function handleTouchEnd() {
-    if (currentX.current < -40) {
+    if (direction.current === "horizontal" && currentX.current < -40) {
       if (rowRef.current) rowRef.current.style.transform = "translateX(-80px)";
     } else {
       if (rowRef.current) rowRef.current.style.transform = "translateX(0)";
     }
+    direction.current = "none";
   }
 
   function handleClick(e: React.MouseEvent) {
