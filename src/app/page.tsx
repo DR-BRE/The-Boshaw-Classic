@@ -38,7 +38,7 @@ export default function Home() {
   }, []);
 
   return (
-    <div className="pb-28 -mt-6">
+    <div className="pb-28 -mt-12">
       {/* Hero Section — takes up the full first screen minus bottom nav + leaderboard heading */}
       <section className="relative px-6 pb-6 h-[calc(100vh-12rem)] h-[calc(100dvh-12rem)]">
         {/* Hero background image */}
@@ -48,10 +48,10 @@ export default function Home() {
           fill
           priority
           sizes="100vw"
-          className="absolute -top-6 left-0 right-0 bottom-0 object-cover object-[center_1rem]"
+          className="absolute -top-12 left-0 right-0 bottom-0 object-cover object-[center_1rem]"
         />
         {/* Dark gradient overlay for text legibility */}
-        <div className="absolute -top-6 left-0 right-0 bottom-0 bg-gradient-to-b from-black/50 via-transparent to-black/70" />
+        <div className="absolute -top-12 left-0 right-0 bottom-0 bg-gradient-to-b from-black/50 via-transparent to-black/70" />
 
         <div className="relative z-10 h-full flex flex-col justify-end">
           {/* Countdown sits at the bottom of the hero */}
