@@ -319,7 +319,7 @@ export default function SettingsPage() {
                     );
                     setGroupsDirty(true);
                   }}
-                  className="flex-1 flex items-center justify-between px-4 py-3 rounded-xl bg-[#1a2e28] border border-white/[0.06] active:scale-[0.98] transition-transform"
+                  className="flex-1 flex items-center justify-between px-4 py-3 rounded-xl bg-surface-container border border-white/[0.06] active:scale-[0.98] transition-transform"
                 >
                   <span className="font-label text-sm font-bold text-on-surface">
                     {p.displayName}

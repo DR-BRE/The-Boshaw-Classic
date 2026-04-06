@@ -15,7 +15,7 @@ export default function BottomTabs() {
   const pathname = usePathname();
 
   return (
-    <nav className="fixed bottom-0 left-0 w-full z-50 flex justify-around items-end px-2 pb-4 pt-1.5 bg-[#0d1f1a] border-t border-white/[0.06] rounded-t-2xl">
+    <nav className="fixed bottom-0 left-0 w-full z-50 flex justify-around items-end px-2 pb-4 pt-1.5 bg-surface-container-low border-t border-white/[0.06] rounded-t-2xl">
       {tabs.map((tab) => {
         const isActive =
           tab.href === "/"
@@ -27,10 +27,10 @@ export default function BottomTabs() {
             href={tab.href}
             className={`flex flex-col items-center justify-center active:scale-90 transition-transform duration-200 ${
               tab.highlight
-                ? "bg-[#e9c349] text-[#3c2f00] rounded-xl px-3 py-1.5 shadow-md shadow-[#e9c349]/20"
+                ? "bg-secondary text-on-secondary rounded-xl px-3 py-1.5 shadow-md shadow-secondary/20"
                 : isActive
-                  ? "bg-white/[0.1] text-[#e9c349] rounded-lg px-2.5 py-1"
-                  : "text-[#a9cfbf]/60 hover:bg-white/[0.06] px-2.5 py-1 rounded-lg"
+                  ? "bg-white/[0.1] text-secondary rounded-lg px-2.5 py-1"
+                  : "text-primary/60 hover:bg-white/[0.06] px-2.5 py-1 rounded-lg"
             }`}
           >
             <span

@@ -515,7 +515,7 @@ function NineHoleGrid({
                 : pIdx % 2 === 0
                   ? "bg-surface"
                   : "bg-surface-container-low";
-              const stickyBg = isCurrentUser ? "bg-[#1c2718]" : rowBg;
+              const stickyBg = isCurrentUser ? "bg-surface-container-low" : rowBg;
 
               return (
                 <React.Fragment key={player.id}>
@@ -658,7 +658,7 @@ function SummaryTable({
                 : pIdx % 2 === 0
                   ? "bg-surface"
                   : "bg-surface-container-low";
-              const stickyBg = isCurrentUser ? "bg-[#1c2718]" : rowBg;
+              const stickyBg = isCurrentUser ? "bg-surface-container-low" : rowBg;
               return (
                 <React.Fragment key={player.id}>
                   <tr className={rowBg}>

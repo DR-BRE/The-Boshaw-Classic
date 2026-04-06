@@ -52,7 +52,7 @@ export default function SideDrawer({
 
       {/* Drawer Panel */}
       <div
-        className={`fixed top-0 left-0 z-50 h-full w-72 bg-[#0d1f1a] border-r border-white/[0.06] flex flex-col transition-transform duration-300 ease-out ${
+        className={`fixed top-0 left-0 z-50 h-full w-72 bg-surface-container-low border-r border-white/[0.06] flex flex-col transition-transform duration-300 ease-out ${
           isOpen ? "translate-x-0" : "-translate-x-full"
         }`}
       >
