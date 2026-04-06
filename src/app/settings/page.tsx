@@ -119,15 +119,21 @@ function SwipeableRow({
     const offset = Math.min(0, Math.max(-80, dx));
     currentX.current = offset;
     if (rowRef.current) {
+      // Disable transition during drag for responsiveness
+      rowRef.current.style.transition = "none";
       rowRef.current.style.transform = `translateX(${offset}px)`;
     }
   }
 
   function handleTouchEnd() {
-    if (direction.current === "horizontal" && currentX.current < -40) {
-      if (rowRef.current) rowRef.current.style.transform = "translateX(-80px)";
-    } else {
-      if (rowRef.current) rowRef.current.style.transform = "translateX(0)";
+    if (direction.current === "horizontal") {
+      // Re-enable transition for snap animation
+      if (rowRef.current) rowRef.current.style.transition = "";
+      if (currentX.current < -40) {
+        if (rowRef.current) rowRef.current.style.transform = "translateX(-80px)";
+      } else {
+        if (rowRef.current) rowRef.current.style.transform = "translateX(0)";
+      }
     }
     direction.current = "none";
   }
