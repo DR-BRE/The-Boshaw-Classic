@@ -23,10 +23,19 @@ function toParColor(toPar: number) {
 function RankBadge({ rank }: { rank: number }) {
   if (rank === 1) {
     return (
-      <div className="w-8 h-8 rounded-full bg-secondary flex items-center justify-center">
-        <span className="material-symbols-outlined text-on-secondary text-sm" style={{ fontVariationSettings: '"FILL" 1' }}>
-          emoji_events
-        </span>
+      <div className="relative w-10 h-10 flex items-center justify-center">
+        <div className="absolute inset-0 rounded-full bg-secondary/20 animate-pulse" />
+        <div
+          className="relative w-9 h-9 rounded-full flex items-center justify-center shadow-lg"
+          style={{ background: "linear-gradient(135deg, #f5d76e 0%, #e9c349 40%, #c8a415 100%)" }}
+        >
+          <span
+            className="material-symbols-outlined text-lg drop-shadow-sm"
+            style={{ fontVariationSettings: '"FILL" 1, "wght" 700', color: "#3a2a00" }}
+          >
+            emoji_events
+          </span>
+        </div>
       </div>
     );
   }
