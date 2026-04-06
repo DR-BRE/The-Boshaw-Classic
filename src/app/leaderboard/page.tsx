@@ -55,14 +55,11 @@ function PlayerAvatar({ name, avatarUrl }: { name: string; avatarUrl: string | n
   if (avatarUrl) {
     return <img src={avatarUrl} alt={name} className="w-12 h-12 rounded-full object-cover" />;
   }
-  const initials = name
-    .split(" ")
-    .map((n) => n[0])
-    .join("")
-    .toUpperCase();
   return (
     <div className="w-12 h-12 rounded-full bg-primary-container flex items-center justify-center">
-      <span className="font-label font-bold text-sm text-primary">{initials}</span>
+      <span className="material-symbols-outlined text-primary text-2xl" style={{ fontVariationSettings: '"FILL" 1' }}>
+        face
+      </span>
     </div>
   );
 }
