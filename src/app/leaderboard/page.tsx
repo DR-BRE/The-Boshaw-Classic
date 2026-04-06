@@ -181,90 +181,65 @@ export default function LeaderboardPage() {
         </div>
       )}
 
-      {/* Column Headers */}
+      {/* Leaderboard Rows */}
       {!loading && entries.length > 0 && (
-        <>
-          <div className="flex items-center px-4 mb-2 text-[10px] font-label uppercase tracking-wider text-on-surface-variant">
-            <div className="w-5" />
-            <div className="w-8 mr-3" />
-            <div className="w-12 mr-3" />
-            <div className="flex-1" />
-            <div className="flex items-center gap-1.5 mr-4">
-              {round === "" && <div className="min-w-[40px] text-center">R1</div>}
-              {round === "" && <div className="min-w-[40px] text-center">R2</div>}
-              {round !== "" && <div className="min-w-[40px] text-center">Scr</div>}
-              <div className="min-w-[40px] text-center">Tot</div>
-            </div>
-            <div className="w-12 text-center">Today</div>
-            <div className="w-8 text-center">Thru</div>
-          </div>
+        <div className="space-y-3">
+          {entries.map((entry) => {
+            const isExpanded = expandedId === entry.playerId;
+            return (
+              <div
+                key={entry.playerId}
+                onClick={() => setExpandedId(isExpanded ? null : entry.playerId)}
+                className={`bg-white/[0.06] backdrop-blur-xl border rounded-xl p-4 cursor-pointer transition-all active:scale-[0.99] ${
+                  entry.rank === 1 ? "border-secondary/30" : "border-white/[0.08]"
+                }`}
+              >
+                {/* Row 1: Identity + Score */}
+                <div className="flex items-center gap-3">
+                  {/* Chevron */}
+                  <span
+                    className={`material-symbols-outlined text-on-surface-variant text-lg shrink-0 transition-transform ${
+                      isExpanded ? "rotate-180" : ""
+                    }`}
+                  >
+                    expand_more
+                  </span>
 
-          {/* Leaderboard Rows */}
-          <div className="space-y-3">
-            {entries.map((entry) => {
-              const isExpanded = expandedId === entry.playerId;
-              return (
-                <div
-                  key={entry.playerId}
-                  onClick={() => setExpandedId(isExpanded ? null : entry.playerId)}
-                  className={`bg-white/[0.06] backdrop-blur-xl border rounded-xl p-4 cursor-pointer transition-all active:scale-[0.99] ${
-                    entry.rank === 1 ? "border-secondary/30" : "border-white/[0.08]"
-                  }`}
-                >
-                  <div className="flex items-center gap-3">
-                    {/* Chevron */}
-                    <span
-                      className={`material-symbols-outlined text-on-surface-variant text-lg transition-transform ${
-                        isExpanded ? "rotate-180" : ""
-                      }`}
-                    >
-                      expand_more
-                    </span>
+                  {/* Rank */}
+                  <RankBadge rank={entry.rank} />
 
-                    {/* Rank */}
-                    <RankBadge rank={entry.rank} />
+                  {/* Avatar */}
+                  <PlayerAvatar name={`${entry.firstName} ${entry.lastName}`} avatarUrl={entry.avatarUrl} />
 
-                    {/* Avatar */}
-                    <PlayerAvatar name={`${entry.firstName} ${entry.lastName}`} avatarUrl={entry.avatarUrl} />
-
-                    {/* Name */}
-                    <div className="flex-1 min-w-0">
-                      <p className="font-label font-bold text-on-surface truncate">{entry.firstName}</p>
-                      <p className="font-label text-xs text-on-surface-variant truncate">{entry.lastName}</p>
-                    </div>
-
-                    {/* Round Pills */}
-                    <div className="flex items-center gap-1.5">
-                      {round === ""
-                        ? entry.rounds.map((r) => (
-                            <RoundPill key={r.round} label={`R${r.round}`} value={r.strokes} />
-                          ))
-                        : entry.rounds.map((r) => (
-                            <RoundPill key={r.round} label={`R${r.round}`} value={r.strokes} />
-                          ))}
-                      <RoundPill label="Tot" value={entry.totalStrokes} />
-                    </div>
-
-                    {/* Today */}
-                    <div className="w-12 text-center">
-                      <p className={`font-headline text-lg font-bold ${toParColor(entry.totalToPar)}`}>
-                        {formatToPar(entry.totalToPar)}
-                      </p>
-                    </div>
-
-                    {/* Thru */}
-                    <div className="w-8 text-center">
-                      <p className="font-label text-xs text-on-surface-variant">F</p>
-                    </div>
+                  {/* Name */}
+                  <div className="flex-1 min-w-0">
+                    <p className="font-label font-bold text-on-surface truncate">{entry.firstName}</p>
+                    <p className="font-label text-xs text-on-surface-variant truncate">{entry.lastName}</p>
                   </div>
 
-                  {/* Expanded Detail */}
-                  {isExpanded && <ExpandedDetail entry={entry} />}
+                  {/* Today */}
+                  <div className="text-right shrink-0">
+                    <p className={`font-headline text-xl font-bold ${toParColor(entry.totalToPar)}`}>
+                      {formatToPar(entry.totalToPar)}
+                    </p>
+                    <p className="font-label text-[10px] text-on-surface-variant">Thru F</p>
+                  </div>
                 </div>
-              );
-            })}
-          </div>
-        </>
+
+                {/* Row 2: Round Pills */}
+                <div className="flex items-center gap-1.5 mt-3 ml-11">
+                  {entry.rounds.map((r) => (
+                    <RoundPill key={r.round} label={`R${r.round}`} value={r.strokes} />
+                  ))}
+                  <RoundPill label="Tot" value={entry.totalStrokes} />
+                </div>
+
+                {/* Expanded Detail */}
+                {isExpanded && <ExpandedDetail entry={entry} />}
+              </div>
+            );
+          })}
+        </div>
       )}
     </div>
   );
