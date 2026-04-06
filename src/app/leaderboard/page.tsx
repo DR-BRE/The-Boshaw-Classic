@@ -26,7 +26,7 @@ function RankBadge({ rank }: { rank: number }) {
       <div className="relative w-10 h-10 flex items-center justify-center shrink-0">
         <div className="absolute inset-0 rounded-full bg-secondary/20 animate-pulse" />
         <img
-          src="/trophy.jpg"
+          src="/trophy.png"
           alt="1st place"
           className="relative w-9 h-9 object-contain drop-shadow-lg"
         />
