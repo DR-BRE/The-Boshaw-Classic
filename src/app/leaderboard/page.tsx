@@ -4,9 +4,9 @@ import { useEffect, useState } from "react";
 import type { LeaderboardEntry } from "@/lib/types/leaderboard";
 
 const ROUNDS = [
-  { label: "All Rounds", value: "" },
-  { label: "Round 1", value: "1" },
-  { label: "Round 2", value: "2" },
+  { label: "All Rounds", value: "", course: "Bear Mountain Ranch & Desert Canyon" },
+  { label: "Round 1", value: "1", course: "Bear Mountain Ranch" },
+  { label: "Round 2", value: "2", course: "Desert Canyon" },
 ];
 
 function formatToPar(toPar: number) {
@@ -103,7 +103,7 @@ export default function LeaderboardPage() {
         <div>
           <h2 className="font-headline text-3xl text-on-surface mb-1">Leaderboard</h2>
           <p className="font-label text-xs text-on-surface-variant uppercase tracking-widest">
-            Bear Mountain Ranch & Desert Canyon
+            {ROUNDS.find((r) => r.value === round)?.course}
           </p>
         </div>
         <span className="text-xs font-label text-primary uppercase tracking-widest bg-primary-container px-3 py-1 rounded-full mt-1">
