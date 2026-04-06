@@ -53,7 +53,7 @@ function RankBadge({ rank }: { rank: number }) {
 
 function PlayerAvatar({ name, avatarUrl }: { name: string; avatarUrl: string | null }) {
   if (avatarUrl) {
-    return <img src={avatarUrl} alt={name} className="w-10 h-10 rounded-full object-cover" />;
+    return <img src={avatarUrl} alt={name} className="w-12 h-12 rounded-full object-cover" />;
   }
   const initials = name
     .split(" ")
@@ -61,20 +61,51 @@ function PlayerAvatar({ name, avatarUrl }: { name: string; avatarUrl: string | n
     .join("")
     .toUpperCase();
   return (
-    <div className="w-10 h-10 rounded-full bg-primary-container flex items-center justify-center">
+    <div className="w-12 h-12 rounded-full bg-primary-container flex items-center justify-center">
       <span className="font-label font-bold text-sm text-primary">{initials}</span>
     </div>
   );
 }
 
+function RoundPill({ label, value }: { label: string; value: string | number }) {
+  return (
+    <div className="bg-white/[0.06] rounded-md px-2 py-1 text-center min-w-[40px]">
+      <p className="font-label text-[9px] uppercase tracking-wider text-on-surface-variant">{label}</p>
+      <p className="font-label text-xs font-bold text-on-surface tabular-nums">{value}</p>
+    </div>
+  );
+}
+
+function ExpandedDetail({ entry }: { entry: LeaderboardEntry }) {
+  return (
+    <div className="border-t border-white/[0.06] mt-3 pt-3 space-y-2">
+      {entry.rounds.map((r) => (
+        <div key={r.round} className="flex items-center justify-between px-1">
+          <div className="flex-1">
+            <p className="font-label text-xs font-bold text-on-surface">Round {r.round}</p>
+            <p className="text-[11px] text-on-surface-variant">{r.course}</p>
+          </div>
+          <div className="flex items-center gap-4">
+            <p className="font-label text-xs text-on-surface tabular-nums">{r.strokes} strokes</p>
+            <p className={`font-label text-xs font-bold tabular-nums min-w-[32px] text-right ${toParColor(r.toPar)}`}>
+              {formatToPar(r.toPar)}
+            </p>
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
 function SkeletonRow() {
-  return <div className="bg-white/[0.06] animate-pulse rounded-xl h-[76px] mb-3" />;
+  return <div className="bg-white/[0.06] animate-pulse rounded-xl h-[88px] mb-3" />;
 }
 
 export default function LeaderboardPage() {
   const [round, setRound] = useState("");
   const [entries, setEntries] = useState<LeaderboardEntry[]>([]);
   const [loading, setLoading] = useState(true);
+  const [expandedId, setExpandedId] = useState<string | null>(null);
 
   useEffect(() => {
     setLoading(true);
@@ -101,8 +132,13 @@ export default function LeaderboardPage() {
       {/* Header */}
       <div className="flex justify-between items-start mb-5">
         <div>
-          <h2 className="font-headline text-3xl text-on-surface mb-1">Leaderboard</h2>
-          <p className="font-label text-xs text-on-surface-variant uppercase tracking-widest">
+          <p className="font-label text-xs uppercase tracking-widest text-secondary mb-1">
+            The Boshaw Classic
+          </p>
+          <h2 className="font-headline text-3xl font-bold text-on-surface uppercase">
+            Leaderboard
+          </h2>
+          <p className="font-label text-xs text-on-surface-variant uppercase tracking-widest mt-1">
             {ROUNDS.find((r) => r.value === round)?.course}
           </p>
         </div>
@@ -148,52 +184,90 @@ export default function LeaderboardPage() {
         </div>
       )}
 
-      {/* Leaderboard Rows */}
+      {/* Column Headers */}
       {!loading && entries.length > 0 && (
-        <div className="space-y-3">
-          {entries.map((entry) => (
-            <div
-              key={entry.playerId}
-              className={`bg-white/[0.06] backdrop-blur-xl border rounded-xl p-4 flex items-center gap-3 ${
-                entry.rank === 1 ? "border-secondary/30" : "border-white/[0.08]"
-              }`}
-            >
-              {/* Rank */}
-              <RankBadge rank={entry.rank} />
-
-              {/* Avatar */}
-              <PlayerAvatar name={entry.displayName} avatarUrl={entry.avatarUrl} />
-
-              {/* Player Info */}
-              <div className="flex-1 min-w-0">
-                <p className="font-label font-bold text-on-surface truncate">
-                  {entry.displayName}
-                  {entry.rank === 1 && (
-                    <span className="material-symbols-outlined text-secondary text-sm ml-1 align-middle" style={{ fontVariationSettings: '"FILL" 1' }}>
-                      star
-                    </span>
-                  )}
-                </p>
-                <p className="text-[11px] text-on-surface-variant">
-                  {entry.firstName} {entry.lastName.charAt(0)}.
-                </p>
-                <p className="text-[11px] text-on-surface-variant uppercase tracking-wider">
-                  HCP {entry.handicap} · Group {entry.group} · {entry.roundsPlayed} {entry.roundsPlayed === 1 ? "round" : "rounds"}
-                </p>
-              </div>
-
-              {/* Score */}
-              <div className="text-right">
-                <p className={`font-headline text-xl font-bold ${toParColor(entry.totalToPar)}`}>
-                  {formatToPar(entry.totalToPar)}
-                </p>
-                <p className="text-[11px] text-on-surface-variant tabular-nums">
-                  {entry.totalStrokes} strokes
-                </p>
-              </div>
+        <>
+          <div className="flex items-center px-4 mb-2 text-[10px] font-label uppercase tracking-wider text-on-surface-variant">
+            <div className="w-5" />
+            <div className="w-8 mr-3" />
+            <div className="w-12 mr-3" />
+            <div className="flex-1" />
+            <div className="flex items-center gap-1.5 mr-4">
+              {round === "" && <div className="min-w-[40px] text-center">R1</div>}
+              {round === "" && <div className="min-w-[40px] text-center">R2</div>}
+              {round !== "" && <div className="min-w-[40px] text-center">Scr</div>}
+              <div className="min-w-[40px] text-center">Tot</div>
             </div>
-          ))}
-        </div>
+            <div className="w-12 text-center">Today</div>
+            <div className="w-8 text-center">Thru</div>
+          </div>
+
+          {/* Leaderboard Rows */}
+          <div className="space-y-3">
+            {entries.map((entry) => {
+              const isExpanded = expandedId === entry.playerId;
+              return (
+                <div
+                  key={entry.playerId}
+                  onClick={() => setExpandedId(isExpanded ? null : entry.playerId)}
+                  className={`bg-white/[0.06] backdrop-blur-xl border rounded-xl p-4 cursor-pointer transition-all active:scale-[0.99] ${
+                    entry.rank === 1 ? "border-secondary/30" : "border-white/[0.08]"
+                  }`}
+                >
+                  <div className="flex items-center gap-3">
+                    {/* Chevron */}
+                    <span
+                      className={`material-symbols-outlined text-on-surface-variant text-lg transition-transform ${
+                        isExpanded ? "rotate-180" : ""
+                      }`}
+                    >
+                      expand_more
+                    </span>
+
+                    {/* Rank */}
+                    <RankBadge rank={entry.rank} />
+
+                    {/* Avatar */}
+                    <PlayerAvatar name={`${entry.firstName} ${entry.lastName}`} avatarUrl={entry.avatarUrl} />
+
+                    {/* Name */}
+                    <div className="flex-1 min-w-0">
+                      <p className="font-label font-bold text-on-surface truncate">{entry.firstName}</p>
+                      <p className="font-label text-xs text-on-surface-variant truncate">{entry.lastName}</p>
+                    </div>
+
+                    {/* Round Pills */}
+                    <div className="flex items-center gap-1.5">
+                      {round === ""
+                        ? entry.rounds.map((r) => (
+                            <RoundPill key={r.round} label={`R${r.round}`} value={r.strokes} />
+                          ))
+                        : entry.rounds.map((r) => (
+                            <RoundPill key={r.round} label={`R${r.round}`} value={r.strokes} />
+                          ))}
+                      <RoundPill label="Tot" value={entry.totalStrokes} />
+                    </div>
+
+                    {/* Today */}
+                    <div className="w-12 text-center">
+                      <p className={`font-headline text-lg font-bold ${toParColor(entry.totalToPar)}`}>
+                        {formatToPar(entry.totalToPar)}
+                      </p>
+                    </div>
+
+                    {/* Thru */}
+                    <div className="w-8 text-center">
+                      <p className="font-label text-xs text-on-surface-variant">F</p>
+                    </div>
+                  </div>
+
+                  {/* Expanded Detail */}
+                  {isExpanded && <ExpandedDetail entry={entry} />}
+                </div>
+              );
+            })}
+          </div>
+        </>
       )}
     </div>
   );
