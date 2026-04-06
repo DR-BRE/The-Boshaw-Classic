@@ -202,8 +202,7 @@ export default function LeaderboardPage() {
                   entry.rank === 1 ? "border-secondary/30" : "border-white/[0.08]"
                 }`}
               >
-                {/* Row 1: Identity + Score */}
-                <div className="flex items-center gap-3">
+                  <div className="flex items-center gap-3">
                   {/* Chevron */}
                   <span
                     className={`material-symbols-outlined text-on-surface-variant text-lg shrink-0 transition-transform ${
@@ -219,17 +218,23 @@ export default function LeaderboardPage() {
                   {/* Avatar */}
                   <PlayerAvatar name={`${entry.firstName} ${entry.lastName}`} avatarUrl={entry.avatarUrl} />
 
-                  {/* Name */}
+                  {/* Name + Round Pills */}
                   <div className="flex-1 min-w-0">
                     <p className="font-label font-bold text-on-surface truncate">{entry.firstName}</p>
-                    <p className="font-label text-xs text-on-surface-variant truncate">{entry.lastName}</p>
+                    <p className="font-label text-xs text-on-surface-variant truncate mb-1.5">{entry.lastName}</p>
+                    <div className="flex items-center gap-1.5">
+                      {entry.rounds.map((r) => (
+                        <RoundPill key={r.round} label={`R${r.round}`} value={r.strokes} />
+                      ))}
+                      <RoundPill label="Tot" value={entry.totalStrokes} />
+                    </div>
                   </div>
 
                   {/* Today + Thru */}
                   <div className="flex items-center gap-4 shrink-0">
                     <div className="text-center">
                       <p className="font-label text-[10px] uppercase tracking-wider text-on-surface-variant mb-0.5">Today</p>
-                      <p className={`font-headline text-2xl font-bold ${toParColor(entry.totalToPar)}`}>
+                      <p className="font-headline text-2xl font-bold text-secondary">
                         {formatToPar(entry.totalToPar)}
                       </p>
                     </div>
@@ -238,14 +243,6 @@ export default function LeaderboardPage() {
                       <p className="font-headline text-2xl font-bold text-on-surface">F</p>
                     </div>
                   </div>
-                </div>
-
-                {/* Row 2: Round Pills */}
-                <div className="flex items-center gap-1.5 mt-3 ml-11">
-                  {entry.rounds.map((r) => (
-                    <RoundPill key={r.round} label={`R${r.round}`} value={r.strokes} />
-                  ))}
-                  <RoundPill label="Tot" value={entry.totalStrokes} />
                 </div>
 
                 {/* Expanded Detail */}
