@@ -236,8 +236,8 @@ export default function SettingsPage() {
 
           <div className="space-y-2">
             {players.map((p) => (
+              <div key={p.id} className="flex items-center gap-2">
                 <button
-                  key={p.id}
                   onClick={() => {
                     const nextGroup = (p.group + 1) % 3;
                     if (nextGroup > 0) {
@@ -255,7 +255,7 @@ export default function SettingsPage() {
                     );
                     setGroupsDirty(true);
                   }}
-                  className="w-full flex items-center justify-between px-4 py-3 rounded-xl bg-[#1a2e28] border border-white/[0.06] active:scale-[0.98] transition-transform"
+                  className="flex-1 flex items-center justify-between px-4 py-3 rounded-xl bg-[#1a2e28] border border-white/[0.06] active:scale-[0.98] transition-transform"
                 >
                   <span className="font-label text-sm font-bold text-on-surface">
                     {p.displayName}
@@ -272,6 +272,18 @@ export default function SettingsPage() {
                     {GROUP_LABELS[p.group]}
                   </span>
                 </button>
+                <button
+                  onClick={async () => {
+                    try {
+                      await fetch(`/api/groups?playerId=${p.id}`, { method: "DELETE" });
+                      setPlayers((prev) => prev.filter((pl) => pl.id !== p.id));
+                    } catch {}
+                  }}
+                  className="w-10 h-10 flex-shrink-0 flex items-center justify-center rounded-xl bg-red-500/15 text-red-400 active:scale-90 transition-transform"
+                >
+                  <span className="material-symbols-outlined text-lg">close</span>
+                </button>
+              </div>
             ))}
           </div>
 
