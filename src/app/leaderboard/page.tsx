@@ -23,37 +23,37 @@ function toParColor(toPar: number) {
 function RankBadge({ rank }: { rank: number }) {
   if (rank === 1) {
     return (
-      <div className="w-10 h-10 flex items-center justify-center shrink-0">
+      <div className="w-8 h-8 flex items-center justify-center shrink-0">
         <img
           src="/trophy.png"
           alt="1st place"
-          className="w-9 h-9 object-contain drop-shadow-lg"
+          className="w-8 h-8 object-contain drop-shadow-lg"
         />
       </div>
     );
   }
   if (rank === 2) {
     return (
-      <div className="w-10 h-10 flex items-center justify-center shrink-0 overflow-hidden">
+      <div className="w-8 h-8 flex items-center justify-center shrink-0 overflow-hidden">
         <img
           src="/trophy-silver.png"
           alt="2nd place"
-          width={36}
-          height={36}
-          className="w-9 h-9 max-w-9 max-h-9 object-contain drop-shadow-lg"
+          width={32}
+          height={32}
+          className="w-8 h-8 object-contain drop-shadow-lg"
         />
       </div>
     );
   }
   if (rank === 3) {
     return (
-      <div className="w-8 h-8 rounded-full bg-secondary-container flex items-center justify-center">
+      <div className="w-8 h-8 rounded-full bg-secondary-container flex items-center justify-center shrink-0">
         <span className="font-label font-bold text-sm text-on-secondary-container">{rank}</span>
       </div>
     );
   }
   return (
-    <div className="w-8 h-8 rounded-full flex items-center justify-center">
+    <div className="w-8 h-8 rounded-full flex items-center justify-center shrink-0">
       <span className="font-label font-bold text-sm text-on-surface-variant">{rank}</span>
     </div>
   );
