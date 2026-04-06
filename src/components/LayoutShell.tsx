@@ -17,6 +17,7 @@ export default function LayoutShell({
   const pathname = usePathname();
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
   const hideAvatar = ["/leaderboard", "/scorecard", "/trip"].includes(pathname);
+  const hideHamburger = ["/leaderboard", "/scorecard", "/trip"].includes(pathname);
 
   // Re-fetch avatar on every page navigation (catches profile updates)
   useEffect(() => {
@@ -35,14 +36,16 @@ export default function LayoutShell({
   return (
     <>
       {/* Hamburger Button */}
-      <button
-        onClick={() => setDrawerOpen(true)}
-        className="fixed top-3 left-3 z-40 w-10 h-10 rounded-full bg-white/[0.06] backdrop-blur-xl border border-white/[0.06] flex items-center justify-center active:scale-90 transition-transform"
-      >
-        <span className="material-symbols-outlined text-on-surface text-xl">
-          menu
-        </span>
-      </button>
+      {!hideHamburger && (
+        <button
+          onClick={() => setDrawerOpen(true)}
+          className="fixed top-3 left-3 z-40 w-10 h-10 rounded-full bg-white/[0.06] backdrop-blur-xl border border-white/[0.06] flex items-center justify-center active:scale-90 transition-transform"
+        >
+          <span className="material-symbols-outlined text-on-surface text-xl">
+            menu
+          </span>
+        </button>
+      )}
 
       {/* Profile Avatar Button */}
       {!hideAvatar && (
