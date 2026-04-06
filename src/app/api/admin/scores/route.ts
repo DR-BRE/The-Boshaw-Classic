@@ -96,6 +96,46 @@ export async function PUT(request: Request) {
   }
 }
 
+// PATCH to update player details (name, handicap)
+export async function PATCH(request: Request) {
+  try {
+    const session = await getServerSession(authOptions);
+    if (!session?.user?.email || session.user.email !== ADMIN_EMAIL) {
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    }
+
+    const { playerId, firstName, lastName, handicap } = (await request.json()) as {
+      playerId: string;
+      firstName?: string;
+      lastName?: string;
+      handicap?: number;
+    };
+
+    if (!playerId) {
+      return NextResponse.json({ error: "Need playerId" }, { status: 400 });
+    }
+
+    const data: Record<string, unknown> = {};
+    if (firstName !== undefined) data.firstName = firstName;
+    if (lastName !== undefined) data.lastName = lastName;
+    if (firstName !== undefined || lastName !== undefined) {
+      const player = await prisma.player.findUnique({ where: { id: playerId } });
+      data.displayName = `${firstName ?? player?.firstName} ${lastName ?? player?.lastName}`;
+    }
+    if (handicap !== undefined) data.handicap = handicap;
+
+    const player = await prisma.player.update({
+      where: { id: playerId },
+      data,
+    });
+
+    return NextResponse.json({ player });
+  } catch (error) {
+    console.error("Admin PATCH error:", error);
+    return NextResponse.json({ error: String(error) }, { status: 500 });
+  }
+}
+
 // DELETE a player's score for a round
 export async function DELETE(request: Request) {
   try {

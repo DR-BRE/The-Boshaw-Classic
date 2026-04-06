@@ -5,6 +5,8 @@ import { usePathname } from "next/navigation";
 import { useSession, signOut } from "next-auth/react";
 import { useEffect } from "react";
 
+const ADMIN_EMAIL = "brettwfrancoeur@gmail.com";
+
 const navLinks = [
   { href: "/", icon: "home", label: "Home" },
   { href: "/leaderboard", icon: "leaderboard", label: "Leaderboard" },
@@ -13,6 +15,8 @@ const navLinks = [
   { href: "/profile", icon: "person", label: "Profile" },
   { href: "/settings", icon: "settings", label: "Settings" },
 ];
+
+const adminLink = { href: "/admin", icon: "admin_panel_settings", label: "Admin" };
 
 export default function SideDrawer({
   isOpen,
@@ -69,7 +73,7 @@ export default function SideDrawer({
 
         {/* Nav Links */}
         <nav className="flex-1 py-4 px-3 space-y-1 overflow-y-auto">
-          {navLinks.map((link) => {
+          {[...navLinks, ...(session?.user?.email === ADMIN_EMAIL ? [adminLink] : [])].map((link) => {
             const isActive =
               link.href === "/"
                 ? pathname === "/"
