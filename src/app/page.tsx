@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Image from "next/image";
 import Link from "next/link";
 import Countdown from "@/components/Countdown";
 import Weather from "@/components/Weather";
@@ -41,7 +42,14 @@ export default function Home() {
       {/* Hero Section — takes up the full first screen minus bottom nav + leaderboard heading */}
       <section className="relative px-6 pb-6 h-[calc(100vh-12rem)] h-[calc(100dvh-12rem)]">
         {/* Hero background image */}
-        <div className="absolute -top-6 left-0 right-0 bottom-0 bg-[url('/hero-bg.webp')] bg-cover bg-[center_1rem]" />
+        <Image
+          src="/hero-bg.webp"
+          alt=""
+          fill
+          priority
+          sizes="100vw"
+          className="absolute -top-6 left-0 right-0 bottom-0 object-cover object-[center_1rem]"
+        />
         {/* Dark gradient overlay for text legibility */}
         <div className="absolute -top-6 left-0 right-0 bottom-0 bg-gradient-to-b from-black/50 via-transparent to-black/70" />
 
