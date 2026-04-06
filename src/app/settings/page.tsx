@@ -86,19 +86,9 @@ export default function SettingsPage() {
   const [allPlayers, setAllPlayers] = useState<PlayerWithScores[]>([]);
 
   useEffect(() => {
-    const s = loadSettings();
-    setSettings(s);
-    applyTheme(s.theme);
+    setSettings(loadSettings());
     setMounted(true);
   }, []);
-
-  function applyTheme(theme: "dark" | "light") {
-    if (theme === "light") {
-      document.documentElement.classList.add("light");
-    } else {
-      document.documentElement.classList.remove("light");
-    }
-  }
 
   useEffect(() => {
     if (isAdmin) {
@@ -123,7 +113,13 @@ export default function SettingsPage() {
     const next = { ...settings, ...patch };
     setSettings(next);
     saveSettings(next);
-    if (patch.theme) applyTheme(patch.theme);
+    if (patch.theme) {
+      if (patch.theme === "light") {
+        document.documentElement.classList.add("light");
+      } else {
+        document.documentElement.classList.remove("light");
+      }
+    }
   }
 
   if (!mounted) {

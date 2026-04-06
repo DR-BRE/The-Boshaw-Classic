@@ -19,6 +19,21 @@ export default function LayoutShell({
   const hideAvatar = ["/leaderboard", "/scorecard", "/trip"].includes(pathname);
   const hideHamburger = ["/leaderboard", "/scorecard", "/trip"].includes(pathname);
 
+  // Apply saved theme on mount (after React hydration)
+  useEffect(() => {
+    try {
+      const raw = localStorage.getItem("boshaw-settings");
+      if (raw) {
+        const s = JSON.parse(raw);
+        if (s.theme === "light") {
+          document.documentElement.classList.add("light");
+        } else {
+          document.documentElement.classList.remove("light");
+        }
+      }
+    } catch {}
+  }, []);
+
   // Re-fetch avatar on every page navigation (catches profile updates)
   useEffect(() => {
     if (session?.user) {
