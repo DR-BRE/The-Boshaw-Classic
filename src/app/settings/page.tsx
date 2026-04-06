@@ -4,15 +4,13 @@ import React, { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
 
 type Settings = {
-  defaultRound: "1" | "2";
-  scorecardView: "card" | "classic";
+  theme: "dark" | "light";
   notifyLeaderboard: boolean;
   notifyScores: boolean;
 };
 
 const DEFAULT_SETTINGS: Settings = {
-  defaultRound: "1",
-  scorecardView: "card",
+  theme: "dark",
   notifyLeaderboard: true,
   notifyScores: true,
 };
@@ -53,34 +51,6 @@ function Toggle({
   );
 }
 
-function SegmentedToggle({
-  options,
-  value,
-  onChange,
-}: {
-  options: { label: string; value: string }[];
-  value: string;
-  onChange: (v: string) => void;
-}) {
-  return (
-    <div className="bg-white/[0.06] border border-white/[0.06] rounded-xl p-1 flex gap-1">
-      {options.map((opt) => (
-        <button
-          key={opt.value}
-          onClick={() => onChange(opt.value)}
-          className={`flex-1 py-2 rounded-lg font-label text-xs font-bold uppercase tracking-wider transition-all active:scale-95 ${
-            value === opt.value
-              ? "bg-white/[0.1] text-primary"
-              : "text-on-surface-variant"
-          }`}
-        >
-          {opt.label}
-        </button>
-      ))}
-    </div>
-  );
-}
-
 
 const ADMIN_EMAIL = "brettwfrancoeur@gmail.com";
 const GROUP_LABELS = ["Unassigned", "Group 1", "Group 2"] as const;
@@ -116,9 +86,19 @@ export default function SettingsPage() {
   const [allPlayers, setAllPlayers] = useState<PlayerWithScores[]>([]);
 
   useEffect(() => {
-    setSettings(loadSettings());
+    const s = loadSettings();
+    setSettings(s);
+    applyTheme(s.theme);
     setMounted(true);
   }, []);
+
+  function applyTheme(theme: "dark" | "light") {
+    if (theme === "light") {
+      document.documentElement.classList.add("light");
+    } else {
+      document.documentElement.classList.remove("light");
+    }
+  }
 
   useEffect(() => {
     if (isAdmin) {
@@ -143,6 +123,7 @@ export default function SettingsPage() {
     const next = { ...settings, ...patch };
     setSettings(next);
     saveSettings(next);
+    if (patch.theme) applyTheme(patch.theme);
   }
 
   if (!mounted) {
@@ -167,42 +148,20 @@ export default function SettingsPage() {
         </h3>
 
         <div className="space-y-5">
-          {/* Default Round */}
-          <div>
-            <label className="block font-label text-xs text-on-surface-variant uppercase tracking-widest mb-2">
-              Default Round
-            </label>
-            <SegmentedToggle
-              options={[
-                { label: "Round 1", value: "1" },
-                { label: "Round 2", value: "2" },
-              ]}
-              value={settings.defaultRound}
-              onChange={(v) => update({ defaultRound: v as "1" | "2" })}
+          {/* Theme */}
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="font-label text-sm font-bold text-on-surface">
+                Light Mode
+              </p>
+              <p className="text-[11px] text-on-surface-variant">
+                Switch between dark and light theme
+              </p>
+            </div>
+            <Toggle
+              enabled={settings.theme === "light"}
+              onChange={(v) => update({ theme: v ? "light" : "dark" })}
             />
-            <p className="text-[11px] text-on-surface-variant mt-1.5">
-              Which round to show by default on scorecard and scoring pages
-            </p>
-          </div>
-
-          {/* Scorecard View */}
-          <div>
-            <label className="block font-label text-xs text-on-surface-variant uppercase tracking-widest mb-2">
-              Scorecard View
-            </label>
-            <SegmentedToggle
-              options={[
-                { label: "Card", value: "card" },
-                { label: "Classic", value: "classic" },
-              ]}
-              value={settings.scorecardView}
-              onChange={(v) =>
-                update({ scorecardView: v as "card" | "classic" })
-              }
-            />
-            <p className="text-[11px] text-on-surface-variant mt-1.5">
-              Your preferred scorecard layout
-            </p>
           </div>
         </div>
       </div>
