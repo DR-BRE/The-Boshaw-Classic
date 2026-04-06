@@ -34,11 +34,13 @@ function RankBadge({ rank }: { rank: number }) {
   }
   if (rank === 2) {
     return (
-      <div className="w-10 h-10 flex items-center justify-center shrink-0">
+      <div className="w-10 h-10 flex items-center justify-center shrink-0 overflow-hidden">
         <img
           src="/trophy-silver.png"
           alt="2nd place"
-          className="w-9 h-9 object-contain drop-shadow-lg"
+          width={36}
+          height={36}
+          className="w-9 h-9 max-w-9 max-h-9 object-contain drop-shadow-lg"
         />
       </div>
     );
