@@ -40,6 +40,15 @@ export default function RootLayout({
   return (
     <html lang="en" className="dark overflow-hidden h-dvh">
       <head>
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <link
+          rel="preload"
+          href="/hero-bg.webp"
+          as="image"
+          type="image/webp"
+          fetchPriority="high"
+        />
         <link
           href="https://fonts.googleapis.com/css2?family=Noto+Serif:wght@400;700&family=Manrope:wght@300;400;500;600;700;800&display=swap"
           rel="stylesheet"

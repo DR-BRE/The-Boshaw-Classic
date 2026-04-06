@@ -45,5 +45,9 @@ next-env.d.ts
 # local database
 dev.db
 
+# Lighthouse reports
+lighthouse-report.html
+*.lighthouse.html
+
 # claude config
 .claude/
