@@ -217,12 +217,18 @@ export default function LeaderboardPage() {
                     <p className="font-label text-xs text-on-surface-variant truncate">{entry.lastName}</p>
                   </div>
 
-                  {/* Today */}
-                  <div className="text-right shrink-0">
-                    <p className={`font-headline text-xl font-bold ${toParColor(entry.totalToPar)}`}>
-                      {formatToPar(entry.totalToPar)}
-                    </p>
-                    <p className="font-label text-[10px] text-on-surface-variant">Thru F</p>
+                  {/* Today + Thru */}
+                  <div className="flex items-center gap-4 shrink-0">
+                    <div className="text-center">
+                      <p className="font-label text-[10px] uppercase tracking-wider text-on-surface-variant mb-0.5">Today</p>
+                      <p className={`font-headline text-2xl font-bold ${toParColor(entry.totalToPar)}`}>
+                        {formatToPar(entry.totalToPar)}
+                      </p>
+                    </div>
+                    <div className="text-center">
+                      <p className="font-label text-[10px] uppercase tracking-wider text-on-surface-variant mb-0.5">Thru</p>
+                      <p className="font-headline text-2xl font-bold text-on-surface">F</p>
+                    </div>
                   </div>
                 </div>
 
