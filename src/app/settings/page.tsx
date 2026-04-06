@@ -118,6 +118,13 @@ export default function SettingsPage() {
   const [confirmClear, setConfirmClear] = useState(false);
   const [clearing, setClearing] = useState(false);
 
+  // Add player
+  const [showAddPlayer, setShowAddPlayer] = useState(false);
+  const [newFirst, setNewFirst] = useState("");
+  const [newLast, setNewLast] = useState("");
+  const [newHandicap, setNewHandicap] = useState("0");
+  const [addingPlayer, setAddingPlayer] = useState(false);
+
   // Admin score editing
   const [allPlayers, setAllPlayers] = useState<PlayerWithScores[]>([]);
   const [editPlayerId, setEditPlayerId] = useState<string | null>(null);
@@ -313,6 +320,87 @@ export default function SettingsPage() {
           </div>
         </div>
       </div>
+
+      {/* Add Player (admin only) */}
+      {isAdmin && (
+        <div className="bg-white/[0.06] backdrop-blur-xl border border-white/[0.08] rounded-2xl p-5 mb-5">
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="font-headline text-lg text-on-surface">Add Player</h3>
+            <button
+              onClick={() => setShowAddPlayer(!showAddPlayer)}
+              className="w-9 h-9 flex items-center justify-center rounded-full bg-secondary text-on-secondary active:scale-90 transition-transform"
+            >
+              <span className="material-symbols-outlined text-lg">
+                {showAddPlayer ? "close" : "person_add"}
+              </span>
+            </button>
+          </div>
+
+          {showAddPlayer && (
+            <div className="space-y-3">
+              <div className="flex gap-2">
+                <input
+                  type="text"
+                  placeholder="First name"
+                  value={newFirst}
+                  onChange={(e) => setNewFirst(e.target.value)}
+                  className="flex-1 px-3 py-2.5 rounded-xl bg-white/[0.06] border border-white/[0.06] text-on-surface font-label text-sm placeholder:text-on-surface-variant/50 outline-none focus:border-primary/50"
+                />
+                <input
+                  type="text"
+                  placeholder="Last name"
+                  value={newLast}
+                  onChange={(e) => setNewLast(e.target.value)}
+                  className="flex-1 px-3 py-2.5 rounded-xl bg-white/[0.06] border border-white/[0.06] text-on-surface font-label text-sm placeholder:text-on-surface-variant/50 outline-none focus:border-primary/50"
+                />
+              </div>
+              <input
+                type="number"
+                placeholder="Handicap"
+                value={newHandicap}
+                onChange={(e) => setNewHandicap(e.target.value)}
+                className="w-full px-3 py-2.5 rounded-xl bg-white/[0.06] border border-white/[0.06] text-on-surface font-label text-sm placeholder:text-on-surface-variant/50 outline-none focus:border-primary/50"
+              />
+              <button
+                onClick={async () => {
+                  if (!newFirst.trim() || !newLast.trim()) return;
+                  setAddingPlayer(true);
+                  try {
+                    await fetch("/api/groups", {
+                      method: "POST",
+                      headers: { "Content-Type": "application/json" },
+                      body: JSON.stringify({
+                        firstName: newFirst.trim(),
+                        lastName: newLast.trim(),
+                        handicap: Number(newHandicap) || 0,
+                        group: 0,
+                      }),
+                    });
+                    // Refresh player lists
+                    const [groupsRes, scoresRes] = await Promise.all([
+                      fetch("/api/groups"),
+                      fetch("/api/admin/scores"),
+                    ]);
+                    const groupsData = await groupsRes.json();
+                    const scoresData = await scoresRes.json();
+                    if (groupsData.players) setPlayers(groupsData.players);
+                    if (scoresData.players) setAllPlayers(scoresData.players);
+                    setNewFirst("");
+                    setNewLast("");
+                    setNewHandicap("0");
+                    setShowAddPlayer(false);
+                  } catch {}
+                  setAddingPlayer(false);
+                }}
+                disabled={addingPlayer || !newFirst.trim() || !newLast.trim()}
+                className="w-full py-3 rounded-xl bg-secondary text-on-secondary font-label text-sm font-bold uppercase tracking-wider active:scale-[0.97] transition-transform disabled:opacity-50"
+              >
+                {addingPlayer ? "Adding…" : "Add Player"}
+              </button>
+            </div>
+          )}
+        </div>
+      )}
 
       {/* Manage Groups (admin only) */}
       {isAdmin && players.length > 0 && (

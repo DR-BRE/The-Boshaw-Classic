@@ -22,6 +22,41 @@ export async function GET() {
   }
 }
 
+export async function POST(request: Request) {
+  try {
+    const session = await getServerSession(authOptions);
+    if (!session?.user?.email || session.user.email !== ADMIN_EMAIL) {
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    }
+
+    const { firstName, lastName, handicap, group } = (await request.json()) as {
+      firstName: string;
+      lastName: string;
+      handicap: number;
+      group: number;
+    };
+
+    if (!firstName || !lastName) {
+      return NextResponse.json({ error: "First and last name required" }, { status: 400 });
+    }
+
+    const player = await prisma.player.create({
+      data: {
+        firstName,
+        lastName,
+        displayName: `${firstName} ${lastName}`,
+        handicap: handicap || 0,
+        group: group || 0,
+      },
+    });
+
+    return NextResponse.json({ player });
+  } catch (error) {
+    console.error("Groups POST error:", error);
+    return NextResponse.json({ error: String(error) }, { status: 500 });
+  }
+}
+
 export async function PUT(request: Request) {
   try {
     const session = await getServerSession(authOptions);
