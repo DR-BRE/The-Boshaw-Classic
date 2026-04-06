@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
 
 type Settings = {
@@ -81,95 +81,6 @@ function SegmentedToggle({
   );
 }
 
-function SwipeableRow({
-  children,
-  onDelete,
-}: {
-  children: React.ReactNode;
-  onDelete: () => void;
-}) {
-  const rowRef = useRef<HTMLDivElement>(null);
-  const startX = useRef(0);
-  const startY = useRef(0);
-  const currentX = useRef(0);
-  const swiping = useRef(false);
-  const direction = useRef<"none" | "horizontal" | "vertical">("none");
-
-  function handleTouchStart(e: React.TouchEvent) {
-    startX.current = e.touches[0].clientX;
-    startY.current = e.touches[0].clientY;
-    currentX.current = 0;
-    swiping.current = false;
-    direction.current = "none";
-  }
-
-  function handleTouchMove(e: React.TouchEvent) {
-    const dx = e.touches[0].clientX - startX.current;
-    const dy = e.touches[0].clientY - startY.current;
-
-    // Lock direction on first significant movement
-    if (direction.current === "none" && (Math.abs(dx) > 10 || Math.abs(dy) > 10)) {
-      direction.current = Math.abs(dy) > Math.abs(dx) ? "vertical" : "horizontal";
-    }
-
-    // Only allow horizontal swipe if locked to horizontal
-    if (direction.current !== "horizontal") return;
-
-    if (dx < -30) swiping.current = true;
-    const offset = Math.min(0, Math.max(-80, dx));
-    currentX.current = offset;
-    if (rowRef.current) {
-      // Disable transition during drag for responsiveness
-      rowRef.current.style.transition = "none";
-      rowRef.current.style.transform = `translateX(${offset}px)`;
-    }
-  }
-
-  function handleTouchEnd() {
-    if (direction.current === "horizontal") {
-      // Re-enable transition for snap animation
-      if (rowRef.current) rowRef.current.style.transition = "";
-      if (currentX.current < -40) {
-        if (rowRef.current) rowRef.current.style.transform = "translateX(-80px)";
-      } else {
-        if (rowRef.current) rowRef.current.style.transform = "translateX(0)";
-      }
-    }
-    direction.current = "none";
-  }
-
-  function handleClick(e: React.MouseEvent) {
-    if (swiping.current) {
-      e.stopPropagation();
-      e.preventDefault();
-    }
-  }
-
-  return (
-    <div className="relative overflow-hidden rounded-xl">
-      <div className="absolute inset-y-0 right-0 w-20 bg-red-500 flex items-center justify-center">
-        <button
-          onClick={onDelete}
-          className="w-full h-full flex items-center justify-center"
-        >
-          <span className="material-symbols-outlined text-white text-xl">
-            delete
-          </span>
-        </button>
-      </div>
-      <div
-        ref={rowRef}
-        onTouchStart={handleTouchStart}
-        onTouchMove={handleTouchMove}
-        onTouchEnd={handleTouchEnd}
-        onClickCapture={handleClick}
-        className="relative z-10 transition-transform duration-150"
-      >
-        {children}
-      </div>
-    </div>
-  );
-}
 
 const ADMIN_EMAIL = "brettwfrancoeur@gmail.com";
 const GROUP_LABELS = ["Unassigned", "Group 1", "Group 2"] as const;
@@ -325,16 +236,8 @@ export default function SettingsPage() {
 
           <div className="space-y-2">
             {players.map((p) => (
-              <SwipeableRow
-                key={p.id}
-                onDelete={async () => {
-                  try {
-                    await fetch(`/api/groups?playerId=${p.id}`, { method: "DELETE" });
-                    setPlayers((prev) => prev.filter((pl) => pl.id !== p.id));
-                  } catch {}
-                }}
-              >
                 <button
+                  key={p.id}
                   onClick={() => {
                     const nextGroup = (p.group + 1) % 3;
                     if (nextGroup > 0) {
@@ -369,7 +272,6 @@ export default function SettingsPage() {
                     {GROUP_LABELS[p.group]}
                   </span>
                 </button>
-              </SwipeableRow>
             ))}
           </div>
 
