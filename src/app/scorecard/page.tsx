@@ -4,6 +4,7 @@ import React, { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
 import type { ScorecardData, ScorecardPlayer } from "@/lib/types/scorecard";
 import { COURSE_PARS } from "@/lib/tournament";
+import { getWolfForHole, calculateWolfStandings } from "@/lib/wolf";
 
 type ViewMode = "card" | "classic";
 type GameMode = "scorecard" | "wolf" | "high-low";
@@ -423,9 +424,10 @@ function ScoreInput({
   );
 }
 
-function getWolfForHole(wolfOrder: string[] | null, holeNumber: number): string | null {
-  if (!wolfOrder || holeNumber > 16) return null;
-  return wolfOrder[(holeNumber - 1) % 4];
+function wolfPointColor(pts: number) {
+  if (pts > 0) return "text-primary";
+  if (pts < 0) return "text-on-error-container";
+  return "text-on-surface-variant";
 }
 
 function NineHoleGrid({
@@ -437,6 +439,10 @@ function NineHoleGrid({
   currentPlayerId,
   onScoreTap,
   wolfOrder,
+  wolfPicks,
+  wolfStandings,
+  isAdmin,
+  onWolfPick,
 }: {
   label: string;
   totalLabel: string;
@@ -446,6 +452,10 @@ function NineHoleGrid({
   currentPlayerId: string | null;
   onScoreTap?: (playerId: string, holeIdx: number) => void;
   wolfOrder?: string[] | null;
+  wolfPicks?: Record<number, string | null>;
+  wolfStandings?: ReturnType<typeof calculateWolfStandings> | null;
+  isAdmin?: boolean;
+  onWolfPick?: (hole: number, partnerId: string | null) => void;
 }) {
   const parTotal = holePars.reduce((sum, p) => sum + p, 0);
 
@@ -580,6 +590,98 @@ function NineHoleGrid({
                 </React.Fragment>
               );
             })}
+
+            {/* Wolf Pick Row — shows who the wolf picked per hole */}
+            {wolfOrder && wolfPicks && onWolfPick && (() => {
+              const groupPlayers = players.filter((p) => wolfOrder.includes(p.id));
+              return (
+                <tr className="bg-yellow-500/5 border-t border-yellow-500/20">
+                  <td className="sticky left-0 z-10 bg-[#1a1a10] px-3 py-2 font-label text-[11px] font-bold uppercase tracking-widest text-yellow-500 shadow-[2px_0_4px_rgba(0,0,0,0.3)]">
+                    Wolf Pick
+                  </td>
+                  {holePars.map((_, i) => {
+                    const holeNum = startHole + i + 1;
+                    const wolfId = getWolfForHole(wolfOrder, holeNum);
+                    if (!wolfId) return <td key={i} className="px-1 py-2 text-center text-on-surface-variant text-[10px]">—</td>;
+                    const isWolf = currentPlayerId === wolfId;
+                    const canPick = isWolf || isAdmin;
+                    const pick = wolfPicks[holeNum];
+                    const hasPick = pick !== undefined;
+                    const partnerName = pick ? groupPlayers.find((p) => p.id === pick)?.displayName : null;
+
+                    if (!canPick) {
+                      return (
+                        <td key={i} className="px-1 py-1 text-center">
+                          {hasPick ? (
+                            <span className="font-label text-[9px] font-bold text-yellow-500 leading-tight block">
+                              {pick === null ? "Lone" : partnerName?.split(" ")[0] ?? "?"}
+                            </span>
+                          ) : (
+                            <span className="text-on-surface-variant text-[10px]">—</span>
+                          )}
+                        </td>
+                      );
+                    }
+
+                    return (
+                      <td key={i} className="px-0.5 py-1 text-center">
+                        {!hasPick ? (
+                          <button
+                            onClick={() => {
+                              // Show pick modal - cycle: first 3 non-wolf players, then lone wolf
+                              const nonWolf = groupPlayers.filter((p) => p.id !== wolfId);
+                              const options = [...nonWolf.map((p) => p.id), null];
+                              onWolfPick(holeNum, options[0]);
+                            }}
+                            className="text-[9px] font-bold text-yellow-500 bg-yellow-500/10 rounded px-1 py-0.5 active:scale-95"
+                          >
+                            Pick
+                          </button>
+                        ) : (
+                          <button
+                            onClick={() => {
+                              // Cycle through options: non-wolf players + lone wolf
+                              const nonWolf = groupPlayers.filter((p) => p.id !== wolfId);
+                              const options: (string | null)[] = [...nonWolf.map((p) => p.id), null];
+                              const currentIdx = options.indexOf(pick);
+                              const nextIdx = (currentIdx + 1) % options.length;
+                              onWolfPick(holeNum, options[nextIdx]);
+                            }}
+                            className="font-label text-[9px] font-bold text-yellow-500 leading-tight block active:scale-95"
+                          >
+                            {pick === null ? "Lone" : partnerName?.split(" ")[0] ?? "?"}
+                          </button>
+                        )}
+                      </td>
+                    );
+                  })}
+                  <td className="px-2 py-2 text-center text-on-surface-variant text-[10px]" />
+                </tr>
+              );
+            })()}
+
+            {/* Wolf Points Row — shows points per hole */}
+            {wolfStandings && wolfOrder && (
+              <tr className="bg-yellow-500/5 border-t border-yellow-500/10">
+                <td className="sticky left-0 z-10 bg-[#1a1a10] px-3 py-1.5 font-label text-[11px] font-bold uppercase tracking-widest text-yellow-500 shadow-[2px_0_4px_rgba(0,0,0,0.3)]">
+                  Wolf Pts
+                </td>
+                {holePars.map((_, i) => {
+                  const holeNum = startHole + i + 1;
+                  const holeResult = wolfStandings.holes[holeNum - 1];
+                  if (!holeResult || !currentPlayerId) {
+                    return <td key={i} className="px-1 py-1.5 text-center text-on-surface-variant text-[10px]">—</td>;
+                  }
+                  const pts = holeResult.points[currentPlayerId] ?? 0;
+                  return (
+                    <td key={i} className={`px-1 py-1.5 text-center font-label text-xs font-bold tabular-nums ${wolfPointColor(pts)}`}>
+                      {pts > 0 ? `+${pts}` : pts === 0 ? "·" : pts}
+                    </td>
+                  );
+                })}
+                <td className="px-2 py-1.5 text-center text-on-surface-variant text-[10px]" />
+              </tr>
+            )}
           </tbody>
         </table>
       </div>
@@ -593,12 +695,14 @@ function SummaryTable({
   frontPar,
   backPar,
   currentPlayerId,
+  wolfTotals,
 }: {
   players: ScorecardPlayer[];
   coursePar: number;
   frontPar: number;
   backPar: number;
   currentPlayerId: string | null;
+  wolfTotals?: Record<string, number> | null;
 }) {
   const { sorted: sortedPlayers, dividerAfter } = sortPlayersByGroup(players, currentPlayerId);
   return (
@@ -625,6 +729,11 @@ function SummaryTable({
               <th className="px-2 py-2 text-center font-label text-[11px] font-bold uppercase tracking-widest text-secondary">
                 Net
               </th>
+              {wolfTotals && (
+                <th className="px-2 py-2 text-center font-label text-[11px] font-bold uppercase tracking-widest text-yellow-500">
+                  Wolf
+                </th>
+              )}
             </tr>
           </thead>
           <tbody>
@@ -648,6 +757,11 @@ function SummaryTable({
               <td className="px-2 py-1.5 text-center font-label text-xs text-on-surface-variant">
                 —
               </td>
+              {wolfTotals && (
+                <td className="px-2 py-1.5 text-center font-label text-xs text-on-surface-variant">
+                  —
+                </td>
+              )}
             </tr>
 
             {/* Player Rows */}
@@ -709,10 +823,18 @@ function SummaryTable({
                     >
                       {player.net !== null ? player.net : "—"}
                     </td>
+                    {wolfTotals && (() => {
+                      const pts = wolfTotals[player.id] ?? 0;
+                      return (
+                        <td className={`px-2 py-2 text-center font-headline tabular-nums ${isCurrentUser ? "text-base font-extrabold" : "text-sm font-bold"} ${wolfPointColor(pts)}`}>
+                          {pts > 0 ? `+${pts}` : pts}
+                        </td>
+                      );
+                    })()}
                   </tr>
                   {pIdx + 1 === dividerAfter && pIdx + 1 < sortedPlayers.length && (
                     <tr>
-                      <td colSpan={6} className="py-0.5 bg-white/[0.08]" />
+                      <td colSpan={wolfTotals ? 7 : 6} className="py-0.5 bg-white/[0.08]" />
                     </tr>
                   )}
                 </React.Fragment>
@@ -753,6 +875,7 @@ export default function ScorecardPage() {
   const [gameMode, setGameMode] = useState<GameMode>("scorecard");
   const [gameModeOpen, setGameModeOpen] = useState(false);
   const [wolfOrder, setWolfOrder] = useState<string[] | null>(null);
+  const [wolfPicks, setWolfPicks] = useState<Record<number, string | null>>({});
   const isAdmin = session?.user?.email === "brettwfrancoeur@gmail.com";
 
   // Load saved settings from localStorage on mount
@@ -808,6 +931,44 @@ export default function ScorecardPage() {
     return () => clearInterval(interval);
   }, [gameMode, round, currentUserGroup, isAdmin]);
 
+  // Fetch wolf picks when wolf mode is active
+  useEffect(() => {
+    if (gameMode !== "wolf" || !currentUserGroup) {
+      setWolfPicks({});
+      return;
+    }
+    const fetchPicks = () =>
+      fetch(`/api/wolf-picks?round=${round}&group=${currentUserGroup}`)
+        .then((res) => res.json())
+        .then((d) => { if (d.picks) setWolfPicks(d.picks); })
+        .catch(() => {});
+    fetchPicks();
+    const interval = setInterval(fetchPicks, 5000);
+    return () => clearInterval(interval);
+  }, [gameMode, round, currentUserGroup]);
+
+  function handleWolfPick(hole: number, partnerId: string | null) {
+    // Optimistic update
+    setWolfPicks((prev) => ({ ...prev, [hole]: partnerId }));
+    fetch("/api/wolf-picks", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ round: Number(round), group: currentUserGroup, hole, partnerId }),
+    }).catch(() => {});
+  }
+
+  // Calculate wolf standings from current data
+  const wolfStandings = React.useMemo(() => {
+    if (!wolfOrder || !data || gameMode !== "wolf") return null;
+    const groupPlayers = data.players.filter((p) => wolfOrder.includes(p.id));
+    if (groupPlayers.length !== 4) return null;
+    const playerScoresPerHole: Record<string, (number | null)[]> = {};
+    for (const p of groupPlayers) {
+      playerScoresPerHole[p.id] = p.scores;
+    }
+    return calculateWolfStandings(wolfOrder, wolfPicks, playerScoresPerHole);
+  }, [wolfOrder, wolfPicks, data, gameMode]);
+
   function shuffleWolf() {
     if (!currentUserGroup) return;
     fetch("/api/wolf", {
@@ -816,7 +977,12 @@ export default function ScorecardPage() {
       body: JSON.stringify({ round: Number(round), group: currentUserGroup }),
     })
       .then((res) => res.json())
-      .then((d) => { if (d.order) setWolfOrder(d.order); })
+      .then((d) => {
+        if (d.order) {
+          setWolfOrder(d.order);
+          setWolfPicks({}); // Clear picks on reshuffle
+        }
+      })
       .catch(() => {});
   }
 
@@ -1095,6 +1261,10 @@ export default function ScorecardPage() {
                 currentPlayerId={currentUserId}
                 onScoreTap={(playerId, holeIdx) => setEditingHole({ playerId, holeIdx })}
                 wolfOrder={wolfOrder}
+                wolfPicks={gameMode === "wolf" ? wolfPicks : undefined}
+                wolfStandings={wolfStandings}
+                isAdmin={isAdmin}
+                onWolfPick={gameMode === "wolf" ? handleWolfPick : undefined}
               />
 
               {/* Back 9 */}
@@ -1107,6 +1277,10 @@ export default function ScorecardPage() {
                 currentPlayerId={currentUserId}
                 onScoreTap={(playerId, holeIdx) => setEditingHole({ playerId, holeIdx })}
                 wolfOrder={wolfOrder}
+                wolfPicks={gameMode === "wolf" ? wolfPicks : undefined}
+                wolfStandings={wolfStandings}
+                isAdmin={isAdmin}
+                onWolfPick={gameMode === "wolf" ? handleWolfPick : undefined}
               />
 
               {/* Summary */}
@@ -1121,7 +1295,48 @@ export default function ScorecardPage() {
                 frontPar={frontPar}
                 backPar={backPar}
                 currentPlayerId={currentUserId}
+                wolfTotals={wolfStandings?.totals}
               />
+
+              {/* Wolf Standings */}
+              {wolfStandings && wolfOrder && (
+                <div className="mb-6">
+                  <div className="bg-yellow-500/20 rounded-t-xl px-4 py-2">
+                    <h3 className="font-headline text-yellow-500 text-center text-lg font-bold uppercase tracking-wider">
+                      Wolf Standings
+                    </h3>
+                  </div>
+                  <div className="bg-white/[0.06] backdrop-blur-xl border border-yellow-500/20 rounded-b-xl overflow-hidden">
+                    {wolfOrder
+                      .map((id) => ({
+                        id,
+                        name: data.players.find((p) => p.id === id)?.displayName ?? "?",
+                        pts: wolfStandings.totals[id] ?? 0,
+                      }))
+                      .sort((a, b) => b.pts - a.pts)
+                      .map((entry, i) => (
+                        <div
+                          key={entry.id}
+                          className={`flex items-center justify-between px-4 py-3 ${
+                            i > 0 ? "border-t border-white/[0.06]" : ""
+                          } ${entry.id === currentUserId ? "bg-secondary/10" : ""}`}
+                        >
+                          <div className="flex items-center gap-3">
+                            <span className="font-headline text-lg font-bold text-on-surface-variant w-6 text-center">
+                              {i + 1}
+                            </span>
+                            <span className={`font-label text-sm font-bold ${entry.id === currentUserId ? "text-secondary" : "text-on-surface"}`}>
+                              {entry.name}
+                            </span>
+                          </div>
+                          <span className={`font-headline text-xl font-bold tabular-nums ${wolfPointColor(entry.pts)}`}>
+                            {entry.pts > 0 ? `+${entry.pts}` : entry.pts}
+                          </span>
+                        </div>
+                      ))}
+                  </div>
+                </div>
+              )}
             </>
           )}
         </>

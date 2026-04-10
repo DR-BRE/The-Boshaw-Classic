@@ -112,3 +112,15 @@ model WolfOrder {
 
   @@unique([round, group])
 }
+
+model WolfPick {
+  id        String   @id @default(cuid())
+  round     Int
+  group     Int
+  hole      Int      // 1-16
+  partnerId String?  // null = lone wolf
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([round, group, hole])
+}

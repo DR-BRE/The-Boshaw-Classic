@@ -51,6 +51,9 @@ export async function POST(request: Request) {
       [ids[i], ids[j]] = [ids[j], ids[i]];
     }
 
+    // Clear any existing wolf picks when reshuffling
+    await prisma.wolfPick.deleteMany({ where: { round, group } });
+
     const wolfOrder = await prisma.wolfOrder.upsert({
       where: { round_group: { round, group } },
       update: { order: JSON.stringify(ids) },
