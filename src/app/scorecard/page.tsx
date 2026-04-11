@@ -469,6 +469,8 @@ function NineHoleGrid({
   totalLabel,
   startHole,
   holePars,
+  yardages,
+  onYardageClick,
   players,
   currentPlayerId,
   onScoreTap,
@@ -482,6 +484,8 @@ function NineHoleGrid({
   totalLabel: string;
   startHole: number;
   holePars: number[];
+  yardages?: number[];
+  onYardageClick?: (hole: number) => void;
   players: ScorecardPlayer[];
   currentPlayerId: string | null;
   onScoreTap?: (playerId: string, holeIdx: number) => void;
@@ -492,6 +496,7 @@ function NineHoleGrid({
   onWolfPick?: (hole: number, partnerId: string | null) => void;
 }) {
   const parTotal = holePars.reduce((sum, p) => sum + p, 0);
+  const ydsTotal = yardages?.reduce((sum, y) => sum + y, 0);
 
   const { sorted: sortedPlayers, dividerAfter } = sortPlayersByGroup(players, currentPlayerId);
 
@@ -545,6 +550,28 @@ function NineHoleGrid({
                 {parTotal}
               </td>
             </tr>
+
+            {/* Yardage Row */}
+            {yardages && (
+              <tr className="bg-surface-container-high">
+                <td className="sticky left-0 z-10 bg-surface-container-high px-3 py-1.5 font-label text-xs text-on-surface-variant shadow-[2px_0_4px_rgba(0,0,0,0.3)]">
+                  Yds
+                </td>
+                {yardages.map((yds, i) => (
+                  <td key={i} className="px-1 py-1.5 text-center">
+                    <button
+                      onClick={() => onYardageClick?.(startHole + i + 1)}
+                      className="font-label text-xs text-secondary tabular-nums active:scale-95 transition-transform"
+                    >
+                      {yds}
+                    </button>
+                  </td>
+                ))}
+                <td className="px-2 py-1.5 text-center font-label text-xs font-bold text-secondary tabular-nums">
+                  {ydsTotal}
+                </td>
+              </tr>
+            )}
 
             {/* Player Rows */}
             {sortedPlayers.map((player, pIdx) => {
@@ -1303,6 +1330,8 @@ export default function ScorecardPage() {
                 totalLabel="OUT"
                 startHole={0}
                 holePars={data.course.holes.slice(0, 9)}
+                yardages={data.course.yardages?.slice(0, 9)}
+                onYardageClick={data.course.name in COURSE_HOLE_IMAGES ? (hole: number) => setCourseImageHole(hole) : undefined}
                 players={data.players}
                 currentPlayerId={currentUserId}
                 onScoreTap={(playerId, holeIdx) => setEditingHole({ playerId, holeIdx })}
@@ -1319,6 +1348,8 @@ export default function ScorecardPage() {
                 totalLabel="IN"
                 startHole={9}
                 holePars={data.course.holes.slice(9)}
+                yardages={data.course.yardages?.slice(9)}
+                onYardageClick={data.course.name in COURSE_HOLE_IMAGES ? (hole: number) => setCourseImageHole(hole) : undefined}
                 players={data.players}
                 currentPlayerId={currentUserId}
                 onScoreTap={(playerId, holeIdx) => setEditingHole({ playerId, holeIdx })}
