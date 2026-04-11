@@ -933,7 +933,7 @@ export default function ScorecardPage() {
   const [data, setData] = useState<ScorecardData | null>(null);
   const [loading, setLoading] = useState(true);
   const [currentUserId, setCurrentUserId] = useState<string | null>(null);
-  const [saving, setSaving] = useState(false);
+
   const [editingHole, setEditingHole] = useState<{ playerId: string; holeIdx: number } | null>(null);
   const [courseImageHole, setCourseImageHole] = useState<number | null>(null);
   const [gameMode, setGameMode] = useState<GameMode>(initSettings.gameMode as GameMode);
@@ -1044,7 +1044,6 @@ export default function ScorecardPage() {
   }
 
   const savingRef = React.useRef(false);
-  React.useEffect(() => { savingRef.current = saving; }, [saving]);
 
   useEffect(() => {
     setLoading(true);
@@ -1100,20 +1099,20 @@ export default function ScorecardPage() {
     const updatedPlayer = newPlayers.find((p) => p.id === player.id);
     if (!updatedPlayer) return;
     const allScores = updatedPlayer.scores as number[];
-    setSaving(true);
+    savingRef.current = true;
     const isOtherPlayer = player.id !== currentUserId;
     if (isAdmin && isOtherPlayer) {
       fetch("/api/admin/scores", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ playerId: player.id, round: Number(round), holes: allScores }),
-      }).finally(() => setSaving(false));
+      }).finally(() => { setTimeout(() => { savingRef.current = false; }, 500); });
     } else {
       fetch("/api/scores", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ round: Number(round), holes: allScores }),
-      }).finally(() => setSaving(false));
+      }).finally(() => { setTimeout(() => { savingRef.current = false; }, 500); });
     }
   }
 
@@ -1139,12 +1138,12 @@ export default function ScorecardPage() {
     setData({ ...data, players: newPlayers });
 
     const allScores = newPlayers[playerIdx].scores as number[];
-    setSaving(true);
+    savingRef.current = true;
     fetch("/api/scores", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ round: Number(round), holes: allScores }),
-    }).finally(() => setSaving(false));
+    }).finally(() => { setTimeout(() => { savingRef.current = false; }, 500); });
   }
 
   const frontPar = data
