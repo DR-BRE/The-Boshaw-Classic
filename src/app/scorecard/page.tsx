@@ -917,10 +917,11 @@ function loadSettings() {
       return {
         defaultRound: parsed.defaultRound || "1",
         scorecardView: parsed.scorecardView || "card",
+        gameMode: parsed.gameMode || "scorecard",
       };
     }
   } catch {}
-  return { defaultRound: "1", scorecardView: "card" };
+  return { defaultRound: "1", scorecardView: "card", gameMode: "scorecard" };
 }
 
 export default function ScorecardPage() {
@@ -935,7 +936,7 @@ export default function ScorecardPage() {
   const [saving, setSaving] = useState(false);
   const [editingHole, setEditingHole] = useState<{ playerId: string; holeIdx: number } | null>(null);
   const [courseImageHole, setCourseImageHole] = useState<number | null>(null);
-  const [gameMode, setGameMode] = useState<GameMode>("scorecard");
+  const [gameMode, setGameMode] = useState<GameMode>(initSettings.gameMode as GameMode);
   const [gameModeOpen, setGameModeOpen] = useState(false);
   const [wolfOrder, setWolfOrder] = useState<string[] | null>(null);
   const [wolfPicks, setWolfPicks] = useState<Record<number, string | null>>({});
@@ -1182,7 +1183,7 @@ export default function ScorecardPage() {
                 {GAME_MODES.map((mode) => (
                   <button
                     key={mode.value}
-                    onClick={() => { setGameMode(mode.value); setGameModeOpen(false); }}
+                    onClick={() => { setGameMode(mode.value); setGameModeOpen(false); try { const raw = localStorage.getItem("boshaw-settings"); const s = raw ? JSON.parse(raw) : {}; s.gameMode = mode.value; localStorage.setItem("boshaw-settings", JSON.stringify(s)); } catch {} }}
                     className={`w-full flex items-center gap-2.5 px-4 py-3 text-left transition-colors ${
                       gameMode === mode.value
                         ? "bg-secondary/15 text-secondary"
