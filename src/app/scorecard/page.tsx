@@ -18,6 +18,7 @@ const GAME_MODES: { label: string; value: GameMode; icon: string }[] = [
 const ROUNDS = [
   { label: "Round 1", value: "1" },
   { label: "Round 2", value: "2" },
+  { label: "Round 3", value: "3" },
 ];
 
 function scoreColor(score: number | null, par: number) {

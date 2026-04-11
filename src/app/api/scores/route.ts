@@ -7,6 +7,7 @@ import { COURSE_PARS, TOURNAMENT } from "@/lib/tournament";
 const ROUND_COURSES: Record<number, string> = {
   1: TOURNAMENT.courses[0],
   2: TOURNAMENT.courses[1],
+  3: TOURNAMENT.courses[2],
 };
 
 export async function GET(request: Request) {

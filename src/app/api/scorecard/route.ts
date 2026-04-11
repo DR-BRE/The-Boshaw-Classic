@@ -6,6 +6,7 @@ import type { ScorecardData, ScorecardPlayer } from "@/lib/types/scorecard";
 const ROUND_COURSES: Record<number, string> = {
   1: TOURNAMENT.courses[0],
   2: TOURNAMENT.courses[1],
+  3: TOURNAMENT.courses[2],
 };
 
 function extractHoleScores(score: Record<string, unknown>): number[] {

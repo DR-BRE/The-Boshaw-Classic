@@ -4,9 +4,10 @@ import { useEffect, useState } from "react";
 import type { LeaderboardEntry } from "@/lib/types/leaderboard";
 
 const ROUNDS = [
-  { label: "All Rounds", value: "", course: "Bear Mountain Ranch & Desert Canyon" },
+  { label: "All Rounds", value: "", course: "Bear Mountain Ranch, Desert Canyon & Echo Falls" },
   { label: "Round 1", value: "1", course: "Bear Mountain Ranch" },
   { label: "Round 2", value: "2", course: "Desert Canyon" },
+  { label: "Round 3", value: "3", course: "Echo Falls" },
 ];
 
 function formatToPar(toPar: number) {

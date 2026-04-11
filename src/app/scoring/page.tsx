@@ -8,6 +8,7 @@ import { TOURNAMENT, COURSE_PARS } from "@/lib/tournament";
 const ROUND_COURSES: Record<number, string> = {
   1: TOURNAMENT.courses[0],
   2: TOURNAMENT.courses[1],
+  3: TOURNAMENT.courses[2],
 };
 
 function scoreColor(score: number, par: number) {
@@ -311,7 +312,7 @@ export default function ScoringPage() {
 
       {/* Round Tabs */}
       <div className="bg-white/[0.06] backdrop-blur-lg border border-white/[0.06] rounded-xl p-1 flex gap-1 mb-4">
-        {[1, 2].map((r) => (
+        {[1, 2, 3].map((r) => (
           <button
             key={r}
             onClick={() => { setRound(r); setCurrentHole(0); setLoading(true); }}

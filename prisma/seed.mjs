@@ -14,6 +14,10 @@ const COURSE_PARS = {
     total: 72,
     holes: [4, 4, 5, 3, 4, 4, 5, 3, 4, 5, 4, 4, 4, 3, 5, 3, 4, 4],
   },
+  "Echo Falls": {
+    total: 71,
+    holes: [4, 4, 4, 5, 3, 5, 3, 4, 4, 3, 4, 5, 3, 3, 5, 4, 5, 3],
+  },
 };
 
 const players = [
@@ -84,7 +88,21 @@ for (const player of round2Players) {
   );
 }
 
+// Round 3: Echo Falls
+const r3 = COURSE_PARS["Echo Falls"];
+for (const player of createdPlayers) {
+  const holes = generateHoleScores(r3.holes, player.handicap);
+  const total = holes.reduce((s, h) => s + h, 0);
+  const toPar = total - r3.total;
+  const id = cuid();
+  const now = new Date();
+  await client.query(
+    `INSERT INTO "Score" (id, "playerId", round, course, hole1,hole2,hole3,hole4,hole5,hole6,hole7,hole8,hole9,hole10,hole11,hole12,hole13,hole14,hole15,hole16,hole17,hole18, "totalStrokes", "toPar", "createdAt", "updatedAt") VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19,$20,$21,$22,$23,$24,$25,$26)`,
+    [id, player.id, 3, "Echo Falls", ...holes, total, toPar, now, now]
+  );
+}
+
 console.log(`Seeded ${createdPlayers.length} players`);
-console.log(`Seeded ${createdPlayers.length} Round 1 scores + ${round2Players.length} Round 2 scores`);
+console.log(`Seeded ${createdPlayers.length} Round 1 scores + ${round2Players.length} Round 2 scores + ${createdPlayers.length} Round 3 scores`);
 
 await client.end();
