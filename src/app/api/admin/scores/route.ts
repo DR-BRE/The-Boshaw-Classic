@@ -147,15 +147,20 @@ export async function DELETE(request: Request) {
 
     const { searchParams } = new URL(request.url);
     const playerId = searchParams.get("playerId");
-    const round = Number(searchParams.get("round"));
+    const roundParam = searchParams.get("round");
 
-    if (!playerId || !round) {
-      return NextResponse.json({ error: "Need playerId and round" }, { status: 400 });
+    if (!playerId) {
+      return NextResponse.json({ error: "Need playerId" }, { status: 400 });
     }
 
-    await prisma.score.delete({
-      where: { playerId_round: { playerId, round } },
-    });
+    if (roundParam) {
+      const round = Number(roundParam);
+      await prisma.score.delete({
+        where: { playerId_round: { playerId, round } },
+      });
+    } else {
+      await prisma.score.deleteMany({ where: { playerId } });
+    }
 
     return NextResponse.json({ success: true });
   } catch (error) {
