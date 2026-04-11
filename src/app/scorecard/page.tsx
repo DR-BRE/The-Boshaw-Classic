@@ -1196,7 +1196,16 @@ export default function ScorecardPage() {
         {ROUNDS.map((r) => (
           <button
             key={r.value}
-            onClick={() => { setRound(r.value); setSelectedPlayer(0); }}
+            onClick={() => {
+              setRound(r.value);
+              setSelectedPlayer(0);
+              try {
+                const raw = localStorage.getItem("boshaw-settings");
+                const s = raw ? JSON.parse(raw) : {};
+                s.defaultRound = r.value;
+                localStorage.setItem("boshaw-settings", JSON.stringify(s));
+              } catch {}
+            }}
             className={`flex-1 py-2.5 rounded-lg font-label text-xs font-bold uppercase tracking-wider transition-all active:scale-95 ${
               round === r.value
                 ? "bg-white/[0.1] text-primary"
