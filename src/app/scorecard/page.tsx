@@ -925,8 +925,9 @@ function loadSettings() {
 
 export default function ScorecardPage() {
   const { data: session } = useSession();
-  const [view, setView] = useState<ViewMode>("card");
-  const [round, setRound] = useState("1");
+  const initSettings = loadSettings();
+  const [view, setView] = useState<ViewMode>(initSettings.scorecardView as ViewMode);
+  const [round, setRound] = useState(initSettings.defaultRound);
   const [selectedPlayer, setSelectedPlayer] = useState(0);
   const [data, setData] = useState<ScorecardData | null>(null);
   const [loading, setLoading] = useState(true);
@@ -939,13 +940,6 @@ export default function ScorecardPage() {
   const [wolfOrder, setWolfOrder] = useState<string[] | null>(null);
   const [wolfPicks, setWolfPicks] = useState<Record<number, string | null>>({});
   const isAdmin = session?.user?.email === "brettwfrancoeur@gmail.com";
-
-  // Load saved settings from localStorage on mount
-  useEffect(() => {
-    const settings = loadSettings();
-    setView(settings.scorecardView as ViewMode);
-    setRound(settings.defaultRound);
-  }, []);
 
   // Fetch current user's player ID
   useEffect(() => {
