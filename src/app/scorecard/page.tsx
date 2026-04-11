@@ -9,6 +9,10 @@ import { getWolfForHole, calculateWolfStandings } from "@/lib/wolf";
 type ViewMode = "card" | "classic";
 type GameMode = "scorecard" | "wolf" | "high-low";
 
+const COURSE_IMAGES: Record<string, string> = {
+  "Echo Falls": "/courses/echo-falls.jpg",
+};
+
 const GAME_MODES: { label: string; value: GameMode; icon: string }[] = [
   { label: "Scorecard", value: "scorecard", icon: "scoreboard" },
   { label: "Wolf", value: "wolf", icon: "pets" },
@@ -97,12 +101,15 @@ function toParColor(n: number) {
   return "text-on-surface";
 }
 
-function ColumnHeaders() {
+function ColumnHeaders({ hasYardage }: { hasYardage?: boolean }) {
   return (
     <div className="flex items-center py-2 px-4 border-b border-white/[0.06] bg-white/[0.02]">
       <span className="w-8 font-label text-[10px] font-bold text-on-surface-variant uppercase tracking-widest">Hole</span>
       <span className="w-14 font-label text-[10px] font-bold text-on-surface-variant uppercase tracking-widest">Par</span>
       <span className="w-8 text-center font-label text-[10px] font-bold text-on-surface-variant uppercase tracking-widest">HCP</span>
+      {hasYardage && (
+        <span className="w-10 text-center font-label text-[10px] font-bold text-on-surface-variant uppercase tracking-widest">Yds</span>
+      )}
       <span className="ml-auto font-label text-[10px] font-bold text-on-surface-variant uppercase tracking-widest text-center" style={{ width: "118px" }}>Score</span>
       <span className="w-10 text-right font-label text-[10px] font-bold text-on-surface-variant uppercase tracking-widest">+/−</span>
     </div>
@@ -114,6 +121,8 @@ function HoleRow({
   par,
   score,
   handicap,
+  yardage,
+  onYardageClick,
   editable,
   onIncrement,
   onDecrement,
@@ -123,6 +132,8 @@ function HoleRow({
   par: number;
   score: number | null;
   handicap: number;
+  yardage?: number;
+  onYardageClick?: () => void;
   editable: boolean;
   onIncrement: () => void;
   onDecrement: () => void;
@@ -146,6 +157,16 @@ function HoleRow({
       <span className="w-8 text-center font-label text-sm text-on-surface-variant tabular-nums">
         {handicap}
       </span>
+
+      {/* Yardage */}
+      {yardage !== undefined && (
+        <button
+          onClick={onYardageClick}
+          className="w-10 text-center font-label text-sm text-secondary tabular-nums active:scale-95 transition-transform"
+        >
+          {yardage}
+        </button>
+      )}
 
       {/* +/- buttons or read-only score */}
       <div className="flex items-center gap-2 ml-auto">
@@ -184,6 +205,8 @@ function CardView({
   players,
   holePars,
   strokeIndices,
+  yardages,
+  onYardageClick,
   selectedPlayer,
   setSelectedPlayer,
   onScoreChange,
@@ -194,6 +217,8 @@ function CardView({
   players: ScorecardPlayer[];
   holePars: number[];
   strokeIndices: readonly number[];
+  yardages?: number[];
+  onYardageClick?: () => void;
   selectedPlayer: number;
   setSelectedPlayer: (i: number) => void;
   onScoreChange: (playerIdx: number, holeIdx: number, delta: number) => void;
@@ -209,8 +234,12 @@ function CardView({
   const backPars = holePars.slice(9);
   const frontIndices = strokeIndices.slice(0, 9);
   const backIndices = strokeIndices.slice(9);
+  const frontYardages = yardages?.slice(0, 9);
+  const backYardages = yardages?.slice(9);
   const frontPar = frontPars.reduce((s, p) => s + p, 0);
   const backPar = backPars.reduce((s, p) => s + p, 0);
+  const frontYds = frontYardages?.reduce((s, y) => s + y, 0);
+  const backYds = backYardages?.reduce((s, y) => s + y, 0);
 
   const frontScores = player.scores.slice(0, 9);
   const backScores = player.scores.slice(9);
@@ -322,10 +351,10 @@ function CardView({
             Front 9
           </h3>
           <span className="font-headline text-on-secondary text-sm font-bold">
-            par {frontPar}
+            {frontYds !== undefined && <>{frontYds} yds &middot; </>}par {frontPar}
           </span>
         </div>
-        <ColumnHeaders />
+        <ColumnHeaders hasYardage={!!frontYardages} />
         {frontPars.map((par, i) => (
           <HoleRow
             key={i}
@@ -333,6 +362,8 @@ function CardView({
             par={par}
             score={player.scores[i]}
             handicap={frontIndices[i]}
+            yardage={frontYardages?.[i]}
+            onYardageClick={onYardageClick}
             editable={canEdit}
             onIncrement={() => onScoreChange(selectedPlayer, i, 1)}
             onDecrement={() => onScoreChange(selectedPlayer, i, -1)}
@@ -348,10 +379,10 @@ function CardView({
             Back 9
           </h3>
           <span className="font-headline text-on-secondary text-sm font-bold">
-            par {backPar}
+            {backYds !== undefined && <>{backYds} yds &middot; </>}par {backPar}
           </span>
         </div>
-        <ColumnHeaders />
+        <ColumnHeaders hasYardage={!!backYardages} />
         {backPars.map((par, i) => (
           <HoleRow
             key={i + 9}
@@ -359,6 +390,8 @@ function CardView({
             par={par}
             score={player.scores[i + 9]}
             handicap={backIndices[i]}
+            yardage={backYardages?.[i]}
+            onYardageClick={onYardageClick}
             editable={canEdit}
             onIncrement={() => onScoreChange(selectedPlayer, i + 9, 1)}
             onDecrement={() => onScoreChange(selectedPlayer, i + 9, -1)}
@@ -873,6 +906,7 @@ export default function ScorecardPage() {
   const [currentUserId, setCurrentUserId] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
   const [editingHole, setEditingHole] = useState<{ playerId: string; holeIdx: number } | null>(null);
+  const [showCourseImage, setShowCourseImage] = useState(false);
   const [gameMode, setGameMode] = useState<GameMode>("scorecard");
   const [gameModeOpen, setGameModeOpen] = useState(false);
   const [wolfOrder, setWolfOrder] = useState<string[] | null>(null);
@@ -1243,6 +1277,8 @@ export default function ScorecardPage() {
               players={sortPlayersByGroup(data.players, currentUserId).sorted}
               holePars={data.course.holes}
               strokeIndices={COURSE_PARS[data.course.name as keyof typeof COURSE_PARS].strokeIndex}
+              yardages={data.course.yardages}
+              onYardageClick={data.course.name in COURSE_IMAGES ? () => setShowCourseImage(true) : undefined}
               selectedPlayer={selectedPlayer}
               setSelectedPlayer={setSelectedPlayer}
               onScoreChange={handleScoreChange}
@@ -1351,6 +1387,34 @@ export default function ScorecardPage() {
           onSubmit={handleDirectScoreChange}
           onClose={() => setEditingHole(null)}
         />
+      )}
+
+      {/* Course Image Modal */}
+      {showCourseImage && data && COURSE_IMAGES[data.course.name] && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4"
+          onClick={() => setShowCourseImage(false)}
+        >
+          <div
+            className="relative max-w-lg w-full bg-surface-container-high border border-white/[0.1] rounded-2xl overflow-hidden shadow-xl"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-center justify-between px-4 py-3 border-b border-white/[0.06]">
+              <h3 className="font-headline text-lg font-bold text-on-surface">{data.course.name}</h3>
+              <button
+                onClick={() => setShowCourseImage(false)}
+                className="w-8 h-8 rounded-full bg-white/[0.06] flex items-center justify-center"
+              >
+                <span className="material-symbols-outlined text-on-surface-variant text-lg">close</span>
+              </button>
+            </div>
+            <img
+              src={COURSE_IMAGES[data.course.name]}
+              alt={`${data.course.name} course map`}
+              className="w-full"
+            />
+          </div>
+        </div>
       )}
     </div>
   );

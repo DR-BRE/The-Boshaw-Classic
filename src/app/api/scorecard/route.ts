@@ -74,6 +74,7 @@ export async function GET(request: Request) {
         name: courseName,
         par: coursePar.total,
         holes: [...coursePar.holes],
+        ...("yardage" in coursePar && { yardages: [...coursePar.yardage] }),
       },
       players: scorecardPlayers,
     };

@@ -15,6 +15,7 @@ export interface ScorecardCourse {
   name: string;
   par: number;
   holes: number[];
+  yardages?: number[];
 }
 
 export interface ScorecardData {
