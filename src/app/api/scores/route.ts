@@ -78,9 +78,14 @@ export async function POST(request: Request) {
     }
 
     const courseKey = courseName as keyof typeof COURSE_PARS;
-    const allFilled = holes.every((h: number | null) => h !== null && h !== undefined);
-    const totalStrokes = allFilled ? holes.reduce((sum: number, s: number) => sum + s, 0) : null;
-    const toPar = totalStrokes !== null ? totalStrokes - COURSE_PARS[courseKey].total : null;
+    const coursePars = COURSE_PARS[courseKey].holes;
+    const filledIndices = holes.map((h: number | null, i: number) => h !== null && h !== undefined ? i : -1).filter((i: number) => i >= 0);
+    const totalStrokes = filledIndices.length > 0
+      ? filledIndices.reduce((sum: number, i: number) => sum + holes[i], 0)
+      : null;
+    const toPar = totalStrokes !== null
+      ? totalStrokes - filledIndices.reduce((sum: number, i: number) => sum + coursePars[i], 0)
+      : null;
 
     const score = await prisma.score.upsert({
       where: {

@@ -17,9 +17,8 @@ export async function GET(request: Request) {
       ? player.scores.filter((s) => s.round === Number(roundFilter))
       : player.scores;
 
-    const completedScores = filteredScores.filter((s) => s.toPar !== null && s.totalStrokes !== null);
-    const totalToPar = completedScores.reduce((sum, s) => sum + (s.toPar ?? 0), 0);
-    const totalStrokes = completedScores.reduce((sum, s) => sum + (s.totalStrokes ?? 0), 0);
+    const totalToPar = filteredScores.reduce((sum, s) => sum + (s.toPar ?? 0), 0);
+    const totalStrokes = filteredScores.reduce((sum, s) => sum + (s.totalStrokes ?? 0), 0);
 
     return {
       playerId: player.id,
