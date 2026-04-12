@@ -9,8 +9,11 @@ const ROUND_COURSES: Record<number, string> = {
   3: TOURNAMENT.courses[2],
 };
 
-function extractHoleScores(score: Record<string, unknown>): number[] {
-  return Array.from({ length: 18 }, (_, i) => score[`hole${i + 1}`] as number);
+function extractHoleScores(score: Record<string, unknown>): (number | null)[] {
+  return Array.from({ length: 18 }, (_, i) => {
+    const val = score[`hole${i + 1}`];
+    return val !== null && val !== undefined ? (val as number) : null;
+  });
 }
 
 export async function GET(request: Request) {
@@ -50,10 +53,16 @@ export async function GET(request: Request) {
       }
 
       const holes = extractHoleScores(score as unknown as Record<string, unknown>);
-      const front9 = holes.slice(0, 9).reduce((sum, s) => sum + s, 0);
-      const back9 = holes.slice(9).reduce((sum, s) => sum + s, 0);
-      const gross = front9 + back9;
-      const net = gross - player.handicap;
+      const front9Holes = holes.slice(0, 9);
+      const back9Holes = holes.slice(9);
+      const front9 = front9Holes.every((s) => s !== null)
+        ? front9Holes.reduce((sum, s) => sum! + s!, 0)
+        : null;
+      const back9 = back9Holes.every((s) => s !== null)
+        ? back9Holes.reduce((sum, s) => sum! + s!, 0)
+        : null;
+      const gross = front9 !== null && back9 !== null ? front9 + back9 : null;
+      const net = gross !== null ? gross - player.handicap : null;
 
       return {
         id: player.id,

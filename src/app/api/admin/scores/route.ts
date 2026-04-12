@@ -57,8 +57,9 @@ export async function PUT(request: Request) {
     }
 
     const courseKey = courseName as keyof typeof COURSE_PARS;
-    const totalStrokes = holes.reduce((sum, s) => sum + s, 0);
-    const toPar = totalStrokes - COURSE_PARS[courseKey].total;
+    const allFilled = holes.every((h: number | null) => h !== null && h !== undefined);
+    const totalStrokes = allFilled ? holes.reduce((sum: number, s: number) => sum + s, 0) : null;
+    const toPar = totalStrokes !== null ? totalStrokes - COURSE_PARS[courseKey].total : null;
 
     const score = await prisma.score.upsert({
       where: {

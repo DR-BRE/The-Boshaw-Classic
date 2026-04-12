@@ -75,26 +75,26 @@ model Score {
   playerId     String
   round        Int
   course       String
-  hole1        Int
-  hole2        Int
-  hole3        Int
-  hole4        Int
-  hole5        Int
-  hole6        Int
-  hole7        Int
-  hole8        Int
-  hole9        Int
-  hole10       Int
-  hole11       Int
-  hole12       Int
-  hole13       Int
-  hole14       Int
-  hole15       Int
-  hole16       Int
-  hole17       Int
-  hole18       Int
-  totalStrokes Int
-  toPar        Int
+  hole1        Int?
+  hole2        Int?
+  hole3        Int?
+  hole4        Int?
+  hole5        Int?
+  hole6        Int?
+  hole7        Int?
+  hole8        Int?
+  hole9        Int?
+  hole10       Int?
+  hole11       Int?
+  hole12       Int?
+  hole13       Int?
+  hole14       Int?
+  hole15       Int?
+  hole16       Int?
+  hole17       Int?
+  hole18       Int?
+  totalStrokes Int?
+  toPar        Int?
   player       Player   @relation(fields: [playerId], references: [id])
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt

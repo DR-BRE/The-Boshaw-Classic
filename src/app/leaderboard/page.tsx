@@ -10,12 +10,14 @@ const ROUNDS = [
   { label: "Round 3", value: "3", course: "Echo Falls" },
 ];
 
-function formatToPar(toPar: number) {
+function formatToPar(toPar: number | null) {
+  if (toPar === null) return "–";
   if (toPar === 0) return "E";
   return toPar > 0 ? `+${toPar}` : `${toPar}`;
 }
 
-function toParColor(toPar: number) {
+function toParColor(toPar: number | null) {
+  if (toPar === null) return "text-on-surface-variant";
   if (toPar < 0) return "text-primary";
   if (toPar > 0) return "text-on-error-container";
   return "text-on-surface";
@@ -73,7 +75,7 @@ function PlayerAvatar({ name, avatarUrl }: { name: string; avatarUrl: string | n
   );
 }
 
-function RoundPill({ label, value }: { label: string; value: string | number }) {
+function RoundPill({ label, value }: { label: string; value: string | number | null }) {
   return (
     <div className="bg-white/[0.06] rounded-md px-2 py-1 text-center min-w-[40px]">
       <p className="font-label text-[9px] uppercase tracking-wider text-on-surface-variant">{label}</p>
@@ -92,7 +94,7 @@ function ExpandedDetail({ entry }: { entry: LeaderboardEntry }) {
             <p className="text-[11px] text-on-surface-variant">{r.course}</p>
           </div>
           <div className="flex items-center gap-4">
-            <p className="font-label text-xs text-on-surface tabular-nums">{r.strokes} strokes</p>
+            <p className="font-label text-xs text-on-surface tabular-nums">{r.strokes !== null ? `${r.strokes} strokes` : "In progress"}</p>
             <p className={`font-label text-xs font-bold tabular-nums min-w-[32px] text-right ${toParColor(r.toPar)}`}>
               {formatToPar(r.toPar)}
             </p>

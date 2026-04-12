@@ -1,8 +1,8 @@
 export type LeaderboardRound = {
   round: number;
   course: string;
-  strokes: number;
-  toPar: number;
+  strokes: number | null;
+  toPar: number | null;
 };
 
 export type LeaderboardEntry = {
