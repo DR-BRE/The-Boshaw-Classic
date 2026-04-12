@@ -118,7 +118,7 @@ export default function LeaderboardPage() {
   useEffect(() => {
     setLoading(true);
     const params = round ? `?round=${round}` : "";
-    fetch(`/api/leaderboard${params}`)
+    fetch(`/api/leaderboard${params}`, { cache: "no-store" })
       .then((res) => res.json())
       .then((data) => {
         setEntries(data);
@@ -127,7 +127,7 @@ export default function LeaderboardPage() {
       .catch(() => setLoading(false));
 
     const interval = setInterval(() => {
-      fetch(`/api/leaderboard${params}`)
+      fetch(`/api/leaderboard${params}`, { cache: "no-store" })
         .then((res) => res.json())
         .then((data) => setEntries(data))
         .catch(() => {});
