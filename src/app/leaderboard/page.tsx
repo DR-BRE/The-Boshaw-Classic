@@ -77,7 +77,7 @@ function PlayerAvatar({ name, avatarUrl }: { name: string; avatarUrl: string | n
 
 function RoundPill({ label, value }: { label: string; value: string | number | null }) {
   return (
-    <div className="bg-white/[0.06] rounded-md px-2 py-1 text-center min-w-[40px]">
+    <div className="bg-white/[0.06] rounded-md px-1.5 py-0.5 text-center min-w-[36px]">
       <p className="font-label text-[9px] uppercase tracking-wider text-on-surface-variant">{label}</p>
       <p className="font-label text-xs font-bold text-on-surface tabular-nums">{value}</p>
     </div>
@@ -225,7 +225,7 @@ export default function LeaderboardPage() {
                   <div className="flex-1 min-w-0">
                     <p className="font-label font-bold text-on-surface truncate">{entry.firstName}</p>
                     <p className="font-label text-xs text-on-surface-variant truncate mb-1.5">{entry.lastName}</p>
-                    <div className="flex items-center gap-1.5">
+                    <div className="flex items-center gap-1 flex-wrap">
                       {entry.rounds.map((r) => (
                         <RoundPill key={r.round} label={`R${r.round}`} value={r.strokes} />
                       ))}

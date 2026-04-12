@@ -46,9 +46,10 @@ export async function GET(request: Request) {
     });
 
     const entries: Omit<LeaderboardEntry, "rank">[] = players.map((player) => {
-      const filteredScores = roundFilter
+      const filteredScores = (roundFilter
         ? player.scores.filter((s) => s.round === Number(roundFilter))
-        : player.scores;
+        : player.scores
+      ).sort((a, b) => a.round - b.round);
 
       let totalToPar = 0;
       let totalStrokes = 0;
