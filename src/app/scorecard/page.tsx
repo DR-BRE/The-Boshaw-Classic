@@ -1165,9 +1165,13 @@ export default function ScorecardPage() {
             onClick={() => setGameModeOpen(!gameModeOpen)}
             className="flex items-center gap-1.5 bg-white/[0.06] border border-white/[0.08] rounded-xl px-3 py-2 active:scale-95 transition-transform"
           >
-            <span className="material-symbols-outlined text-secondary text-lg">
-              {GAME_MODES.find((m) => m.value === gameMode)?.icon}
-            </span>
+            {gameMode === "wolf" ? (
+              <img src="/wolf.png" alt="Wolf" className="w-5 h-5 rounded-full object-cover" />
+            ) : (
+              <span className="material-symbols-outlined text-secondary text-lg">
+                {GAME_MODES.find((m) => m.value === gameMode)?.icon}
+              </span>
+            )}
             <span className="font-label text-xs font-bold text-on-surface uppercase tracking-wider">
               {GAME_MODES.find((m) => m.value === gameMode)?.label}
             </span>
@@ -1189,7 +1193,11 @@ export default function ScorecardPage() {
                         : "text-on-surface hover:bg-white/[0.06]"
                     }`}
                   >
-                    <span className="material-symbols-outlined text-lg">{mode.icon}</span>
+                    {mode.value === "wolf" ? (
+                      <img src="/wolf.png" alt="Wolf" className="w-5 h-5 rounded-full object-cover" />
+                    ) : (
+                      <span className="material-symbols-outlined text-lg">{mode.icon}</span>
+                    )}
                     <span className="font-label text-sm font-bold">{mode.label}</span>
                   </button>
                 ))}
