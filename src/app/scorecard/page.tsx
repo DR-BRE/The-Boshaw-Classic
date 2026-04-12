@@ -1147,9 +1147,10 @@ export default function ScorecardPage() {
     const player = sortedCards[playerIdx];
     if (!player) return;
     const current = player.scores[holeIdx];
-    // If no score yet, initialize to par then apply delta
-    const base = current !== null ? current : data.course.holes[holeIdx];
-    const next = Math.max(1, Math.min(15, base + delta));
+    // If no score yet, first press sets to par; after that, +/- adjusts normally
+    const next = current !== null
+      ? Math.max(1, Math.min(15, current + delta))
+      : data.course.holes[holeIdx];
     if (current !== null && next === current) return;
 
     // Optimistic update
