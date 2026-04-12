@@ -487,9 +487,9 @@ function WolfPickModal({
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/60 backdrop-blur-sm" onClick={onClose}>
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4" onClick={onClose}>
       <div
-        className="w-full max-w-md bg-surface-container-high border border-yellow-500/20 rounded-t-3xl p-6 pb-10"
+        className="w-full max-w-sm bg-surface-container-high border border-yellow-500/20 rounded-3xl p-6"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex items-center justify-between mb-5">
