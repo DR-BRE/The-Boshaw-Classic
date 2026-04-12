@@ -56,15 +56,14 @@ export function calculateWolfHole(
   for (const id of allPlayers) points[id] = 0;
 
   if (wolfTeamBest < opponentBest) {
-    // Wolf side wins: each winner gets +1 per loser
-    for (const w of wolfTeam) points[w] = opponents.length;
-    for (const o of opponents) points[o] = -wolfTeam.length;
+    // Wolf team wins
+    const pts = isLoneWolf ? 2 : 1;
+    for (const w of wolfTeam) points[w] = pts;
   } else if (opponentBest < wolfTeamBest) {
-    // Opponent side wins
-    for (const o of opponents) points[o] = wolfTeam.length;
-    for (const w of wolfTeam) points[w] = -opponents.length;
+    // Opponent team wins
+    for (const o of opponents) points[o] = 1;
   }
-  // Tie: all zeros (already initialized)
+  // Tie: all zeros (push)
 
   return { hole, wolfId, partnerId, wolfTeamBest, opponentBest, points };
 }
