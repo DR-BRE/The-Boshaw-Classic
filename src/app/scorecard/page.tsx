@@ -464,6 +464,100 @@ function wolfPointColor(pts: number) {
   return "text-on-surface-variant";
 }
 
+function WolfPickModal({
+  hole,
+  wolfId,
+  players,
+  currentPick,
+  onPick,
+  onClose,
+}: {
+  hole: number;
+  wolfId: string;
+  players: ScorecardPlayer[];
+  currentPick: string | null | undefined;
+  onPick: (hole: number, partnerId: string | null) => void;
+  onClose: () => void;
+}) {
+  const options = players.filter((p) => p.id !== wolfId);
+
+  function select(partnerId: string | null) {
+    onPick(hole, partnerId);
+    onClose();
+  }
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/60 backdrop-blur-sm" onClick={onClose}>
+      <div
+        className="w-full max-w-md bg-surface-container-high border border-yellow-500/20 rounded-t-3xl p-6 pb-10"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <div className="flex items-center justify-between mb-5">
+          <div>
+            <p className="font-label text-xs text-yellow-500 uppercase tracking-widest">Hole {hole}</p>
+            <h3 className="font-headline text-xl font-bold text-on-surface">Pick your partner</h3>
+          </div>
+          <button
+            onClick={onClose}
+            className="w-9 h-9 rounded-full bg-white/[0.06] flex items-center justify-center"
+          >
+            <span className="material-symbols-outlined text-on-surface-variant text-lg">close</span>
+          </button>
+        </div>
+
+        <div className="flex flex-col gap-3">
+          {options.map((p) => {
+            const selected = currentPick === p.id;
+            return (
+              <button
+                key={p.id}
+                onClick={() => select(p.id)}
+                className={`flex items-center gap-4 px-4 py-4 rounded-2xl border transition-all active:scale-[0.98] ${
+                  selected
+                    ? "bg-yellow-500/15 border-yellow-500/40"
+                    : "bg-white/[0.04] border-white/[0.08] active:bg-white/[0.08]"
+                }`}
+              >
+                {p.avatarUrl ? (
+                  <img src={p.avatarUrl} alt="" className="w-10 h-10 rounded-full object-cover" />
+                ) : (
+                  <div className="w-10 h-10 rounded-full bg-white/[0.1] flex items-center justify-center">
+                    <span className="font-headline text-sm font-bold text-on-surface-variant">
+                      {p.displayName.charAt(0)}
+                    </span>
+                  </div>
+                )}
+                <span className="font-headline text-base font-bold text-on-surface">{p.displayName}</span>
+                {selected && (
+                  <span className="material-symbols-outlined text-yellow-500 ml-auto">check_circle</span>
+                )}
+              </button>
+            );
+          })}
+
+          {/* Lone Wolf option */}
+          <button
+            onClick={() => select(null)}
+            className={`flex items-center gap-4 px-4 py-4 rounded-2xl border transition-all active:scale-[0.98] ${
+              currentPick === null
+                ? "bg-yellow-500/15 border-yellow-500/40"
+                : "bg-white/[0.04] border-white/[0.08] active:bg-white/[0.08]"
+            }`}
+          >
+            <div className="w-10 h-10 rounded-full bg-yellow-500/20 flex items-center justify-center">
+              <img src="/wolf.png" alt="Lone Wolf" className="w-6 h-6 rounded-full object-cover" />
+            </div>
+            <span className="font-headline text-base font-bold text-yellow-500">Lone Wolf</span>
+            {currentPick === null && (
+              <span className="material-symbols-outlined text-yellow-500 ml-auto">check_circle</span>
+            )}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function NineHoleGrid({
   label,
   totalLabel,
@@ -477,8 +571,7 @@ function NineHoleGrid({
   wolfOrder,
   wolfPicks,
   wolfStandings,
-  isAdmin,
-  onWolfPick,
+  onOpenWolfPick,
 }: {
   label: string;
   totalLabel: string;
@@ -492,8 +585,7 @@ function NineHoleGrid({
   wolfOrder?: string[] | null;
   wolfPicks?: Record<number, string | null>;
   wolfStandings?: ReturnType<typeof calculateWolfStandings> | null;
-  isAdmin?: boolean;
-  onWolfPick?: (hole: number, partnerId: string | null) => void;
+  onOpenWolfPick?: (hole: number) => void;
 }) {
   const parTotal = holePars.reduce((sum, p) => sum + p, 0);
   const ydsTotal = yardages?.reduce((sum, y) => sum + y, 0);
@@ -653,7 +745,7 @@ function NineHoleGrid({
             })}
 
             {/* Wolf Pick Row — shows who the wolf picked per hole */}
-            {wolfOrder && wolfPicks && onWolfPick && (() => {
+            {wolfOrder && wolfPicks && onOpenWolfPick && (() => {
               const groupPlayers = players.filter((p) => wolfOrder.includes(p.id));
               return (
                 <tr className="bg-yellow-500/5 border-t border-yellow-500/20">
@@ -665,12 +757,11 @@ function NineHoleGrid({
                     const wolfId = getWolfForHole(wolfOrder, holeNum);
                     if (!wolfId) return <td key={i} className="px-1 py-2 text-center text-on-surface-variant text-[10px]">—</td>;
                     const isWolf = currentPlayerId === wolfId;
-                    const canPick = isWolf || isAdmin;
                     const pick = wolfPicks[holeNum];
                     const hasPick = pick !== undefined;
                     const partnerName = pick ? groupPlayers.find((p) => p.id === pick)?.displayName : null;
 
-                    if (!canPick) {
+                    if (!isWolf) {
                       return (
                         <td key={i} className="px-1 py-1 text-center">
                           {hasPick ? (
@@ -686,33 +777,14 @@ function NineHoleGrid({
 
                     return (
                       <td key={i} className="px-0.5 py-1 text-center">
-                        {!hasPick ? (
-                          <button
-                            onClick={() => {
-                              // Show pick modal - cycle: first 3 non-wolf players, then lone wolf
-                              const nonWolf = groupPlayers.filter((p) => p.id !== wolfId);
-                              const options = [...nonWolf.map((p) => p.id), null];
-                              onWolfPick(holeNum, options[0]);
-                            }}
-                            className="text-[9px] font-bold text-yellow-500 bg-yellow-500/10 rounded px-1 py-0.5 active:scale-95"
-                          >
-                            Pick
-                          </button>
-                        ) : (
-                          <button
-                            onClick={() => {
-                              // Cycle through options: non-wolf players + lone wolf
-                              const nonWolf = groupPlayers.filter((p) => p.id !== wolfId);
-                              const options: (string | null)[] = [...nonWolf.map((p) => p.id), null];
-                              const currentIdx = options.indexOf(pick);
-                              const nextIdx = (currentIdx + 1) % options.length;
-                              onWolfPick(holeNum, options[nextIdx]);
-                            }}
-                            className="font-label text-[9px] font-bold text-yellow-500 leading-tight block active:scale-95"
-                          >
-                            {pick === null ? "Lone" : partnerName?.split(" ")[0] ?? "?"}
-                          </button>
-                        )}
+                        <button
+                          onClick={() => onOpenWolfPick(holeNum)}
+                          className={`text-[9px] font-bold text-yellow-500 rounded px-1 py-0.5 active:scale-95 ${
+                            hasPick ? "" : "bg-yellow-500/10"
+                          }`}
+                        >
+                          {!hasPick ? "Pick" : pick === null ? "Lone" : partnerName?.split(" ")[0] ?? "?"}
+                        </button>
                       </td>
                     );
                   })}
@@ -940,6 +1012,7 @@ export default function ScorecardPage() {
   const [gameModeOpen, setGameModeOpen] = useState(false);
   const [wolfOrder, setWolfOrder] = useState<string[] | null>(null);
   const [wolfPicks, setWolfPicks] = useState<Record<number, string | null>>({});
+  const [wolfPickModal, setWolfPickModal] = useState<number | null>(null);
   const isAdmin = session?.user?.email === "brettwfrancoeur@gmail.com";
 
   // Fetch current user's player ID
@@ -1340,8 +1413,7 @@ export default function ScorecardPage() {
                 wolfOrder={wolfOrder}
                 wolfPicks={gameMode === "wolf" ? wolfPicks : undefined}
                 wolfStandings={wolfStandings}
-                isAdmin={isAdmin}
-                onWolfPick={gameMode === "wolf" ? handleWolfPick : undefined}
+                onOpenWolfPick={gameMode === "wolf" ? (hole: number) => setWolfPickModal(hole) : undefined}
               />
 
               {/* Back 9 */}
@@ -1358,8 +1430,7 @@ export default function ScorecardPage() {
                 wolfOrder={wolfOrder}
                 wolfPicks={gameMode === "wolf" ? wolfPicks : undefined}
                 wolfStandings={wolfStandings}
-                isAdmin={isAdmin}
-                onWolfPick={gameMode === "wolf" ? handleWolfPick : undefined}
+                onOpenWolfPick={gameMode === "wolf" ? (hole: number) => setWolfPickModal(hole) : undefined}
               />
 
               {/* Summary */}
@@ -1430,6 +1501,23 @@ export default function ScorecardPage() {
           onClose={() => setEditingHole(null)}
         />
       )}
+
+      {/* Wolf Pick Modal */}
+      {wolfPickModal !== null && wolfOrder && data && (() => {
+        const wolfId = getWolfForHole(wolfOrder, wolfPickModal);
+        if (!wolfId) return null;
+        const groupPlayers = data.players.filter((p) => wolfOrder.includes(p.id));
+        return (
+          <WolfPickModal
+            hole={wolfPickModal}
+            wolfId={wolfId}
+            players={groupPlayers}
+            currentPick={wolfPicks[wolfPickModal]}
+            onPick={handleWolfPick}
+            onClose={() => setWolfPickModal(null)}
+          />
+        );
+      })()}
 
       {/* Hole Image Modal */}
       {courseImageHole !== null && data && COURSE_HOLE_IMAGES[data.course.name] && (
