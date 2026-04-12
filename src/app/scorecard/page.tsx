@@ -145,7 +145,7 @@ function HoleRow({
     <div className={`flex items-center py-3 px-4 border-b border-white/[0.04] ${isWolf ? "bg-yellow-500/10" : ""}`}>
       {/* Hole number */}
       <span className="w-8 font-headline text-lg font-bold text-on-surface tabular-nums">
-        {isWolf ? "🐺" : hole}
+        {isWolf ? <img src="/wolf.png" alt="Wolf" className="w-5 h-5 rounded-full object-cover inline-block" /> : hole}
       </span>
 
       {/* Par info */}
@@ -622,7 +622,7 @@ function NineHoleGrid({
                           } ${isCurrentUser && onScoreTap ? "cursor-pointer active:bg-white/[0.15] rounded-md bg-white/[0.06] border border-white/[0.1]" : ""} ${isWolf ? "bg-yellow-500/10" : ""}`}
                           onClick={isCurrentUser && onScoreTap ? () => onScoreTap(player.id, startHole + i) : undefined}
                         >
-                          {isWolf && <div className="text-[8px] leading-none">🐺</div>}
+                          {isWolf && <div className="leading-none"><img src="/wolf.png" alt="Wolf" className="w-3 h-3 rounded-full object-cover inline-block" /></div>}
                           {score !== null ? score : "—"}
                         </td>
                       );
