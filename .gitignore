@@ -50,4 +50,5 @@ lighthouse-report.html
 *.lighthouse.html
 
 # claude config
-.claude/
+.claude/*
+!.claude/skills
