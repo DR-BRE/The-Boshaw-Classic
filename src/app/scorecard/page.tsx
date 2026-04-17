@@ -127,6 +127,8 @@ function HoleRow({
   onIncrement,
   onDecrement,
   isWolf,
+  wolfPickLabel,
+  onPickWolf,
 }: {
   hole: number;
   par: number;
@@ -138,65 +140,91 @@ function HoleRow({
   onIncrement: () => void;
   onDecrement: () => void;
   isWolf?: boolean;
+  wolfPickLabel?: string; // "Pick", "Lone", or partner first name
+  onPickWolf?: () => void; // if provided, label renders as interactive button
 }) {
   const diff = score !== null ? score - par : null;
+  const showWolfPickStrip = isWolf && wolfPickLabel !== undefined;
 
   return (
-    <div className={`flex items-center py-3 px-4 border-b border-white/[0.04] ${isWolf ? "bg-yellow-500/10" : ""}`}>
-      {/* Hole number */}
-      <span className="w-8 font-headline text-lg font-bold text-on-surface tabular-nums">
-        {isWolf ? <img src="/wolf.png" alt="Wolf" className="w-5 h-5 rounded-full object-cover inline-block" /> : hole}
-      </span>
-
-      {/* Par info */}
-      <div className="w-14">
-        <p className="font-label text-sm font-bold text-on-surface">Par {par}</p>
-      </div>
-
-      {/* Handicap */}
-      <span className="w-8 text-center font-label text-sm text-on-surface-variant tabular-nums">
-        {handicap}
-      </span>
-
-      {/* Yardage */}
-      {yardage !== undefined && (
-        <button
-          onClick={() => onYardageClick?.(hole)}
-          className="w-10 text-center font-label text-sm text-secondary tabular-nums active:scale-95 transition-transform"
-        >
-          {yardage}
-        </button>
-      )}
-
-      {/* +/- buttons or read-only score */}
-      <div className="flex items-center gap-2 ml-auto">
-        {editable && (
-          <button
-            onClick={onDecrement}
-            disabled={score !== null && score <= 1}
-            className="w-10 h-10 rounded-full bg-white/[0.06] border border-white/[0.08] flex items-center justify-center active:scale-90 transition-transform disabled:opacity-30"
-          >
-            <span className="material-symbols-outlined text-on-surface text-lg">remove</span>
-          </button>
-        )}
-        <span className={`w-6 text-center font-headline text-lg font-bold tabular-nums ${score !== null ? scoreColor(score, par) : "text-on-surface-variant"}`}>
-          {score !== null ? score : "·"}
+    <div className={`border-b border-white/[0.04] ${isWolf ? "bg-yellow-500/10" : ""}`}>
+      <div className="flex items-center py-3 px-4">
+        {/* Hole number */}
+        <span className="w-8 font-headline text-lg font-bold text-on-surface tabular-nums">
+          {isWolf ? <img src="/wolf.png" alt="Wolf" className="w-5 h-5 rounded-full object-cover inline-block" /> : hole}
         </span>
-        {editable && (
+
+        {/* Par info */}
+        <div className="w-14">
+          <p className="font-label text-sm font-bold text-on-surface">Par {par}</p>
+        </div>
+
+        {/* Handicap */}
+        <span className="w-8 text-center font-label text-sm text-on-surface-variant tabular-nums">
+          {handicap}
+        </span>
+
+        {/* Yardage */}
+        {yardage !== undefined && (
           <button
-            onClick={onIncrement}
-            disabled={score !== null && score >= 15}
-            className="w-10 h-10 rounded-full bg-white/[0.06] border border-white/[0.08] flex items-center justify-center active:scale-90 transition-transform disabled:opacity-30"
+            onClick={() => onYardageClick?.(hole)}
+            className="w-10 text-center font-label text-sm text-secondary tabular-nums active:scale-95 transition-transform"
           >
-            <span className="material-symbols-outlined text-on-surface text-lg">add</span>
+            {yardage}
           </button>
         )}
+
+        {/* +/- buttons or read-only score */}
+        <div className="flex items-center gap-2 ml-auto">
+          {editable && (
+            <button
+              onClick={onDecrement}
+              disabled={score !== null && score <= 1}
+              className="w-10 h-10 rounded-full bg-white/[0.06] border border-white/[0.08] flex items-center justify-center active:scale-90 transition-transform disabled:opacity-30"
+            >
+              <span className="material-symbols-outlined text-on-surface text-lg">remove</span>
+            </button>
+          )}
+          <span className={`w-6 text-center font-headline text-lg font-bold tabular-nums ${score !== null ? scoreColor(score, par) : "text-on-surface-variant"}`}>
+            {score !== null ? score : "·"}
+          </span>
+          {editable && (
+            <button
+              onClick={onIncrement}
+              disabled={score !== null && score >= 15}
+              className="w-10 h-10 rounded-full bg-white/[0.06] border border-white/[0.08] flex items-center justify-center active:scale-90 transition-transform disabled:opacity-30"
+            >
+              <span className="material-symbols-outlined text-on-surface text-lg">add</span>
+            </button>
+          )}
+        </div>
+
+        {/* +/- to par */}
+        <span className={`w-10 text-right font-label text-sm font-bold tabular-nums ${diff !== null ? (diff < 0 ? "text-primary" : diff > 0 ? "text-on-error-container" : "text-on-surface-variant") : "text-on-surface-variant"}`}>
+          {diff !== null ? (diff === 0 ? "E" : diff > 0 ? `+${diff}` : diff) : "—"}
+        </span>
       </div>
 
-      {/* +/- to par */}
-      <span className={`w-10 text-right font-label text-sm font-bold tabular-nums ${diff !== null ? (diff < 0 ? "text-primary" : diff > 0 ? "text-on-error-container" : "text-on-surface-variant") : "text-on-surface-variant"}`}>
-        {diff !== null ? (diff === 0 ? "E" : diff > 0 ? `+${diff}` : diff) : "—"}
-      </span>
+      {/* Wolf pick strip — shown only when player is wolf on this hole */}
+      {showWolfPickStrip && (
+        <div className="flex items-center gap-2 px-4 pb-2 -mt-1">
+          <span className="font-label text-[10px] font-bold text-yellow-500/80 uppercase tracking-widest">
+            Wolf Partner
+          </span>
+          {onPickWolf ? (
+            <button
+              onClick={onPickWolf}
+              className="font-label text-[11px] font-bold text-yellow-500 bg-yellow-500/15 border border-yellow-500/30 rounded-full px-2.5 py-0.5 active:scale-95 transition-transform"
+            >
+              {wolfPickLabel}
+            </button>
+          ) : (
+            <span className="font-label text-[11px] font-bold text-yellow-500/80">
+              {wolfPickLabel}
+            </span>
+          )}
+        </div>
+      )}
     </div>
   );
 }
@@ -212,6 +240,8 @@ function CardView({
   onScoreChange,
   currentPlayerId,
   wolfOrder,
+  wolfPicks,
+  onOpenWolfPick,
   isAdmin,
 }: {
   players: ScorecardPlayer[];
@@ -224,11 +254,37 @@ function CardView({
   onScoreChange: (playerIdx: number, holeIdx: number, delta: number) => void;
   currentPlayerId: string | null;
   wolfOrder?: string[] | null;
+  wolfPicks?: Record<number, string | null>;
+  onOpenWolfPick?: (hole: number) => void;
   isAdmin?: boolean;
 }) {
   const player = players[selectedPlayer];
   const canEdit = player?.id === currentPlayerId || !!isAdmin;
   if (!player) return null;
+
+  // Compute wolf pick UI for a given hole — label + optional click handler.
+  // Returns {} when the pick strip shouldn't show (wrong mode, not the wolf, read-only + no pick yet).
+  function wolfInfo(holeNum: number): { wolfPickLabel?: string; onPickWolf?: () => void } {
+    if (!wolfPicks || !wolfOrder) return {};
+    const wolfId = getWolfForHole(wolfOrder, holeNum);
+    if (!wolfId || player.id !== wolfId) return {};
+    const pick = wolfPicks[holeNum];
+    const amWolf = currentPlayerId === wolfId;
+    let label: string;
+    if (pick === undefined) {
+      if (!amWolf) return {}; // don't show "Pick" on another player's card
+      label = "Pick";
+    } else if (pick === null) {
+      label = "Lone";
+    } else {
+      const partner = players.find((p) => p.id === pick);
+      label = partner?.displayName.split(" ")[0] ?? "?";
+    }
+    return {
+      wolfPickLabel: label,
+      onPickWolf: amWolf && onOpenWolfPick ? () => onOpenWolfPick(holeNum) : undefined,
+    };
+  }
 
   const frontPars = holePars.slice(0, 9);
   const backPars = holePars.slice(9);
@@ -368,6 +424,7 @@ function CardView({
             onIncrement={() => onScoreChange(selectedPlayer, i, 1)}
             onDecrement={() => onScoreChange(selectedPlayer, i, -1)}
             isWolf={getWolfForHole(wolfOrder ?? null, i + 1) === player.id}
+            {...wolfInfo(i + 1)}
           />
         ))}
       </div>
@@ -396,6 +453,7 @@ function CardView({
             onIncrement={() => onScoreChange(selectedPlayer, i + 9, 1)}
             onDecrement={() => onScoreChange(selectedPlayer, i + 9, -1)}
             isWolf={getWolfForHole(wolfOrder ?? null, i + 10) === player.id}
+            {...wolfInfo(i + 10)}
           />
         ))}
       </div>
@@ -1111,9 +1169,24 @@ export default function ScorecardPage() {
         if (d.order) {
           setWolfOrder(d.order);
           setWolfPicks({}); // Clear picks on reshuffle
+          // If the logged-in user is the new hole-1 wolf, prompt them to pick now.
+          if (d.order[0] === currentUserId) setWolfPickModal(1);
         }
       })
       .catch(() => {});
+  }
+
+  // After the current user enters their own score on hole N, if they are the wolf
+  // on hole N+1 and haven't picked yet, open the pick modal. Skips holes 17/18
+  // (everyone-lone-wolf — no partner to choose). Does not re-trigger if the pick
+  // already exists (editing an earlier score shouldn't force a re-pick).
+  function maybeOpenNextWolfPick(justScoredHoleIdx: number) {
+    if (gameMode !== "wolf" || !wolfOrder || !currentUserId) return;
+    const nextHole = justScoredHoleIdx + 2; // holeIdx is 0-based; N+1 in 1-based terms
+    if (nextHole > 16) return;
+    if (getWolfForHole(wolfOrder, nextHole) !== currentUserId) return;
+    if (wolfPicks[nextHole] !== undefined) return;
+    setWolfPickModal(nextHole);
   }
 
   const savingRef = React.useRef(false);
@@ -1187,6 +1260,7 @@ export default function ScorecardPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ round: Number(round), holes: allScores }),
       }).finally(() => { setTimeout(() => { savingRef.current = false; }, 500); });
+      maybeOpenNextWolfPick(holeIdx);
     }
   }
 
@@ -1218,6 +1292,7 @@ export default function ScorecardPage() {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ round: Number(round), holes: allScores }),
     }).finally(() => { setTimeout(() => { savingRef.current = false; }, 500); });
+    maybeOpenNextWolfPick(holeIdx);
   }
 
   const frontPar = data
@@ -1396,6 +1471,8 @@ export default function ScorecardPage() {
               onScoreChange={handleScoreChange}
               currentPlayerId={currentUserId}
               wolfOrder={wolfOrder}
+              wolfPicks={gameMode === "wolf" ? wolfPicks : undefined}
+              onOpenWolfPick={gameMode === "wolf" ? (hole: number) => setWolfPickModal(hole) : undefined}
               isAdmin={isAdmin}
             />
           ) : (
