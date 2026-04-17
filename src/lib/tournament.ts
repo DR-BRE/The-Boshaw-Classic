@@ -43,6 +43,7 @@ export const COURSE_PARS = {
     total: 72,
     holes: [4, 4, 5, 3, 4, 4, 5, 3, 4, 5, 4, 4, 4, 3, 5, 3, 4, 4] as const,
     strokeIndex: [13, 5, 9, 15, 3, 7, 1, 17, 11, 12, 10, 4, 8, 16, 2, 18, 14, 6] as const,
+    yardage: [380, 353, 538, 131, 472, 426, 517, 173, 414, 499, 346, 444, 433, 214, 655, 144, 348, 417] as const,
     tee: "White",
     rating: 70.7,
     slope: 127,

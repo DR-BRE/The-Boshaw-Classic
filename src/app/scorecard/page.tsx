@@ -9,8 +9,9 @@ import { getWolfForHole, calculateWolfStandings } from "@/lib/wolf";
 type ViewMode = "card" | "classic";
 type GameMode = "scorecard" | "wolf" | "high-low";
 
-const COURSE_HOLE_IMAGES: Record<string, string> = {
-  "Echo Falls": "/courses/echo-falls",
+const COURSE_HOLE_IMAGES: Record<string, { path: string; ext: string }> = {
+  "Echo Falls": { path: "/courses/echo-falls", ext: "jpg" },
+  "Desert Canyon": { path: "/courses/desert-canyon", ext: "png" },
 };
 
 const GAME_MODES: { label: string; value: GameMode; icon: string }[] = [
@@ -1685,7 +1686,7 @@ export default function ScorecardPage() {
               </button>
             </div>
             <img
-              src={`${COURSE_HOLE_IMAGES[data.course.name]}/hole-${courseImageHole}.jpg`}
+              src={`${COURSE_HOLE_IMAGES[data.course.name].path}/hole-${courseImageHole}.${COURSE_HOLE_IMAGES[data.course.name].ext}`}
               alt={`${data.course.name} hole ${courseImageHole}`}
               className="w-full"
             />
