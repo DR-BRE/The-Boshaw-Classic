@@ -1686,11 +1686,11 @@ export default function ScorecardPage() {
                 <span className="material-symbols-outlined text-on-surface text-xl">close</span>
               </button>
             </div>
-            <div className="flex-1 min-h-0 p-4">
+            <div className="flex-1 min-h-0 overflow-y-auto overscroll-contain p-4">
               <img
                 src={`${COURSE_HOLE_IMAGES[data.course.name].path}/hole-${courseImageHole}.${COURSE_HOLE_IMAGES[data.course.name].ext}`}
                 alt={`${data.course.name} hole ${courseImageHole}`}
-                className="w-full h-full object-contain"
+                className="w-full h-auto block mx-auto"
               />
             </div>
           </div>
