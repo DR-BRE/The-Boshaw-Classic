@@ -1669,24 +1669,24 @@ export default function ScorecardPage() {
       {/* Hole Image Modal */}
       {courseImageHole !== null && data && COURSE_HOLE_IMAGES[data.course.name] && (
         <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4"
+          className="fixed inset-0 z-50 flex items-start justify-center bg-black/60 backdrop-blur-sm px-3 pt-4 pb-3"
           onClick={() => setCourseImageHole(null)}
         >
           <div
-            className="relative max-w-xs w-full h-[80vh] h-[80dvh] flex flex-col bg-surface-container-high border border-white/[0.1] rounded-2xl overflow-hidden shadow-xl"
+            className="relative max-w-xs w-full h-[92vh] h-[92dvh] flex flex-col bg-surface-container-high border border-white/[0.1] rounded-2xl overflow-hidden shadow-xl"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="flex items-center justify-between px-4 py-3 border-b border-white/[0.06] shrink-0">
-              <h3 className="font-headline text-lg font-bold text-on-surface">Hole {courseImageHole}</h3>
+            <div className="flex items-center justify-between px-3 py-1.5 border-b border-white/[0.06] shrink-0">
+              <h3 className="font-headline text-sm font-bold text-on-surface">Hole {courseImageHole}</h3>
               <button
                 onClick={() => setCourseImageHole(null)}
                 aria-label="Close"
-                className="w-9 h-9 rounded-full bg-white/[0.1] hover:bg-white/[0.15] flex items-center justify-center"
+                className="w-7 h-7 rounded-full bg-white/[0.1] hover:bg-white/[0.15] flex items-center justify-center"
               >
-                <span className="material-symbols-outlined text-on-surface text-xl">close</span>
+                <span className="material-symbols-outlined text-on-surface text-base">close</span>
               </button>
             </div>
-            <div className="flex-1 min-h-0 overflow-y-auto overscroll-contain p-4">
+            <div className="flex-1 min-h-0 overflow-y-auto overscroll-contain p-2">
               <img
                 src={`${COURSE_HOLE_IMAGES[data.course.name].path}/hole-${courseImageHole}.${COURSE_HOLE_IMAGES[data.course.name].ext}`}
                 alt={`${data.course.name} hole ${courseImageHole}`}
