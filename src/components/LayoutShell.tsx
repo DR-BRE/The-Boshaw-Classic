@@ -6,6 +6,7 @@ import { usePathname } from "next/navigation";
 import { useSession } from "next-auth/react";
 import SideDrawer from "@/components/SideDrawer";
 import BottomTabs from "@/components/BottomTabs";
+import ScoreToastProvider from "@/components/ScoreToastProvider";
 
 export default function LayoutShell({
   children,
@@ -90,6 +91,9 @@ export default function LayoutShell({
 
       {/* Bottom Navigation */}
       <BottomTabs />
+
+      {/* App-wide score toasts (birdies / eagles / aces) */}
+      <ScoreToastProvider />
     </>
   );
 }
