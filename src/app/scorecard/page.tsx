@@ -1475,7 +1475,15 @@ export default function ScorecardPage() {
             {/* View Toggle */}
             <div className="bg-white/[0.06] border border-white/[0.06] rounded-lg p-0.5 flex">
               <button
-                onClick={() => setView("card")}
+                onClick={() => {
+                  setView("card");
+                  try {
+                    const raw = localStorage.getItem("boshaw-settings");
+                    const s = raw ? JSON.parse(raw) : {};
+                    s.scorecardView = "card";
+                    localStorage.setItem("boshaw-settings", JSON.stringify(s));
+                  } catch {}
+                }}
                 className={`px-3 py-1.5 rounded-md font-label text-[10px] font-bold uppercase tracking-wider transition-all ${
                   view === "card"
                     ? "bg-white/[0.1] text-primary"
@@ -1485,7 +1493,15 @@ export default function ScorecardPage() {
                 Card
               </button>
               <button
-                onClick={() => setView("classic")}
+                onClick={() => {
+                  setView("classic");
+                  try {
+                    const raw = localStorage.getItem("boshaw-settings");
+                    const s = raw ? JSON.parse(raw) : {};
+                    s.scorecardView = "classic";
+                    localStorage.setItem("boshaw-settings", JSON.stringify(s));
+                  } catch {}
+                }}
                 className={`px-3 py-1.5 rounded-md font-label text-[10px] font-bold uppercase tracking-wider transition-all ${
                   view === "classic"
                     ? "bg-white/[0.1] text-primary"
