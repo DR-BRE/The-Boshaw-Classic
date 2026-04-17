@@ -22,7 +22,17 @@ function toParColor(toPar: number | null) {
   return "text-on-surface";
 }
 
-function RankBadge({ rank }: { rank: number }) {
+function RankBadge({ rank, isLast }: { rank: number; isLast?: boolean }) {
+  if (isLast && rank !== 1) {
+    return (
+      <div
+        className="w-8 h-8 flex items-center justify-center shrink-0"
+        aria-label={`Last place (rank ${rank})`}
+      >
+        <span className="text-2xl leading-none drop-shadow-lg">{"\u{1F4A9}"}</span>
+      </div>
+    );
+  }
   if (rank === 1) {
     return (
       <div className="w-8 h-8 flex items-center justify-center shrink-0">
@@ -192,10 +202,13 @@ export default function LeaderboardPage() {
       )}
 
       {/* Leaderboard Rows */}
-      {!loading && entries.length > 0 && (
+      {!loading && entries.length > 0 && (() => {
+        const maxRank = Math.max(...entries.map((e) => e.rank));
+        return (
         <div className="space-y-3">
           {entries.map((entry) => {
             const isExpanded = expandedId === entry.playerId;
+            const isLast = entries.length > 1 && entry.rank === maxRank;
             return (
               <div
                 key={entry.playerId}
@@ -215,7 +228,7 @@ export default function LeaderboardPage() {
                   </span>
 
                   {/* Rank */}
-                  <RankBadge rank={entry.rank} />
+                  <RankBadge rank={entry.rank} isLast={isLast} />
 
                   {/* Avatar */}
                   <PlayerAvatar name={`${entry.firstName} ${entry.lastName}`} avatarUrl={entry.avatarUrl} />
@@ -253,7 +266,8 @@ export default function LeaderboardPage() {
             );
           })}
         </div>
-      )}
+        );
+      })()}
     </div>
   );
 }
