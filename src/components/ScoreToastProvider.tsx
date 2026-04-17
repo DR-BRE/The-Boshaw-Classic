@@ -195,7 +195,7 @@ export default function ScoreToastProvider() {
           t.kind === "ace" ? "HOLE IN ONE" : t.kind === "eagle" ? "EAGLE" : "BIRDIE";
         const labelColor =
           t.kind === "ace"
-            ? "text-yellow-600 drop-shadow-[0_1px_0_rgba(0,0,0,0.4)]"
+            ? "text-amber-800"
             : t.kind === "eagle"
             ? "text-primary"
             : "text-secondary";
