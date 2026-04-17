@@ -1071,6 +1071,9 @@ export default function ScorecardPage() {
   const [wolfOrder, setWolfOrder] = useState<string[] | null>(null);
   const [wolfPicks, setWolfPicks] = useState<Record<number, string | null>>({});
   const [wolfPickModal, setWolfPickModal] = useState<number | null>(null);
+  // Holes the user dismissed without picking this session — don't re-pop the
+  // modal for them on subsequent focus events. Cleared on reshuffle.
+  const [dismissedWolfHoles, setDismissedWolfHoles] = useState<Set<number>>(new Set());
   const isAdmin = session?.user?.email === "brettwfrancoeur@gmail.com";
 
   // Fetch current user's player ID
@@ -1169,25 +1172,50 @@ export default function ScorecardPage() {
         if (d.order) {
           setWolfOrder(d.order);
           setWolfPicks({}); // Clear picks on reshuffle
-          // If the logged-in user is the new hole-1 wolf, prompt them to pick now.
-          if (d.order[0] === currentUserId) setWolfPickModal(1);
+          setDismissedWolfHoles(new Set()); // Reset dismiss state on reshuffle
         }
       })
       .catch(() => {});
   }
 
-  // After the current user enters their own score on hole N, if they are the wolf
-  // on hole N+1 and haven't picked yet, open the pick modal. Skips holes 17/18
-  // (everyone-lone-wolf — no partner to choose). Does not re-trigger if the pick
-  // already exists (editing an earlier score shouldn't force a re-pick).
-  function maybeOpenNextWolfPick(justScoredHoleIdx: number) {
-    if (gameMode !== "wolf" || !wolfOrder || !currentUserId) return;
-    const nextHole = justScoredHoleIdx + 2; // holeIdx is 0-based; N+1 in 1-based terms
-    if (nextHole > 16) return;
-    if (getWolfForHole(wolfOrder, nextHole) !== currentUserId) return;
-    if (wolfPicks[nextHole] !== undefined) return;
-    setWolfPickModal(nextHole);
-  }
+  // Earliest hole (1–16) where the current user is wolf, hasn't picked, hasn't
+  // dismissed this session, and either it's hole 1 or they've scored the prior
+  // hole. This drives the focus-based modal trigger below — matching the real
+  // flow of scoring the last hole, driving to the next tee, then opening the
+  // phone to pick.
+  const pendingWolfPickHole = React.useMemo(() => {
+    if (gameMode !== "wolf" || !wolfOrder || !currentUserId || !data) return null;
+    const me = data.players.find((p) => p.id === currentUserId);
+    if (!me) return null;
+    for (let h = 1; h <= 16; h++) {
+      if (getWolfForHole(wolfOrder, h) !== currentUserId) continue;
+      if (wolfPicks[h] !== undefined) continue;
+      if (dismissedWolfHoles.has(h)) continue;
+      if (h === 1 || me.scores[h - 2] !== null) return h;
+    }
+    return null;
+  }, [gameMode, wolfOrder, currentUserId, wolfPicks, data, dismissedWolfHoles]);
+
+  // Open the pick modal when the page becomes visible / focused with a pending
+  // pick. Fires on deps change too, so it also pops right after shuffle.
+  useEffect(() => {
+    if (pendingWolfPickHole === null) return;
+    const trigger = () => {
+      if (typeof document !== "undefined" && document.visibilityState !== "visible") return;
+      setWolfPickModal((cur) => (cur === null ? pendingWolfPickHole : cur));
+    };
+    trigger();
+    if (typeof document !== "undefined") {
+      document.addEventListener("visibilitychange", trigger);
+    }
+    window.addEventListener("focus", trigger);
+    return () => {
+      if (typeof document !== "undefined") {
+        document.removeEventListener("visibilitychange", trigger);
+      }
+      window.removeEventListener("focus", trigger);
+    };
+  }, [pendingWolfPickHole]);
 
   const savingRef = React.useRef(false);
 
@@ -1260,7 +1288,6 @@ export default function ScorecardPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ round: Number(round), holes: allScores }),
       }).finally(() => { setTimeout(() => { savingRef.current = false; }, 500); });
-      maybeOpenNextWolfPick(holeIdx);
     }
   }
 
@@ -1292,7 +1319,6 @@ export default function ScorecardPage() {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ round: Number(round), holes: allScores }),
     }).finally(() => { setTimeout(() => { savingRef.current = false; }, 500); });
-    maybeOpenNextWolfPick(holeIdx);
   }
 
   const frontPar = data
@@ -1592,7 +1618,20 @@ export default function ScorecardPage() {
             players={groupPlayers}
             currentPick={wolfPicks[wolfPickModal]}
             onPick={handleWolfPick}
-            onClose={() => setWolfPickModal(null)}
+            onClose={() => {
+              const dismissed = wolfPickModal;
+              setWolfPickModal(null);
+              // If they closed without picking, don't re-pop on next focus.
+              // Picking auto-closes too, but then wolfPicks[hole] is set so
+              // pendingWolfPickHole won't match it anyway.
+              if (dismissed !== null && wolfPicks[dismissed] === undefined) {
+                setDismissedWolfHoles((prev) => {
+                  const next = new Set(prev);
+                  next.add(dismissed);
+                  return next;
+                });
+              }
+            }}
           />
         );
       })()}
