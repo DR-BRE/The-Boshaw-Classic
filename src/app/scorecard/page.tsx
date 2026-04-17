@@ -1673,23 +1673,26 @@ export default function ScorecardPage() {
           onClick={() => setCourseImageHole(null)}
         >
           <div
-            className="relative max-w-lg w-full bg-surface-container-high border border-white/[0.1] rounded-2xl overflow-hidden shadow-xl"
+            className="relative max-w-sm w-full max-h-[90vh] flex flex-col bg-surface-container-high border border-white/[0.1] rounded-2xl overflow-hidden shadow-xl"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="flex items-center justify-between px-4 py-3 border-b border-white/[0.06]">
+            <div className="flex items-center justify-between px-4 py-3 border-b border-white/[0.06] shrink-0">
               <h3 className="font-headline text-lg font-bold text-on-surface">Hole {courseImageHole}</h3>
               <button
                 onClick={() => setCourseImageHole(null)}
-                className="w-8 h-8 rounded-full bg-white/[0.06] flex items-center justify-center"
+                aria-label="Close"
+                className="w-9 h-9 rounded-full bg-white/[0.1] hover:bg-white/[0.15] flex items-center justify-center"
               >
-                <span className="material-symbols-outlined text-on-surface-variant text-lg">close</span>
+                <span className="material-symbols-outlined text-on-surface text-xl">close</span>
               </button>
             </div>
-            <img
-              src={`${COURSE_HOLE_IMAGES[data.course.name].path}/hole-${courseImageHole}.${COURSE_HOLE_IMAGES[data.course.name].ext}`}
-              alt={`${data.course.name} hole ${courseImageHole}`}
-              className="w-full"
-            />
+            <div className="flex-1 min-h-0 flex items-center justify-center p-3 overflow-auto">
+              <img
+                src={`${COURSE_HOLE_IMAGES[data.course.name].path}/hole-${courseImageHole}.${COURSE_HOLE_IMAGES[data.course.name].ext}`}
+                alt={`${data.course.name} hole ${courseImageHole}`}
+                className="max-h-full max-w-full object-contain"
+              />
+            </div>
           </div>
         </div>
       )}
