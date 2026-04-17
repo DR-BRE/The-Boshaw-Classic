@@ -9,6 +9,10 @@ const ROUND_COURSES: Record<number, string> = {
   3: TOURNAMENT.courses[2],
 };
 
+// Rounds currently being played this trip. Scores from other rounds remain
+// in the DB but are excluded from the leaderboard.
+const ACTIVE_ROUNDS = new Set([1, 2]);
+
 /** Extract individual hole scores from a Score record, preserving nulls */
 function extractHoles(score: Record<string, unknown>): (number | null)[] {
   return Array.from({ length: 18 }, (_, i) => {
@@ -46,9 +50,10 @@ export async function GET(request: Request) {
     });
 
     const entries: Omit<LeaderboardEntry, "rank">[] = players.map((player) => {
+      const activeScores = player.scores.filter((s) => ACTIVE_ROUNDS.has(s.round));
       const filteredScores = (roundFilter
-        ? player.scores.filter((s) => s.round === Number(roundFilter))
-        : player.scores
+        ? activeScores.filter((s) => s.round === Number(roundFilter))
+        : activeScores
       ).sort((a, b) => a.round - b.round);
 
       let totalToPar = 0;
