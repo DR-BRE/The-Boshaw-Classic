@@ -127,7 +127,7 @@ export default function Home() {
               })}
             </p>
             <p className="text-xs text-on-surface-variant mt-1">
-              {TOURNAMENT.courses.join(" & ")} &middot; {TOURNAMENT.location}
+              {TOURNAMENT.courses.slice(0, 2).join(" & ")} &middot; {TOURNAMENT.location}
             </p>
           </div>
         )}

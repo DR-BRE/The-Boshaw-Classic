@@ -363,7 +363,7 @@ export default function AdminPage() {
 
               {/* Round Score Buttons */}
               <div className="flex gap-2 px-4 pb-4">
-                {[1, 2, 3].map((r) => {
+                {[1, 2].map((r) => {
                   const score = p.scores.find((s) => s.round === r);
                   const active = isEditingScoreForPlayer && editingScore?.round === r;
                   return (
