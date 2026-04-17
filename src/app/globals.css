@@ -214,13 +214,13 @@ body {
 
 /* Score banner drop animation (birdie/eagle/ace toasts) */
 @keyframes scoreBannerDrop {
-  0%   { transform: translate(-50%, -120%); opacity: 0; }
-  70%  { transform: translate(-50%, 8%);    opacity: 1; }
-  100% { transform: translate(-50%, 0);     opacity: 1; }
+  0%   { transform: translateY(-120%); opacity: 0; }
+  70%  { transform: translateY(8%);    opacity: 1; }
+  100% { transform: translateY(0);     opacity: 1; }
 }
 @keyframes scoreBannerExit {
-  0%   { transform: translate(-50%, 0);     opacity: 1; }
-  100% { transform: translate(-50%, -120%); opacity: 0; }
+  0%   { transform: translateY(0);     opacity: 1; }
+  100% { transform: translateY(-120%); opacity: 0; }
 }
 .animate-score-banner-in  { animation: scoreBannerDrop 450ms cubic-bezier(0.22, 1, 0.36, 1) both; }
 .animate-score-banner-out { animation: scoreBannerExit 300ms cubic-bezier(0.4, 0, 1, 1) both; }

@@ -153,8 +153,11 @@ export default function ScoreToastProvider() {
 
   if (toasts.length === 0) return null;
   return (
-    <div className="fixed top-0 left-0 right-0 z-50 pointer-events-none">
-      {toasts.map((t, i) => {
+    <div
+      className="fixed left-0 right-0 z-50 pointer-events-none flex flex-col items-center gap-2 px-4"
+      style={{ top: "calc(env(safe-area-inset-top, 0px) + 12px)" }}
+    >
+      {toasts.map((t) => {
         const accent =
           t.kind === "ace"
             ? "border-yellow-400/70 bg-gradient-to-b from-yellow-500/25 via-surface-container-high/95 to-surface-container-high/95"
@@ -172,20 +175,19 @@ export default function ScoreToastProvider() {
         return (
           <div
             key={t.id}
-            className={`fixed left-1/2 -translate-x-1/2 pointer-events-auto ${
+            className={`pointer-events-auto w-full max-w-sm ${
               t.exiting ? "animate-score-banner-out" : "animate-score-banner-in"
             }`}
-            style={{ top: `calc(env(safe-area-inset-top, 0px) + ${12 + i * 88}px)` }}
           >
             <div
-              className={`backdrop-blur-xl border-2 rounded-2xl px-6 py-4 shadow-2xl shadow-black/50 min-w-[300px] max-w-[92vw] ${accent}`}
+              className={`backdrop-blur-xl border-2 rounded-2xl px-6 py-4 shadow-2xl shadow-black/50 ${accent}`}
             >
               <p
                 className={`font-label text-[11px] font-bold uppercase tracking-[0.25em] text-center ${labelColor}`}
               >
                 {label}
               </p>
-              <p className="font-headline text-xl font-bold text-on-surface text-center mt-1 whitespace-nowrap">
+              <p className="font-headline text-xl font-bold text-on-surface text-center mt-1">
                 {t.playerName} just {verbFor(t.kind)} hole {t.hole}
                 {t.kind === "ace" ? "!" : ""}
               </p>
