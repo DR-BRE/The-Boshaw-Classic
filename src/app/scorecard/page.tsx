@@ -1673,7 +1673,7 @@ export default function ScorecardPage() {
           onClick={() => setCourseImageHole(null)}
         >
           <div
-            className="relative max-w-sm w-full max-h-[90vh] flex flex-col bg-surface-container-high border border-white/[0.1] rounded-2xl overflow-hidden shadow-xl"
+            className="relative max-w-xs w-full h-[80vh] h-[80dvh] flex flex-col bg-surface-container-high border border-white/[0.1] rounded-2xl overflow-hidden shadow-xl"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex items-center justify-between px-4 py-3 border-b border-white/[0.06] shrink-0">
@@ -1686,11 +1686,11 @@ export default function ScorecardPage() {
                 <span className="material-symbols-outlined text-on-surface text-xl">close</span>
               </button>
             </div>
-            <div className="flex-1 min-h-0 flex items-center justify-center p-3 overflow-auto">
+            <div className="flex-1 min-h-0 p-4">
               <img
                 src={`${COURSE_HOLE_IMAGES[data.course.name].path}/hole-${courseImageHole}.${COURSE_HOLE_IMAGES[data.course.name].ext}`}
                 alt={`${data.course.name} hole ${courseImageHole}`}
-                className="max-h-full max-w-full object-contain"
+                className="w-full h-full object-contain"
               />
             </div>
           </div>
