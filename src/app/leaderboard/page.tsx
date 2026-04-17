@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import type { LeaderboardEntry } from "@/lib/types/leaderboard";
+import { useLiveRound } from "@/lib/useLiveRound";
 
 const ROUNDS = [
   { label: "All Rounds", value: "", course: "Bear Mountain Ranch & Desert Canyon" },
@@ -123,6 +124,7 @@ export default function LeaderboardPage() {
   const [entries, setEntries] = useState<LeaderboardEntry[]>([]);
   const [loading, setLoading] = useState(true);
   const [expandedId, setExpandedId] = useState<string | null>(null);
+  const isLive = useLiveRound();
 
   useEffect(() => {
     setLoading(true);
@@ -159,8 +161,21 @@ export default function LeaderboardPage() {
             {ROUNDS.find((r) => r.value === round)?.course}
           </p>
         </div>
-        <span className="text-xs font-label text-primary uppercase tracking-widest bg-primary-container px-3 py-1 rounded-full mt-1">
-          Live
+        <span
+          className={`text-xs font-label uppercase tracking-widest px-3 py-1 rounded-full mt-1 transition-colors ${
+            isLive
+              ? "bg-red-500/15 text-red-400 border border-red-500/60 shadow-[0_0_14px_rgba(239,68,68,0.55)] animate-pulse"
+              : "bg-primary-container text-primary"
+          }`}
+        >
+          {isLive ? (
+            <span className="inline-flex items-center gap-1.5">
+              <span className="w-1.5 h-1.5 rounded-full bg-red-500" />
+              Live
+            </span>
+          ) : (
+            "Live"
+          )}
         </span>
       </div>
 

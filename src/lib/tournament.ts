@@ -13,6 +13,8 @@ export const TOURNAMENT = {
         { group: 1, time: "10:30 AM" },
         { group: 2, time: "10:40 AM" },
       ],
+      // PDT = UTC-7. Live window runs 4.5h from Group 1's tee time.
+      activeStartISO: "2026-05-15T10:30:00-07:00",
     },
     {
       date: "Saturday, May 16",
@@ -21,8 +23,11 @@ export const TOURNAMENT = {
         { group: 1, time: "12:27 PM" },
         { group: 2, time: "12:37 PM" },
       ],
+      activeStartISO: "2026-05-16T12:27:00-07:00",
     },
   ],
+  // How long the "Live" badge glows after each day's first tee time.
+  activeWindowHours: 4.5,
 } as const;
 
 export const COURSE_PARS = {

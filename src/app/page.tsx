@@ -7,6 +7,7 @@ import Countdown from "@/components/Countdown";
 import Weather from "@/components/Weather";
 import { TOURNAMENT } from "@/lib/tournament";
 import type { LeaderboardEntry } from "@/lib/types/leaderboard";
+import { useLiveRound } from "@/lib/useLiveRound";
 
 function formatToPar(toPar: number) {
   if (toPar === 0) return "E";
@@ -21,6 +22,7 @@ function toParColor(toPar: number) {
 
 export default function Home() {
   const [topPlayers, setTopPlayers] = useState<LeaderboardEntry[]>([]);
+  const isLive = useLiveRound();
 
   useEffect(() => {
     fetch("/api/leaderboard")
@@ -114,8 +116,21 @@ export default function Home() {
           <h3 className="font-headline text-2xl text-on-surface">
             Leaderboard
           </h3>
-          <span className="text-xs font-label text-primary uppercase tracking-widest bg-primary-container px-3 py-1 rounded-full">
-            Live Updates
+          <span
+            className={`text-xs font-label uppercase tracking-widest px-3 py-1 rounded-full transition-colors ${
+              isLive
+                ? "bg-red-500/15 text-red-400 border border-red-500/60 shadow-[0_0_14px_rgba(239,68,68,0.55)] animate-pulse"
+                : "bg-primary-container text-primary"
+            }`}
+          >
+            {isLive ? (
+              <span className="inline-flex items-center gap-1.5">
+                <span className="w-1.5 h-1.5 rounded-full bg-red-500" />
+                Live
+              </span>
+            ) : (
+              "Live Updates"
+            )}
           </span>
         </div>
         {topPlayers.length > 0 ? (
