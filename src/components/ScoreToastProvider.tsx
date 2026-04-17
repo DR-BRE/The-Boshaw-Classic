@@ -17,6 +17,11 @@ const ACTIVE_ROUNDS = [1, 2];
 const POLL_MS = 5000;
 const VISIBLE_MS = 4500;
 const EXIT_MS = 300;
+// Delay between observing a birdie-or-better score and actually firing the
+// banner — gives players a window to correct a mis-tap without triggering a
+// false celebration. If the score on that hole changes within the window,
+// the pending banner is cancelled.
+const CONFIRM_DELAY_MS = 10000;
 
 function kindFor(score: number, par: number): ToastKind | null {
   if (score === 1) return "ace";
@@ -95,6 +100,10 @@ export default function ScoreToastProvider() {
   const seenRef = useRef<Set<string>>(new Set());
   const seededRef = useRef<Set<number>>(new Set());
   const toastIdRef = useRef(0);
+  // Pending confirmation timers keyed by `${playerId}:${round}:${holeIdx}`.
+  // If the score on that hole changes again inside the window, we clear the
+  // timer and (re)schedule based on the new score.
+  const pendingRef = useRef<Map<string, ReturnType<typeof setTimeout>>>(new Map());
 
   useEffect(() => {
     let cancelled = false;
@@ -130,9 +139,24 @@ export default function ScoreToastProvider() {
             seenRef.current.add(key);
             if (isInitial) continue;
 
+            // Any score change on this hole cancels a pending banner — if
+            // they correct a birdie down to a par, no fake celebration.
+            const holeKey = `${p.id}:${round}:${h}`;
+            const existing = pendingRef.current.get(holeKey);
+            if (existing) {
+              clearTimeout(existing);
+              pendingRef.current.delete(holeKey);
+            }
+
             const kind = kindFor(score, data.course.holes[h]);
             if (!kind) continue;
-            pushToast(firstName(p.displayName), h + 1, kind);
+            const name = firstName(p.displayName);
+            const holeNum = h + 1;
+            const timeoutId = setTimeout(() => {
+              pendingRef.current.delete(holeKey);
+              pushToast(name, holeNum, kind);
+            }, CONFIRM_DELAY_MS);
+            pendingRef.current.set(holeKey, timeoutId);
           }
         }
         seededRef.current.add(round);
@@ -145,9 +169,12 @@ export default function ScoreToastProvider() {
 
     pollAll();
     const iv = setInterval(pollAll, POLL_MS);
+    const pending = pendingRef.current;
     return () => {
       cancelled = true;
       clearInterval(iv);
+      for (const timer of pending.values()) clearTimeout(timer);
+      pending.clear();
     };
   }, []);
 
