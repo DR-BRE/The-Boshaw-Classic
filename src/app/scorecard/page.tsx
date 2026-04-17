@@ -1173,6 +1173,8 @@ export default function ScorecardPage() {
           setWolfOrder(d.order);
           setWolfPicks({}); // Clear picks on reshuffle
           setDismissedWolfHoles(new Set()); // Reset dismiss state on reshuffle
+          // Shuffle is an explicit action — if the user is hole-1 wolf, pop now.
+          if (d.order[0] === currentUserId) setWolfPickModal(1);
         }
       })
       .catch(() => {});
@@ -1196,24 +1198,36 @@ export default function ScorecardPage() {
     return null;
   }, [gameMode, wolfOrder, currentUserId, wolfPicks, data, dismissedWolfHoles]);
 
-  // Open the pick modal when the page becomes visible / focused with a pending
-  // pick. Fires on deps change too, so it also pops right after shuffle.
+  // Open the pick modal when the user *returns* to the app (focus or tab
+  // becomes visible) with a pending pick. Also fires once on initial page
+  // load. Does NOT fire on mid-session state changes (e.g. scoring the prior
+  // hole) — those are handled passively via the yellow pill in card view.
+  const didInitialPickCheckRef = React.useRef(false);
   useEffect(() => {
     if (pendingWolfPickHole === null) return;
-    const trigger = () => {
+    // One-time pop on initial mount when the page loads with a pending pick.
+    if (!didInitialPickCheckRef.current) {
+      didInitialPickCheckRef.current = true;
+      if (typeof document === "undefined" || document.visibilityState === "visible") {
+        setWolfPickModal((cur) => (cur === null ? pendingWolfPickHole : cur));
+      }
+    }
+    // Re-entry triggers: only pop on real focus/visibility events, not on
+    // every deps change (which would fire the moment scoring makes a new
+    // hole pending — exactly what we're trying to avoid).
+    const onReturn = () => {
       if (typeof document !== "undefined" && document.visibilityState !== "visible") return;
       setWolfPickModal((cur) => (cur === null ? pendingWolfPickHole : cur));
     };
-    trigger();
     if (typeof document !== "undefined") {
-      document.addEventListener("visibilitychange", trigger);
+      document.addEventListener("visibilitychange", onReturn);
     }
-    window.addEventListener("focus", trigger);
+    window.addEventListener("focus", onReturn);
     return () => {
       if (typeof document !== "undefined") {
-        document.removeEventListener("visibilitychange", trigger);
+        document.removeEventListener("visibilitychange", onReturn);
       }
-      window.removeEventListener("focus", trigger);
+      window.removeEventListener("focus", onReturn);
     };
   }, [pendingWolfPickHole]);
 
