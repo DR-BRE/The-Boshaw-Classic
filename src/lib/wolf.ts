@@ -8,10 +8,11 @@ export function getWolfForHole(
 
 export interface WolfHoleResult {
   hole: number;
-  wolfId: string;
-  partnerId: string | null; // null = lone wolf
-  wolfTeamBest: number;
-  opponentBest: number;
+  wolfId?: string; // absent on solo holes (17, 18)
+  partnerId?: string | null; // null = lone wolf; absent on solo holes
+  wolfTeamBest?: number;
+  opponentBest?: number;
+  soloHole?: boolean; // true for holes 17 and 18 — everyone plays alone, low score wins 1 pt
   points: Record<string, number>; // playerId -> points for this hole
 }
 
@@ -69,7 +70,35 @@ export function calculateWolfHole(
 }
 
 /**
- * Calculate wolf standings across all 16 holes.
+ * Calculate points for a solo hole (17 or 18): everyone plays alone, lowest score wins 1 point,
+ * ties for low push (nobody scores). Returns null if any player has no score yet.
+ */
+export function calculateSoloHole(
+  hole: number,
+  playerIds: string[],
+  playerScores: Record<string, number | null>
+): WolfHoleResult | null {
+  for (const id of playerIds) {
+    if (playerScores[id] === null || playerScores[id] === undefined) return null;
+  }
+
+  const best = Math.min(...playerIds.map((id) => playerScores[id]!));
+  const winners = playerIds.filter((id) => playerScores[id] === best);
+
+  const points: Record<string, number> = {};
+  for (const id of playerIds) points[id] = 0;
+
+  // Single low score wins 1 pt; ties push
+  if (winners.length === 1) {
+    points[winners[0]] = 1;
+  }
+
+  return { hole, soloHole: true, points };
+}
+
+/**
+ * Calculate wolf standings across all 18 holes.
+ * Holes 1–16 use wolf rotation + picks; holes 17 and 18 are everyone-lone-wolf (low score = 1 pt).
  */
 export function calculateWolfStandings(
   wolfOrder: string[],
@@ -81,20 +110,22 @@ export function calculateWolfStandings(
 
   const holes: (WolfHoleResult | null)[] = [];
 
-  for (let hole = 1; hole <= 16; hole++) {
-    const pickForHole = picks[hole];
+  for (let hole = 1; hole <= 18; hole++) {
     // Build per-hole score map
     const holeScores: Record<string, number | null> = {};
     for (const id of wolfOrder) {
       holeScores[id] = playerScoresPerHole[id]?.[hole - 1] ?? null;
     }
 
-    const result = calculateWolfHole(
-      hole,
-      wolfOrder,
-      pickForHole === undefined ? undefined : pickForHole,
-      holeScores
-    );
+    const result =
+      hole >= 17
+        ? calculateSoloHole(hole, wolfOrder, holeScores)
+        : calculateWolfHole(
+            hole,
+            wolfOrder,
+            picks[hole] === undefined ? undefined : picks[hole],
+            holeScores
+          );
 
     holes.push(result);
 
