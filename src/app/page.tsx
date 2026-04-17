@@ -72,6 +72,42 @@ export default function Home() {
         <Weather />
       </section>
 
+      {/* Tee Times */}
+      <section className="px-6 mt-6">
+        <div className="flex items-center gap-2 mb-3">
+          <span className="material-symbols-outlined text-secondary text-lg" style={{ fontVariationSettings: '"FILL" 1' }}>
+            schedule
+          </span>
+          <h3 className="font-headline text-2xl text-on-surface">Tee Times</h3>
+        </div>
+        <div className="bg-surface-container-high/60 backdrop-blur-xl border border-outline-variant/15 rounded-xl overflow-hidden">
+          {TOURNAMENT.schedule.map((day, i) => (
+            <div
+              key={day.course}
+              className={`p-4 ${i < TOURNAMENT.schedule.length - 1 ? "border-b border-outline-variant/20" : ""}`}
+            >
+              <div className="flex items-baseline justify-between mb-2">
+                <p className="font-headline text-base font-bold text-on-surface">{day.course}</p>
+                <p className="text-xs font-label text-on-surface-variant uppercase tracking-wider">{day.date}</p>
+              </div>
+              <div className="flex gap-2">
+                {day.teeTimes.map((t) => (
+                  <div
+                    key={t.group}
+                    className="flex-1 bg-white/[0.04] border border-white/[0.06] rounded-lg px-3 py-2 flex items-center justify-between"
+                  >
+                    <span className="font-label text-xs font-bold text-secondary uppercase tracking-wider">
+                      Group {t.group}
+                    </span>
+                    <span className="font-headline text-sm font-bold text-on-surface">{t.time}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+
       {/* Leaderboard Preview — Glassmorphism */}
       <section className="px-6 pb-8 mt-4">
         <div className="flex justify-between items-end mb-4">

@@ -5,6 +5,24 @@ export const TOURNAMENT = {
   courses: ["Bear Mountain Ranch", "Desert Canyon", "Echo Falls"],
   playerCount: 8,
   groupCount: 2,
+  schedule: [
+    {
+      date: "Friday, May 15",
+      course: "Bear Mountain Ranch",
+      teeTimes: [
+        { group: 1, time: "10:30 AM" },
+        { group: 2, time: "10:40 AM" },
+      ],
+    },
+    {
+      date: "Saturday, May 16",
+      course: "Desert Canyon",
+      teeTimes: [
+        { group: 1, time: "12:27 PM" },
+        { group: 2, time: "12:37 PM" },
+      ],
+    },
+  ],
 } as const;
 
 export const COURSE_PARS = {
