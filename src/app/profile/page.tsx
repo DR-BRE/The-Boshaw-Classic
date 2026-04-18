@@ -190,6 +190,7 @@ export default function ProfilePage() {
             type="file"
             accept="image/*"
             onChange={handleAvatarUpload}
+            aria-label="Upload avatar photo"
             className="hidden"
           />
           <Avatar

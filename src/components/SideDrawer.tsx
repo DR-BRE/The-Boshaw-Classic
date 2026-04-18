@@ -63,6 +63,7 @@ export default function SideDrawer({
           </h2>
           <button
             onClick={onClose}
+            aria-label="Close navigation"
             className="w-8 h-8 rounded-full bg-surface-container hover:bg-surface-container-highest flex items-center justify-center active:scale-90 transition-transform"
           >
             <span className="material-symbols-outlined text-on-surface-variant text-lg">
