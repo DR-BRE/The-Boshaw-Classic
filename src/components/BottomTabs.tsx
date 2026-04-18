@@ -4,18 +4,18 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 
 const tabs = [
-  { href: "/", icon: "home", label: "Home", highlight: false },
-  { href: "/leaderboard", icon: "leaderboard", label: "Leaderboard", highlight: false },
-  { href: "/scorecard", icon: "scoreboard", label: "Scorecard", highlight: true },
-  { href: "/trip", icon: "luggage", label: "Trip Info", highlight: false },
-  { href: "/profile", icon: "person", label: "Profile", highlight: false },
+  { href: "/", icon: "home", label: "Home" },
+  { href: "/leaderboard", icon: "leaderboard", label: "Leaderboard" },
+  { href: "/scorecard", icon: "scoreboard", label: "Scorecard" },
+  { href: "/trip", icon: "luggage", label: "Trip Info" },
+  { href: "/profile", icon: "person", label: "Profile" },
 ];
 
 export default function BottomTabs() {
   const pathname = usePathname();
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-40 bg-surface-container border-t border-outline-variant/40 pb-safe">
+    <nav aria-label="Primary" className="fixed bottom-0 left-0 right-0 z-40 bg-surface-container border-t border-outline-variant/40 pb-safe">
       <div className="flex items-stretch h-16">
         {tabs.map((tab) => {
           const active =
