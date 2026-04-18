@@ -103,7 +103,7 @@ function toParColor(n: number) {
 
 function ColumnHeaders({ hasYardage }: { hasYardage?: boolean }) {
   return (
-    <div className="flex items-center py-2 px-4 border-b border-white/[0.06] bg-white/[0.02]">
+    <div className="flex items-center py-2 px-4 border-b border-outline-variant/40 bg-surface-container-low">
       <span className="w-8 font-label text-[10px] font-bold text-on-surface-variant uppercase tracking-widest">Hole</span>
       <span className="w-14 font-label text-[10px] font-bold text-on-surface-variant uppercase tracking-widest">Par</span>
       <span className="w-8 text-center font-label text-[10px] font-bold text-on-surface-variant uppercase tracking-widest">HCP</span>
@@ -147,10 +147,10 @@ function HoleRow({
   const showWolfPickStrip = isWolf && wolfPickLabel !== undefined;
 
   return (
-    <div className={`border-b border-white/[0.04] ${isWolf ? "bg-yellow-500/10" : ""}`}>
+    <div className={`border-b border-outline-variant/30 ${isWolf ? "bg-yellow-500/10" : ""}`}>
       <div className="flex items-center py-3 px-4">
         {/* Hole number */}
-        <span className="w-8 font-headline text-lg font-bold text-on-surface tabular-nums">
+        <span className="w-8 font-display text-2xl text-on-surface-variant leading-none tabular-nums">
           {isWolf ? <img src="/wolf.png" alt="Wolf" className="w-5 h-5 rounded-full object-cover inline-block" /> : hole}
         </span>
 
@@ -168,7 +168,7 @@ function HoleRow({
         {yardage !== undefined && (
           <button
             onClick={() => onYardageClick?.(hole)}
-            className="w-10 text-center font-label text-sm text-secondary tabular-nums active:scale-95 transition-transform"
+            className="w-10 text-center font-label text-sm text-primary tabular-nums active:scale-95 transition-transform"
           >
             {yardage}
           </button>
@@ -180,7 +180,7 @@ function HoleRow({
             <button
               onClick={onDecrement}
               disabled={score !== null && score <= 1}
-              className="w-10 h-10 rounded-full bg-white/[0.06] border border-white/[0.08] flex items-center justify-center active:scale-90 transition-transform disabled:opacity-30"
+              className="w-10 h-10 rounded-full bg-surface-container-high border border-outline-variant/50 flex items-center justify-center active:scale-90 transition-transform disabled:opacity-30"
             >
               <span className="material-symbols-outlined text-on-surface text-lg">remove</span>
             </button>
@@ -192,7 +192,7 @@ function HoleRow({
             <button
               onClick={onIncrement}
               disabled={score !== null && score >= 15}
-              className="w-10 h-10 rounded-full bg-white/[0.06] border border-white/[0.08] flex items-center justify-center active:scale-90 transition-transform disabled:opacity-30"
+              className="w-10 h-10 rounded-full bg-surface-container-high border border-outline-variant/50 flex items-center justify-center active:scale-90 transition-transform disabled:opacity-30"
             >
               <span className="material-symbols-outlined text-on-surface text-lg">add</span>
             </button>
@@ -329,8 +329,8 @@ function CardView({
               onClick={() => setSelectedPlayer(i)}
               className={`flex-shrink-0 flex flex-col items-center gap-1 px-3 py-2 rounded-xl transition-all active:scale-95 min-w-[72px] ${
                 active
-                  ? "bg-white/[0.1] border border-secondary/40"
-                  : "bg-white/[0.04] border border-white/[0.06]"
+                  ? "bg-surface-bright border border-primary/40"
+                  : "bg-surface-container border border-outline-variant/40"
               }`}
             >
               {p.avatarUrl ? (
@@ -338,15 +338,15 @@ function CardView({
                   src={p.avatarUrl}
                   alt={p.displayName}
                   className={`w-9 h-9 rounded-full object-cover border-2 ${
-                    active ? "border-secondary" : "border-white/[0.08]"
+                    active ? "border-primary" : "border-outline-variant/50"
                   }`}
                 />
               ) : (
                 <div
                   className={`w-9 h-9 rounded-full flex items-center justify-center text-xs font-bold ${
                     active
-                      ? "bg-secondary text-on-secondary"
-                      : "bg-white/[0.08] text-on-surface-variant"
+                      ? "bg-primary text-on-primary"
+                      : "bg-surface-container-highest text-on-surface-variant"
                   }`}
                 >
                   {initials}
@@ -354,7 +354,7 @@ function CardView({
               )}
               <span
                 className={`font-label text-[9px] font-bold truncate max-w-[64px] ${
-                  active ? "text-secondary" : "text-on-surface-variant"
+                  active ? "text-primary" : "text-on-surface-variant"
                 }`}
               >
                 {p.displayName}
@@ -365,7 +365,7 @@ function CardView({
       </div>
 
       {/* Summary Bar */}
-      <div className="bg-white/[0.06] backdrop-blur-xl border border-white/[0.08] rounded-xl p-3 mb-4">
+      <div className="bg-surface-container-high backdrop-blur-xl border border-outline-variant/50 rounded-xl p-3 mb-4">
         <div className="flex justify-around text-center">
           <div>
             <p className="font-label text-[10px] text-on-surface-variant uppercase tracking-widest">Front</p>
@@ -401,12 +401,12 @@ function CardView({
       </div>
 
       {/* Front 9 */}
-      <div className="bg-white/[0.06] backdrop-blur-xl border border-white/[0.08] rounded-2xl overflow-hidden mb-4">
-        <div className="flex justify-between items-center bg-secondary px-4 py-2">
-          <h3 className="font-headline text-on-secondary text-sm font-bold uppercase tracking-wider">
+      <div className="bg-surface-container-high backdrop-blur-xl border border-outline-variant/50 rounded-2xl overflow-hidden mb-4">
+        <div className="flex justify-between items-center bg-primary px-4 py-2">
+          <h3 className="font-headline text-on-primary text-sm font-bold uppercase tracking-wider">
             Front 9
           </h3>
-          <span className="font-headline text-on-secondary text-sm font-bold">
+          <span className="font-headline text-on-primary text-sm font-bold">
             {frontYds !== undefined && <>{frontYds} yds &middot; </>}par {frontPar}
           </span>
         </div>
@@ -430,12 +430,12 @@ function CardView({
       </div>
 
       {/* Back 9 */}
-      <div className="bg-white/[0.06] backdrop-blur-xl border border-white/[0.08] rounded-2xl overflow-hidden mb-4">
-        <div className="flex justify-between items-center bg-secondary px-4 py-2">
-          <h3 className="font-headline text-on-secondary text-sm font-bold uppercase tracking-wider">
+      <div className="bg-surface-container-high backdrop-blur-xl border border-outline-variant/50 rounded-2xl overflow-hidden mb-4">
+        <div className="flex justify-between items-center bg-primary px-4 py-2">
+          <h3 className="font-headline text-on-primary text-sm font-bold uppercase tracking-wider">
             Back 9
           </h3>
-          <span className="font-headline text-on-secondary text-sm font-bold">
+          <span className="font-headline text-on-primary text-sm font-bold">
             {backYds !== undefined && <>{backYds} yds &middot; </>}par {backPar}
           </span>
         </div>
@@ -487,7 +487,7 @@ function ScoreInput({
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60" onClick={onClose}>
       <div
-        className="bg-surface-container-high border border-white/[0.1] rounded-2xl p-5 w-48 text-center"
+        className="bg-surface-container-high border border-outline-variant/60 rounded-2xl p-5 w-48 text-center"
         onClick={(e) => e.stopPropagation()}
       >
         <p className="font-label text-xs text-on-surface-variant uppercase tracking-widest mb-3">
@@ -503,11 +503,11 @@ function ScoreInput({
           value={inputValue}
           onChange={(e) => setInputValue(e.target.value)}
           onKeyDown={(e) => e.key === "Enter" && handleSubmit()}
-          className="w-full text-center font-headline text-3xl font-bold text-on-surface bg-white/[0.06] border border-white/[0.1] rounded-xl py-3 mb-3 outline-none focus:border-secondary"
+          className="w-full text-center font-headline text-3xl font-bold text-on-surface bg-surface-container-high border border-outline-variant/60 rounded-xl py-3 mb-3 outline-none focus:border-primary"
         />
         <button
           onClick={handleSubmit}
-          className="w-full py-2.5 bg-secondary text-on-secondary font-label text-sm font-bold uppercase tracking-wider rounded-xl active:scale-95 transition-transform"
+          className="w-full py-2.5 bg-primary text-on-primary font-label text-sm font-bold uppercase tracking-wider rounded-xl active:scale-95 transition-transform"
         >
           Save
         </button>
@@ -557,7 +557,7 @@ function WolfPickModal({
           </div>
           <button
             onClick={onClose}
-            className="w-9 h-9 rounded-full bg-white/[0.06] flex items-center justify-center"
+            className="w-9 h-9 rounded-full bg-surface-container-high flex items-center justify-center"
           >
             <span className="material-symbols-outlined text-on-surface-variant text-lg">close</span>
           </button>
@@ -573,13 +573,13 @@ function WolfPickModal({
                 className={`flex items-center gap-4 px-4 py-4 rounded-2xl border transition-all active:scale-[0.98] ${
                   selected
                     ? "bg-yellow-500/15 border-yellow-500/40"
-                    : "bg-white/[0.04] border-white/[0.08] active:bg-white/[0.08]"
+                    : "bg-surface-container border-outline-variant/50 active:bg-surface-container-highest"
                 }`}
               >
                 {p.avatarUrl ? (
                   <img src={p.avatarUrl} alt="" className="w-10 h-10 rounded-full object-cover" />
                 ) : (
-                  <div className="w-10 h-10 rounded-full bg-white/[0.1] flex items-center justify-center">
+                  <div className="w-10 h-10 rounded-full bg-surface-bright flex items-center justify-center">
                     <span className="font-headline text-sm font-bold text-on-surface-variant">
                       {p.displayName.charAt(0)}
                     </span>
@@ -599,7 +599,7 @@ function WolfPickModal({
             className={`flex items-center gap-4 px-4 py-4 rounded-2xl border transition-all active:scale-[0.98] ${
               currentPick === null
                 ? "bg-yellow-500/15 border-yellow-500/40"
-                : "bg-white/[0.04] border-white/[0.08] active:bg-white/[0.08]"
+                : "bg-surface-container border-outline-variant/50 active:bg-surface-container-highest"
             }`}
           >
             <div className="w-10 h-10 rounded-full bg-yellow-500/20 flex items-center justify-center">
@@ -653,8 +653,8 @@ function NineHoleGrid({
   return (
     <div className="mb-6">
       {/* Section Header */}
-      <div className="bg-secondary rounded-t-xl px-4 py-2">
-        <h3 className="font-headline text-on-secondary text-center text-lg font-bold uppercase tracking-wider">
+      <div className="bg-primary rounded-t-xl px-4 py-2">
+        <h3 className="font-headline text-on-primary text-center text-lg font-bold uppercase tracking-wider">
           {label}
         </h3>
       </div>
@@ -671,12 +671,14 @@ function NineHoleGrid({
               {holePars.map((_, i) => (
                 <th
                   key={i}
-                  className="px-1 py-2 text-center font-label text-xs font-bold text-secondary min-w-[40px]"
+                  className="px-1 py-2 text-center min-w-[40px]"
                 >
-                  {startHole + i + 1}
+                  <span className="font-display text-2xl text-on-surface-variant leading-none">
+                    {startHole + i + 1}
+                  </span>
                 </th>
               ))}
-              <th className="px-2 py-2 text-center font-label text-xs font-bold text-secondary min-w-[44px]">
+              <th className="px-2 py-2 text-center font-label text-xs font-bold text-primary min-w-[44px]">
                 {totalLabel}
               </th>
             </tr>
@@ -711,13 +713,13 @@ function NineHoleGrid({
                   <td key={i} className="px-1 py-1.5 text-center">
                     <button
                       onClick={() => onYardageClick?.(startHole + i + 1)}
-                      className="font-label text-xs text-secondary tabular-nums active:scale-95 transition-transform"
+                      className="font-label text-xs text-primary tabular-nums active:scale-95 transition-transform"
                     >
                       {yds}
                     </button>
                   </td>
                 ))}
-                <td className="px-2 py-1.5 text-center font-label text-xs font-bold text-secondary tabular-nums">
+                <td className="px-2 py-1.5 text-center font-label text-xs font-bold text-primary tabular-nums">
                   {ydsTotal}
                 </td>
               </tr>
@@ -732,7 +734,7 @@ function NineHoleGrid({
                   ? nineScores.reduce((sum, s) => sum! + s!, 0)
                   : null;
               const rowBg = isCurrentUser
-                ? "bg-secondary/10"
+                ? "bg-primary/10"
                 : pIdx % 2 === 0
                   ? "bg-surface"
                   : "bg-surface-container-low";
@@ -742,7 +744,7 @@ function NineHoleGrid({
                 <React.Fragment key={player.id}>
                   <tr className={rowBg}>
                     <td
-                      className={`sticky left-0 z-10 ${stickyBg} px-3 py-2 shadow-[2px_0_4px_rgba(0,0,0,0.3)] ${isCurrentUser ? "border-l-2 border-secondary" : ""}`}
+                      className={`sticky left-0 z-10 ${stickyBg} px-3 py-2 shadow-[2px_0_4px_rgba(0,0,0,0.3)] ${isCurrentUser ? "border-l-2 border-primary" : ""}`}
                     >
                       <div className="flex items-center gap-2">
                         {isCurrentUser && player.avatarUrl ? (
@@ -756,7 +758,7 @@ function NineHoleGrid({
                             className={`w-2 h-2 rounded-full flex-shrink-0 ${groupDotColor(player.group)}`}
                           />
                         )}
-                        <span className={`font-label font-bold text-on-surface truncate max-w-[90px] ${isCurrentUser ? "text-sm text-secondary" : "text-xs"}`}>
+                        <span className={`font-label font-bold text-on-surface truncate max-w-[90px] ${isCurrentUser ? "text-sm text-primary" : "text-xs"}`}>
                           {player.displayName}
                         </span>
                       </div>
@@ -769,7 +771,7 @@ function NineHoleGrid({
                           key={i}
                           className={`px-1 py-2 text-center font-label tabular-nums ${scoreColor(score, holePars[i])} ${
                             isCurrentUser ? "text-base font-extrabold" : "text-sm font-bold"
-                          } ${isCurrentUser && onScoreTap ? "cursor-pointer active:bg-white/[0.15] rounded-md bg-white/[0.06] border border-white/[0.1]" : ""} ${isWolf ? "bg-yellow-500/10" : ""}`}
+                          } ${isCurrentUser && onScoreTap ? "cursor-pointer active:bg-surface-bright rounded-md bg-surface-container-high border border-outline-variant/60" : ""} ${isWolf ? "bg-yellow-500/10" : ""}`}
                           onClick={isCurrentUser && onScoreTap ? () => onScoreTap(player.id, startHole + i) : undefined}
                         >
                           {isWolf && <div className="leading-none"><img src="/wolf.png" alt="Wolf" className="w-3 h-3 rounded-full object-cover inline-block" /></div>}
@@ -795,7 +797,7 @@ function NineHoleGrid({
                   </tr>
                   {pIdx + 1 === dividerAfter && pIdx + 1 < sortedPlayers.length && (
                     <tr>
-                      <td colSpan={holePars.length + 2} className="py-0.5 bg-white/[0.08]" />
+                      <td colSpan={holePars.length + 2} className="py-0.5 bg-surface-container-highest" />
                     </tr>
                   )}
                 </React.Fragment>
@@ -905,19 +907,19 @@ function SummaryTable({
               <th className="sticky left-0 z-10 bg-surface-container text-left px-3 py-2 font-label text-[11px] font-bold uppercase tracking-widest text-on-surface-variant min-w-[120px] shadow-[2px_0_4px_rgba(0,0,0,0.3)]">
                 Player
               </th>
-              <th className="px-2 py-2 text-center font-label text-[11px] font-bold uppercase tracking-widest text-secondary">
+              <th className="px-2 py-2 text-center font-label text-[11px] font-bold uppercase tracking-widest text-primary">
                 HCP
               </th>
-              <th className="px-2 py-2 text-center font-label text-[11px] font-bold uppercase tracking-widest text-secondary">
+              <th className="px-2 py-2 text-center font-label text-[11px] font-bold uppercase tracking-widest text-primary">
                 Front
               </th>
-              <th className="px-2 py-2 text-center font-label text-[11px] font-bold uppercase tracking-widest text-secondary">
+              <th className="px-2 py-2 text-center font-label text-[11px] font-bold uppercase tracking-widest text-primary">
                 Back
               </th>
-              <th className="px-2 py-2 text-center font-label text-[11px] font-bold uppercase tracking-widest text-secondary">
+              <th className="px-2 py-2 text-center font-label text-[11px] font-bold uppercase tracking-widest text-primary">
                 Gross
               </th>
-              <th className="px-2 py-2 text-center font-label text-[11px] font-bold uppercase tracking-widest text-secondary">
+              <th className="px-2 py-2 text-center font-label text-[11px] font-bold uppercase tracking-widest text-primary">
                 Net
               </th>
               {wolfTotals && (
@@ -959,7 +961,7 @@ function SummaryTable({
             {sortedPlayers.map((player, pIdx) => {
               const isCurrentUser = player.id === currentPlayerId;
               const rowBg = isCurrentUser
-                ? "bg-secondary/10"
+                ? "bg-primary/10"
                 : pIdx % 2 === 0
                   ? "bg-surface"
                   : "bg-surface-container-low";
@@ -968,13 +970,13 @@ function SummaryTable({
                 <React.Fragment key={player.id}>
                   <tr className={rowBg}>
                     <td
-                      className={`sticky left-0 z-10 ${stickyBg} px-3 py-2 shadow-[2px_0_4px_rgba(0,0,0,0.3)] ${isCurrentUser ? "border-l-2 border-secondary" : ""}`}
+                      className={`sticky left-0 z-10 ${stickyBg} px-3 py-2 shadow-[2px_0_4px_rgba(0,0,0,0.3)] ${isCurrentUser ? "border-l-2 border-primary" : ""}`}
                     >
                       <div className="flex items-center gap-2">
                         <span
                           className={`w-2 h-2 rounded-full flex-shrink-0 ${groupDotColor(player.group)}`}
                         />
-                        <span className={`font-label font-bold text-on-surface truncate max-w-[90px] ${isCurrentUser ? "text-sm text-secondary" : "text-xs"}`}>
+                        <span className={`font-label font-bold text-on-surface truncate max-w-[90px] ${isCurrentUser ? "text-sm text-primary" : "text-xs"}`}>
                           {player.displayName}
                         </span>
                       </div>
@@ -1025,7 +1027,7 @@ function SummaryTable({
                   </tr>
                   {pIdx + 1 === dividerAfter && pIdx + 1 < sortedPlayers.length && (
                     <tr>
-                      <td colSpan={wolfTotals ? 7 : 6} className="py-0.5 bg-white/[0.08]" />
+                      <td colSpan={wolfTotals ? 7 : 6} className="py-0.5 bg-surface-container-highest" />
                     </tr>
                   )}
                 </React.Fragment>
@@ -1352,12 +1354,12 @@ export default function ScorecardPage() {
         <div className="relative">
           <button
             onClick={() => setGameModeOpen(!gameModeOpen)}
-            className="flex items-center gap-1.5 bg-white/[0.06] border border-white/[0.08] rounded-xl px-3 py-2 active:scale-95 transition-transform"
+            className="flex items-center gap-1.5 bg-surface-container-high border border-outline-variant/50 rounded-xl px-3 py-2 active:scale-95 transition-transform"
           >
             {gameMode === "wolf" ? (
               <img src="/wolf.png" alt="Wolf" className="w-5 h-5 rounded-full object-cover" />
             ) : (
-              <span className="material-symbols-outlined text-secondary text-lg">
+              <span className="material-symbols-outlined text-primary text-lg">
                 {GAME_MODES.find((m) => m.value === gameMode)?.icon}
               </span>
             )}
@@ -1371,15 +1373,15 @@ export default function ScorecardPage() {
           {gameModeOpen && (
             <>
               <div className="fixed inset-0 z-40" onClick={() => setGameModeOpen(false)} />
-              <div className="absolute right-0 top-full mt-1 z-50 bg-surface-container-high border border-white/[0.1] rounded-xl overflow-hidden shadow-lg min-w-[160px]">
+              <div className="absolute right-0 top-full mt-1 z-50 bg-surface-container-high border border-outline-variant/60 rounded-xl overflow-hidden shadow-lg min-w-[160px]">
                 {GAME_MODES.map((mode) => (
                   <button
                     key={mode.value}
                     onClick={() => { setGameMode(mode.value); setGameModeOpen(false); try { const raw = localStorage.getItem("boshaw-settings"); const s = raw ? JSON.parse(raw) : {}; s.gameMode = mode.value; localStorage.setItem("boshaw-settings", JSON.stringify(s)); } catch {} }}
                     className={`w-full flex items-center gap-2.5 px-4 py-3 text-left transition-colors ${
                       gameMode === mode.value
-                        ? "bg-secondary/15 text-secondary"
-                        : "text-on-surface hover:bg-white/[0.06]"
+                        ? "bg-primary/15 text-primary"
+                        : "text-on-surface hover:bg-surface-container"
                     }`}
                   >
                     {mode.value === "wolf" ? (
@@ -1400,9 +1402,9 @@ export default function ScorecardPage() {
       {gameMode === "wolf" && isAdmin && wolfOrder && (
         <button
           onClick={shuffleWolf}
-          className="mb-4 flex items-center gap-2 bg-white/[0.06] border border-white/[0.08] rounded-xl px-4 py-2.5 active:scale-95 transition-transform"
+          className="mb-4 flex items-center gap-2 bg-surface-container-high border border-outline-variant/50 rounded-xl px-4 py-2.5 active:scale-95 transition-transform"
         >
-          <span className="material-symbols-outlined text-secondary text-lg">shuffle</span>
+          <span className="material-symbols-outlined text-primary text-lg">shuffle</span>
           <span className="font-label text-xs font-bold text-on-surface uppercase tracking-wider">
             Shuffle Wolf Order
           </span>
@@ -1410,7 +1412,7 @@ export default function ScorecardPage() {
       )}
 
       {/* Round Tabs */}
-      <div className="bg-white/[0.06] backdrop-blur-lg border border-white/[0.06] rounded-xl p-1 flex gap-1 mb-4">
+      <div className="flex bg-surface-container rounded-xl p-1 mb-4">
         {ROUNDS.map((r) => (
           <button
             key={r.value}
@@ -1424,11 +1426,12 @@ export default function ScorecardPage() {
                 localStorage.setItem("boshaw-settings", JSON.stringify(s));
               } catch {}
             }}
-            className={`flex-1 py-2.5 rounded-lg font-label text-xs font-bold uppercase tracking-wider transition-all active:scale-95 ${
+            className={[
+              "flex-1 py-2 rounded-lg text-sm font-label font-medium uppercase tracking-wider transition-all active:scale-95",
               round === r.value
-                ? "bg-white/[0.1] text-primary"
-                : "text-on-surface-variant hover:text-on-surface"
-            }`}
+                ? "bg-surface-container-high text-on-surface shadow-sm"
+                : "text-on-surface-variant hover:text-on-surface",
+            ].join(" ")}
           >
             {r.label}
           </button>
@@ -1438,16 +1441,16 @@ export default function ScorecardPage() {
       {/* Loading State */}
       {loading && (
         <div className="space-y-4">
-          <div className="bg-white/[0.06] animate-pulse rounded-xl h-10" />
-          <div className="bg-white/[0.06] animate-pulse rounded-xl h-64" />
-          <div className="bg-white/[0.06] animate-pulse rounded-xl h-64" />
+          <div className="bg-surface-container-high animate-pulse rounded-xl h-10" />
+          <div className="bg-surface-container-high animate-pulse rounded-xl h-64" />
+          <div className="bg-surface-container-high animate-pulse rounded-xl h-64" />
         </div>
       )}
 
       {/* Empty State */}
       {!loading && !data && (
-        <div className="bg-white/[0.06] backdrop-blur-xl border border-white/[0.08] rounded-xl p-8 text-center">
-          <span className="material-symbols-outlined text-secondary text-3xl mb-2">
+        <div className="bg-surface-container-high backdrop-blur-xl border border-outline-variant/50 rounded-xl p-8 text-center">
+          <span className="material-symbols-outlined text-primary text-3xl mb-2">
             scoreboard
           </span>
           <p className="font-headline text-lg text-on-surface">
@@ -1474,7 +1477,7 @@ export default function ScorecardPage() {
             </div>
 
             {/* View Toggle */}
-            <div className="bg-white/[0.06] border border-white/[0.06] rounded-lg p-0.5 flex">
+            <div className="flex bg-surface-container rounded-xl p-1">
               <button
                 onClick={() => {
                   setView("card");
@@ -1485,11 +1488,12 @@ export default function ScorecardPage() {
                     localStorage.setItem("boshaw-settings", JSON.stringify(s));
                   } catch {}
                 }}
-                className={`px-3 py-1.5 rounded-md font-label text-[10px] font-bold uppercase tracking-wider transition-all ${
+                className={[
+                  "flex-1 px-3 py-1.5 rounded-lg text-xs font-label font-medium uppercase tracking-wider transition-all active:scale-95",
                   view === "card"
-                    ? "bg-white/[0.1] text-primary"
-                    : "text-on-surface-variant"
-                }`}
+                    ? "bg-surface-container-high text-on-surface shadow-sm"
+                    : "text-on-surface-variant hover:text-on-surface",
+                ].join(" ")}
               >
                 Card
               </button>
@@ -1503,11 +1507,12 @@ export default function ScorecardPage() {
                     localStorage.setItem("boshaw-settings", JSON.stringify(s));
                   } catch {}
                 }}
-                className={`px-3 py-1.5 rounded-md font-label text-[10px] font-bold uppercase tracking-wider transition-all ${
+                className={[
+                  "flex-1 px-3 py-1.5 rounded-lg text-xs font-label font-medium uppercase tracking-wider transition-all active:scale-95",
                   view === "classic"
-                    ? "bg-white/[0.1] text-primary"
-                    : "text-on-surface-variant"
-                }`}
+                    ? "bg-surface-container-high text-on-surface shadow-sm"
+                    : "text-on-surface-variant hover:text-on-surface",
+                ].join(" ")}
               >
                 Classic
               </button>
@@ -1568,8 +1573,8 @@ export default function ScorecardPage() {
               />
 
               {/* Summary */}
-              <div className="bg-secondary rounded-t-xl px-4 py-2 mt-2">
-                <h3 className="font-headline text-on-secondary text-center text-lg font-bold uppercase tracking-wider">
+              <div className="bg-primary rounded-t-xl px-4 py-2 mt-2">
+                <h3 className="font-headline text-on-primary text-center text-lg font-bold uppercase tracking-wider">
                   Summary
                 </h3>
               </div>
@@ -1590,7 +1595,7 @@ export default function ScorecardPage() {
                       Wolf Standings
                     </h3>
                   </div>
-                  <div className="bg-white/[0.06] backdrop-blur-xl border border-yellow-500/20 rounded-b-xl overflow-hidden">
+                  <div className="bg-surface-container-high backdrop-blur-xl border border-yellow-500/20 rounded-b-xl overflow-hidden">
                     {wolfOrder
                       .map((id) => ({
                         id,
@@ -1602,14 +1607,14 @@ export default function ScorecardPage() {
                         <div
                           key={entry.id}
                           className={`flex items-center justify-between px-4 py-3 ${
-                            i > 0 ? "border-t border-white/[0.06]" : ""
-                          } ${entry.id === currentUserId ? "bg-secondary/10" : ""}`}
+                            i > 0 ? "border-t border-outline-variant/40" : ""
+                          } ${entry.id === currentUserId ? "bg-primary/10" : ""}`}
                         >
                           <div className="flex items-center gap-3">
                             <span className="font-headline text-lg font-bold text-on-surface-variant w-6 text-center">
                               {i + 1}
                             </span>
-                            <span className={`font-label text-sm font-bold ${entry.id === currentUserId ? "text-secondary" : "text-on-surface"}`}>
+                            <span className={`font-label text-sm font-bold ${entry.id === currentUserId ? "text-primary" : "text-on-surface"}`}>
                               {entry.name}
                             </span>
                           </div>
@@ -1673,15 +1678,15 @@ export default function ScorecardPage() {
           onClick={() => setCourseImageHole(null)}
         >
           <div
-            className="relative max-w-xs w-full h-[92vh] h-[92dvh] flex flex-col bg-surface-container-high border border-white/[0.1] rounded-2xl overflow-hidden shadow-xl"
+            className="relative max-w-xs w-full h-[92vh] h-[92dvh] flex flex-col bg-surface-container-high border border-outline-variant/60 rounded-2xl overflow-hidden shadow-xl"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="flex items-center justify-between px-3 py-1.5 border-b border-white/[0.06] shrink-0">
+            <div className="flex items-center justify-between px-3 py-1.5 border-b border-outline-variant/40 shrink-0">
               <h3 className="font-headline text-sm font-bold text-on-surface">Hole {courseImageHole}</h3>
               <button
                 onClick={() => setCourseImageHole(null)}
                 aria-label="Close"
-                className="w-7 h-7 rounded-full bg-white/[0.1] hover:bg-white/[0.15] flex items-center justify-center"
+                className="w-7 h-7 rounded-full bg-surface-bright hover:bg-surface-bright flex items-center justify-center"
               >
                 <span className="material-symbols-outlined text-on-surface text-base">close</span>
               </button>
