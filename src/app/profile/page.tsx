@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useSession, signOut } from "next-auth/react";
 import Link from "next/link";
+import { Avatar, Input, Button, Card } from "@/components/ui";
 
 type Player = {
   id: string;
@@ -139,10 +140,10 @@ export default function ProfilePage() {
   if (status === "unauthenticated") {
     return (
       <div className="px-4 py-6">
-        <h2 className="font-headline text-3xl text-on-surface mb-2">Profile</h2>
-        <div className="bg-white/[0.06] backdrop-blur-xl border border-white/[0.08] rounded-xl p-8 text-center mt-4">
+        <h2 className="font-display text-4xl text-on-surface mb-6 leading-none">PROFILE</h2>
+        <Card className="text-center py-10">
           <span
-            className="material-symbols-outlined text-secondary text-4xl mb-3"
+            className="material-symbols-outlined text-primary text-4xl mb-3 block"
             style={{ fontVariationSettings: '"FILL" 1' }}
           >
             person
@@ -155,12 +156,12 @@ export default function ProfilePage() {
           </p>
           <Link
             href="/api/auth/signin"
-            className="inline-flex items-center gap-2 bg-secondary text-on-secondary font-label font-bold uppercase tracking-widest text-sm px-6 py-3 rounded-xl active:scale-95 transition-transform"
+            className="inline-flex items-center gap-2 bg-primary text-on-primary font-label font-semibold uppercase tracking-widest text-sm px-6 py-3 rounded-lg active:scale-95 transition-transform"
           >
             Sign In with Google
             <span className="material-symbols-outlined text-lg">login</span>
           </Link>
-        </div>
+        </Card>
       </div>
     );
   }
@@ -169,10 +170,10 @@ export default function ProfilePage() {
   if (loading || status === "loading") {
     return (
       <div className="px-4 py-6">
-        <h2 className="font-headline text-3xl text-on-surface mb-6">Profile</h2>
+        <h2 className="font-display text-4xl text-on-surface mb-6 leading-none">PROFILE</h2>
         <div className="space-y-4">
-          <div className="bg-white/[0.06] animate-pulse rounded-xl h-24" />
-          <div className="bg-white/[0.06] animate-pulse rounded-xl h-48" />
+          <div className="bg-surface-container-high animate-pulse rounded-xl h-24" />
+          <div className="bg-surface-container-high animate-pulse rounded-xl h-48" />
         </div>
       </div>
     );
@@ -180,10 +181,10 @@ export default function ProfilePage() {
 
   return (
     <div className="px-4 py-6 pb-24">
-      <h2 className="font-headline text-3xl text-on-surface mb-6">Profile</h2>
+      <h2 className="font-display text-4xl text-on-surface mb-6 leading-none">PROFILE</h2>
 
-      {/* User Card */}
-      <div className="bg-white/[0.06] backdrop-blur-xl border border-white/[0.08] rounded-xl p-4 flex items-center gap-4 mb-6">
+      {/* User Card with Avatar */}
+      <Card className="flex items-center gap-4 mb-6">
         <label className="relative cursor-pointer group flex-shrink-0">
           <input
             type="file"
@@ -191,17 +192,11 @@ export default function ProfilePage() {
             onChange={handleAvatarUpload}
             className="hidden"
           />
-          {avatarUrl || session?.user?.image ? (
-            <img
-              src={avatarUrl || session?.user?.image || ""}
-              alt="Avatar"
-              className="w-14 h-14 rounded-full border-2 border-secondary/30 object-cover"
-            />
-          ) : (
-            <div className="w-14 h-14 rounded-full bg-primary-container flex items-center justify-center border-2 border-secondary/30">
-              <span className="material-symbols-outlined text-primary text-2xl">person</span>
-            </div>
-          )}
+          <Avatar
+            src={avatarUrl || session?.user?.image || null}
+            name={player?.displayName || session?.user?.name || "Player"}
+            size="lg"
+          />
           <div className="absolute inset-0 rounded-full bg-black/40 flex items-center justify-center opacity-60 sm:opacity-0 sm:group-hover:opacity-100 group-active:opacity-100 transition-opacity">
             <span className="material-symbols-outlined text-white text-lg">
               {uploading ? "hourglass_empty" : "photo_camera"}
@@ -209,131 +204,91 @@ export default function ProfilePage() {
           </div>
         </label>
         <div className="flex-1 min-w-0">
-          <p className="font-label font-bold text-on-surface truncate">
+          <p className="font-headline text-lg font-semibold text-on-surface truncate">
             {player?.displayName || session?.user?.name || "Player"}
           </p>
           <p className="text-xs text-on-surface-variant truncate">
             {session?.user?.email}
           </p>
           {player && (
-            <span className="inline-flex items-center gap-1 mt-1 text-[10px] font-label text-primary uppercase tracking-widest bg-primary-container px-2 py-0.5 rounded-full">
+            <span className="inline-flex items-center gap-1 mt-1.5 text-[10px] font-label font-semibold text-primary uppercase tracking-widest bg-primary/10 px-2 py-0.5 rounded-full">
               <span className="material-symbols-outlined text-xs" style={{ fontVariationSettings: '"FILL" 1' }}>check_circle</span>
               Registered
             </span>
           )}
         </div>
-      </div>
+      </Card>
 
       {/* Profile Form */}
-      <div className="bg-white/[0.06] backdrop-blur-xl border border-white/[0.08] rounded-2xl p-5">
-        <h3 className="font-headline text-lg text-on-surface mb-4">
+      <Card className="mb-6">
+        <h3 className="font-headline text-lg font-semibold text-on-surface mb-4">
           {player ? "Edit Profile" : "Set Up Profile"}
         </h3>
 
         <div className="space-y-4">
-          {/* First Name */}
-          <div>
-            <label className="block font-label text-xs text-on-surface-variant uppercase tracking-widest mb-1.5">
-              First Name
-            </label>
-            <input
-              type="text"
-              value={firstName}
-              onChange={(e) => setFirstName(e.target.value)}
-              className="w-full bg-white/[0.04] border border-white/[0.08] rounded-lg px-4 py-3 text-on-surface font-body text-sm focus:outline-none focus:border-primary transition-colors"
-              placeholder="Ryan"
-            />
-          </div>
-
-          {/* Last Name */}
-          <div>
-            <label className="block font-label text-xs text-on-surface-variant uppercase tracking-widest mb-1.5">
-              Last Name
-            </label>
-            <input
-              type="text"
-              value={lastName}
-              onChange={(e) => setLastName(e.target.value)}
-              className="w-full bg-white/[0.04] border border-white/[0.08] rounded-lg px-4 py-3 text-on-surface font-body text-sm focus:outline-none focus:border-primary transition-colors"
-              placeholder="Boshaw"
-            />
-          </div>
-
-          {/* Display Name */}
-          <div>
-            <label className="block font-label text-xs text-on-surface-variant uppercase tracking-widest mb-1.5">
-              Display Name
-            </label>
-            <input
-              type="text"
-              value={displayName}
-              onChange={(e) => setDisplayName(e.target.value)}
-              className="w-full bg-white/[0.04] border border-white/[0.08] rounded-lg px-4 py-3 text-on-surface font-body text-sm focus:outline-none focus:border-primary transition-colors"
-              placeholder="Ryan B."
-            />
-            <p className="text-[11px] text-on-surface-variant mt-1">
-              Shown on the leaderboard
-            </p>
-          </div>
-
-          {/* Handicap */}
-          <div>
-            <label className="block font-label text-xs text-on-surface-variant uppercase tracking-widest mb-1.5">
-              Handicap
-            </label>
-            <input
-              type="number"
-              min="0"
-              max="54"
-              value={handicap}
-              onChange={(e) => setHandicap(e.target.value)}
-              className="w-full bg-white/[0.04] border border-white/[0.08] rounded-lg px-4 py-3 text-on-surface font-body text-sm focus:outline-none focus:border-primary transition-colors"
-              placeholder="18"
-            />
-            <p className="text-[11px] text-on-surface-variant mt-1">
-              Your USGA handicap index (0–54)
-            </p>
-          </div>
+          <Input
+            label="First Name"
+            value={firstName}
+            onChange={(e) => setFirstName(e.target.value)}
+            placeholder="Ryan"
+          />
+          <Input
+            label="Last Name"
+            value={lastName}
+            onChange={(e) => setLastName(e.target.value)}
+            placeholder="Boshaw"
+          />
+          <Input
+            label="Display Name"
+            value={displayName}
+            onChange={(e) => setDisplayName(e.target.value)}
+            placeholder="Ryan B."
+            hint="Shown on the leaderboard"
+          />
+          <Input
+            label="Handicap"
+            type="number"
+            min={0}
+            max={54}
+            value={handicap}
+            onChange={(e) => setHandicap(e.target.value)}
+            placeholder="18"
+            hint="Your USGA handicap index (0–54)"
+          />
         </div>
 
-        {/* Save Button */}
-        <button
+        <Button
           onClick={handleSave}
-          disabled={saving || !firstName || !lastName || !displayName}
-          className="mt-6 w-full flex items-center justify-center gap-2 bg-secondary text-on-secondary font-label font-bold uppercase tracking-widest text-sm py-4 rounded-xl active:scale-95 transition-transform disabled:opacity-50 disabled:active:scale-100"
+          loading={saving}
+          disabled={!firstName || !lastName || !displayName}
+          className="mt-6 w-full"
         >
-          {saving ? "Saving..." : saved ? "Saved!" : player ? "Update Profile" : "Create Profile"}
-          <span className="material-symbols-outlined text-lg">
-            {saved ? "check" : "save"}
-          </span>
-        </button>
-      </div>
+          {saved ? "Saved!" : player ? "Update Profile" : "Create Profile"}
+        </Button>
+      </Card>
 
-      {/* Stats Card (if registered) */}
+      {/* Stats Card (if registered and assigned group) */}
       {player && player.group > 0 && (
-        <div className="bg-white/[0.06] backdrop-blur-xl border border-white/[0.08] rounded-xl p-4 mt-6">
-          <h3 className="font-headline text-lg text-on-surface mb-3">Tournament Info</h3>
+        <Card className="mb-6">
+          <h3 className="font-headline text-lg font-semibold text-on-surface mb-3">Tournament Info</h3>
           <div className="grid grid-cols-2 gap-3">
-            <div className="bg-white/[0.04] border border-white/[0.06] rounded-lg p-3 text-center">
+            <div className="bg-surface-container-high border border-outline-variant/40 rounded-lg p-3 text-center">
               <p className="text-xs text-on-surface-variant uppercase tracking-wider mb-1">Group</p>
-              <p className="font-headline text-xl text-secondary">{player.group}</p>
+              <p className="font-display text-3xl text-primary leading-none">{player.group}</p>
             </div>
-            <div className="bg-white/[0.04] border border-white/[0.06] rounded-lg p-3 text-center">
+            <div className="bg-surface-container-high border border-outline-variant/40 rounded-lg p-3 text-center">
               <p className="text-xs text-on-surface-variant uppercase tracking-wider mb-1">Handicap</p>
-              <p className="font-headline text-xl text-on-surface">{player.handicap}</p>
+              <p className="font-display text-3xl text-on-surface leading-none tabular-nums">{player.handicap}</p>
             </div>
           </div>
-        </div>
+        </Card>
       )}
 
       {/* Sign Out */}
-      <button
-        onClick={() => signOut()}
-        className="mt-6 w-full flex items-center justify-center gap-2 border border-white/[0.1] bg-white/[0.04] text-on-surface-variant font-label font-bold uppercase tracking-widest text-xs py-3 rounded-xl hover:bg-white/[0.08] transition-colors"
-      >
+      <Button variant="ghost" onClick={() => signOut()} className="w-full">
         Sign Out
         <span className="material-symbols-outlined text-base">logout</span>
-      </button>
+      </Button>
     </div>
   );
 }
