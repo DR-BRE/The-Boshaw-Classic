@@ -70,10 +70,15 @@
 
   --color-primary: var(--primary);
   --color-primary-container: var(--primary-container);
+  --color-primary-fixed: var(--primary-fixed);
+  --color-primary-fixed-dim: var(--primary-fixed-dim);
+  --color-inverse-primary: var(--inverse-primary);
   --color-on-primary: var(--on-primary);
   --color-on-primary-container: var(--on-primary-container);
 
   --color-secondary: var(--secondary);
+  --color-secondary-container: var(--secondary-container);
+  --color-secondary-fixed: var(--secondary-fixed);
   --color-on-secondary: var(--on-secondary);
   --color-on-secondary-container: var(--on-secondary-container);
 
@@ -117,10 +122,15 @@
 
   --primary: #946D00;
   --primary-container: #FFF3C4;
+  --primary-fixed: #FFF3C4;
+  --primary-fixed-dim: #946D00;
+  --inverse-primary: #C9A227;
   --on-primary: #FFFFFF;
   --on-primary-container: #3D2F00;
 
   --secondary: #57606A;
+  --secondary-container: #D8E1EA;
+  --secondary-fixed: #B0BAC4;
   --on-secondary: #FFFFFF;
   --on-secondary-container: #0D1117;
 
