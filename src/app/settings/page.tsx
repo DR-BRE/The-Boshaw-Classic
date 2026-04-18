@@ -221,7 +221,7 @@ export default function SettingsPage() {
             <h3 className="font-headline text-lg text-on-surface">Add Player</h3>
             <button
               onClick={() => setShowAddPlayer(!showAddPlayer)}
-              className="w-9 h-9 flex items-center justify-center rounded-full bg-secondary text-on-secondary active:scale-90 transition-transform"
+              className="w-9 h-9 flex items-center justify-center rounded-full bg-primary text-on-primary active:scale-90 transition-transform"
             >
               <span className="material-symbols-outlined text-lg">
                 {showAddPlayer ? "close" : "person_add"}
@@ -286,7 +286,7 @@ export default function SettingsPage() {
                   setAddingPlayer(false);
                 }}
                 disabled={addingPlayer || !newFirst.trim() || !newLast.trim()}
-                className="w-full py-3 rounded-xl bg-secondary text-on-secondary font-label text-sm font-bold uppercase tracking-wider active:scale-[0.97] transition-transform disabled:opacity-50"
+                className="w-full py-3 rounded-xl bg-primary text-on-primary font-label text-sm font-bold uppercase tracking-wider active:scale-[0.97] transition-transform disabled:opacity-50"
               >
                 {addingPlayer ? "Adding…" : "Add Player"}
               </button>
@@ -334,7 +334,7 @@ export default function SettingsPage() {
                   <span
                     className={`font-label text-xs font-bold uppercase tracking-wider px-3 py-1 rounded-full ${
                       p.group === 1
-                        ? "bg-secondary/20 text-secondary"
+                        ? "bg-tertiary/20 text-tertiary"
                         : p.group === 2
                         ? "bg-primary/20 text-primary"
                         : "bg-surface-container-high text-on-surface-variant"
@@ -378,7 +378,7 @@ export default function SettingsPage() {
                 setGroupsSaving(false);
               }}
               disabled={groupsSaving}
-              className="mt-4 w-full py-3 rounded-xl bg-secondary text-on-secondary font-label text-sm font-bold uppercase tracking-wider active:scale-[0.97] transition-transform disabled:opacity-50"
+              className="mt-4 w-full py-3 rounded-xl bg-primary text-on-primary font-label text-sm font-bold uppercase tracking-wider active:scale-[0.97] transition-transform disabled:opacity-50"
             >
               {groupsSaving ? "Saving…" : "Save Groups"}
             </button>
