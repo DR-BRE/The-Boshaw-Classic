@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
+import { Card } from "@/components/ui";
 
 type Settings = {
   theme: "dark" | "light";
@@ -31,21 +32,28 @@ function saveSettings(settings: Settings) {
 function Toggle({
   enabled,
   onChange,
+  label,
 }: {
   enabled: boolean;
   onChange: (v: boolean) => void;
+  label?: string;
 }) {
   return (
     <button
       onClick={() => onChange(!enabled)}
-      className={`relative w-11 h-6 rounded-full transition-colors duration-200 ${
-        enabled ? "bg-secondary" : "bg-white/[0.1]"
-      }`}
+      role="switch"
+      aria-checked={enabled}
+      aria-label={label}
+      className={[
+        "relative w-12 h-7 rounded-full transition-colors",
+        enabled ? "bg-primary" : "bg-surface-container-highest",
+      ].join(" ")}
     >
-      <div
-        className={`absolute top-0.5 left-0.5 w-5 h-5 rounded-full bg-white shadow transition-transform duration-200 ${
-          enabled ? "translate-x-5" : "translate-x-0"
-        }`}
+      <span
+        className={[
+          "absolute top-1 w-5 h-5 rounded-full bg-white shadow transition-transform",
+          enabled ? "translate-x-6" : "translate-x-1",
+        ].join(" ")}
       />
     </button>
   );
@@ -129,79 +137,78 @@ export default function SettingsPage() {
   if (!mounted) {
     return (
       <div className="px-4 py-6">
-        <h2 className="font-headline text-3xl text-on-surface mb-6">
-          Settings
-        </h2>
-        <div className="bg-white/[0.06] rounded-xl h-48" />
+        <h2 className="font-display text-4xl text-on-surface mb-6 leading-none">SETTINGS</h2>
+        <div className="bg-surface-container-high rounded-xl h-48" />
       </div>
     );
   }
 
   return (
     <div className="px-4 py-6 pb-24">
-      <h2 className="font-headline text-3xl text-on-surface mb-6">Settings</h2>
+      <h2 className="font-display text-4xl text-on-surface mb-6 leading-none">SETTINGS</h2>
 
       {/* Preferences */}
-      <div className="bg-white/[0.06] backdrop-blur-xl border border-white/[0.08] rounded-2xl p-5 mb-5">
+      <div className="bg-surface-container-high backdrop-blur-xl border border-outline-variant/50 rounded-2xl p-5 mb-5">
         <h3 className="font-headline text-lg text-on-surface mb-4">
           Preferences
         </h3>
 
         <div className="space-y-5">
           {/* Theme */}
-          <div className="flex items-center justify-between">
+          <div className="flex items-center justify-between py-3 border-b border-outline-variant/30">
             <div>
-              <p className="font-label text-sm font-bold text-on-surface">
+              <p className="text-sm font-medium text-on-surface">
                 Light Mode
               </p>
-              <p className="text-[11px] text-on-surface-variant">
+              <p className="text-xs text-on-surface-variant">
                 Switch between dark and light theme
               </p>
             </div>
             <Toggle
               enabled={settings.theme === "light"}
               onChange={(v) => update({ theme: v ? "light" : "dark" })}
+              label="Light Mode"
             />
           </div>
         </div>
       </div>
 
       {/* Notifications */}
-      <div className="bg-white/[0.06] backdrop-blur-xl border border-white/[0.08] rounded-2xl p-5 mb-5">
+      <div className="bg-surface-container-high backdrop-blur-xl border border-outline-variant/50 rounded-2xl p-5 mb-5">
         <h3 className="font-headline text-lg text-on-surface mb-4">
           Notifications
         </h3>
 
         <div className="space-y-4">
-          <div className="flex items-center justify-between">
+          <div className="flex items-center justify-between py-3 border-b border-outline-variant/30">
             <div>
-              <p className="font-label text-sm font-bold text-on-surface">
+              <p className="text-sm font-medium text-on-surface">
                 Leaderboard Updates
               </p>
-              <p className="text-[11px] text-on-surface-variant">
+              <p className="text-xs text-on-surface-variant">
                 When someone takes the lead
               </p>
             </div>
             <Toggle
               enabled={settings.notifyLeaderboard}
               onChange={(v) => update({ notifyLeaderboard: v })}
+              label="Leaderboard Updates"
             />
           </div>
 
-          <div className="border-t border-white/[0.06]" />
-
-          <div className="flex items-center justify-between">
+          <div className="flex items-center justify-between py-3 border-b border-outline-variant/30">
             <div>
-              <p className="font-label text-sm font-bold text-on-surface">
+              <p className="text-sm font-medium text-on-surface">
                 Score Submissions
               </p>
-              <p className="text-[11px] text-on-surface-variant">
+              <p className="text-xs text-on-surface-variant">
                 When a player submits their round
               </p>
             </div>
             <Toggle
               enabled={settings.notifyScores}
               onChange={(v) => update({ notifyScores: v })}
+              label="Score Submissions"
             />
           </div>
         </div>
@@ -209,7 +216,7 @@ export default function SettingsPage() {
 
       {/* Add Player (admin only) */}
       {isAdmin && (
-        <div className="bg-white/[0.06] backdrop-blur-xl border border-white/[0.08] rounded-2xl p-5 mb-5">
+        <div className="bg-surface-container-high backdrop-blur-xl border border-outline-variant/50 rounded-2xl p-5 mb-5">
           <div className="flex items-center justify-between mb-4">
             <h3 className="font-headline text-lg text-on-surface">Add Player</h3>
             <button
@@ -230,14 +237,14 @@ export default function SettingsPage() {
                   placeholder="First name"
                   value={newFirst}
                   onChange={(e) => setNewFirst(e.target.value)}
-                  className="flex-1 px-3 py-2.5 rounded-xl bg-white/[0.06] border border-white/[0.06] text-on-surface font-label text-sm placeholder:text-on-surface-variant/50 outline-none focus:border-primary/50"
+                  className="flex-1 px-3 py-2.5 rounded-xl bg-surface-container-high border border-outline-variant/40 text-on-surface font-label text-sm placeholder:text-on-surface-variant/50 outline-none focus:border-primary/50"
                 />
                 <input
                   type="text"
                   placeholder="Last name"
                   value={newLast}
                   onChange={(e) => setNewLast(e.target.value)}
-                  className="flex-1 px-3 py-2.5 rounded-xl bg-white/[0.06] border border-white/[0.06] text-on-surface font-label text-sm placeholder:text-on-surface-variant/50 outline-none focus:border-primary/50"
+                  className="flex-1 px-3 py-2.5 rounded-xl bg-surface-container-high border border-outline-variant/40 text-on-surface font-label text-sm placeholder:text-on-surface-variant/50 outline-none focus:border-primary/50"
                 />
               </div>
               <input
@@ -245,7 +252,7 @@ export default function SettingsPage() {
                 placeholder="Handicap"
                 value={newHandicap}
                 onChange={(e) => setNewHandicap(e.target.value)}
-                className="w-full px-3 py-2.5 rounded-xl bg-white/[0.06] border border-white/[0.06] text-on-surface font-label text-sm placeholder:text-on-surface-variant/50 outline-none focus:border-primary/50"
+                className="w-full px-3 py-2.5 rounded-xl bg-surface-container-high border border-outline-variant/40 text-on-surface font-label text-sm placeholder:text-on-surface-variant/50 outline-none focus:border-primary/50"
               />
               <button
                 onClick={async () => {
@@ -290,7 +297,7 @@ export default function SettingsPage() {
 
       {/* Manage Groups (admin only) */}
       {isAdmin && players.length > 0 && (
-        <div className="bg-white/[0.06] backdrop-blur-xl border border-white/[0.08] rounded-2xl p-5 mb-5">
+        <div className="bg-surface-container-high backdrop-blur-xl border border-outline-variant/50 rounded-2xl p-5 mb-5">
           <h3 className="font-headline text-lg text-on-surface mb-4">
             Manage Groups
           </h3>
@@ -319,7 +326,7 @@ export default function SettingsPage() {
                     );
                     setGroupsDirty(true);
                   }}
-                  className="flex-1 flex items-center justify-between px-4 py-3 rounded-xl bg-surface-container border border-white/[0.06] active:scale-[0.98] transition-transform"
+                  className="flex-1 flex items-center justify-between px-4 py-3 rounded-xl bg-surface-container border border-outline-variant/40 active:scale-[0.98] transition-transform"
                 >
                   <span className="font-label text-sm font-bold text-on-surface">
                     {p.displayName}
@@ -330,7 +337,7 @@ export default function SettingsPage() {
                         ? "bg-secondary/20 text-secondary"
                         : p.group === 2
                         ? "bg-primary/20 text-primary"
-                        : "bg-white/[0.06] text-on-surface-variant"
+                        : "bg-surface-container-high text-on-surface-variant"
                     }`}
                   >
                     {GROUP_LABELS[p.group]}
@@ -381,7 +388,7 @@ export default function SettingsPage() {
 
       {/* Clear Scores (admin only) */}
       {isAdmin && allPlayers.length > 0 && (
-        <div className="bg-white/[0.06] backdrop-blur-xl border border-white/[0.08] rounded-2xl p-5 mb-5">
+        <Card className="mb-5 border-on-error-container/30 p-5">
           <h3 className="font-headline text-lg text-on-surface mb-2">
             Clear Scores
           </h3>
@@ -392,7 +399,7 @@ export default function SettingsPage() {
           <div className="space-y-2">
             {allPlayers.map((p) => (
               <div key={p.id} className="flex items-center gap-2">
-                <span className="flex-1 font-label text-sm font-bold text-on-surface px-4 py-3 rounded-xl bg-surface-container border border-white/[0.06]">
+                <span className="flex-1 font-label text-sm font-bold text-on-surface px-4 py-3 rounded-xl bg-surface-container border border-outline-variant/40">
                   {p.displayName}
                   <span className="ml-2 text-xs font-normal text-on-surface-variant">
                     ({p.scores.length} {p.scores.length === 1 ? "round" : "rounds"})
@@ -402,7 +409,7 @@ export default function SettingsPage() {
                   <div className="flex gap-1.5">
                     <button
                       onClick={() => setConfirmClearScoreId(null)}
-                      className="px-3 py-2.5 rounded-xl bg-white/[0.06] text-on-surface-variant font-label text-xs font-bold uppercase tracking-wider active:scale-[0.97] transition-transform"
+                      className="px-3 py-2.5 rounded-xl bg-surface-container-high text-on-surface-variant font-label text-xs font-bold uppercase tracking-wider active:scale-[0.97] transition-transform"
                     >
                       Cancel
                     </button>
@@ -436,12 +443,12 @@ export default function SettingsPage() {
               </div>
             ))}
           </div>
-        </div>
+        </Card>
       )}
 
       {/* Clear Players (admin only) */}
       {isAdmin && (
-        <div className="bg-white/[0.06] backdrop-blur-xl border border-white/[0.08] rounded-2xl p-5 mb-5">
+        <Card className="mb-5 border-on-error-container/30 p-5">
           <h3 className="font-headline text-lg text-on-surface mb-2">
             Clear Players
           </h3>
@@ -459,7 +466,7 @@ export default function SettingsPage() {
             <div className="flex gap-3">
               <button
                 onClick={() => setConfirmClear(false)}
-                className="flex-1 py-3 rounded-xl bg-white/[0.06] text-on-surface-variant font-label text-sm font-bold uppercase tracking-wider active:scale-[0.97] transition-transform"
+                className="flex-1 py-3 rounded-xl bg-surface-container-high text-on-surface-variant font-label text-sm font-bold uppercase tracking-wider active:scale-[0.97] transition-transform"
               >
                 Cancel
               </button>
@@ -491,11 +498,11 @@ export default function SettingsPage() {
               </button>
             </div>
           )}
-        </div>
+        </Card>
       )}
 
       {/* About */}
-      <div className="bg-white/[0.06] backdrop-blur-xl border border-white/[0.08] rounded-2xl p-5">
+      <Card className="p-5">
         <h3 className="font-headline text-lg text-on-surface mb-4">About</h3>
 
         <div className="space-y-3">
@@ -507,7 +514,7 @@ export default function SettingsPage() {
               The Boshaw Classic
             </span>
           </div>
-          <div className="border-t border-white/[0.06]" />
+          <div className="border-t border-outline-variant/30" />
           <div className="flex justify-between items-center">
             <span className="font-label text-sm text-on-surface-variant">
               Location
@@ -516,7 +523,7 @@ export default function SettingsPage() {
               Lake Chelan, WA
             </span>
           </div>
-          <div className="border-t border-white/[0.06]" />
+          <div className="border-t border-outline-variant/30" />
           <div className="flex justify-between items-center">
             <span className="font-label text-sm text-on-surface-variant">
               Date
@@ -525,7 +532,7 @@ export default function SettingsPage() {
               May 2026
             </span>
           </div>
-          <div className="border-t border-white/[0.06]" />
+          <div className="border-t border-outline-variant/30" />
           <div className="flex justify-between items-center">
             <span className="font-label text-sm text-on-surface-variant">
               Version
@@ -533,7 +540,7 @@ export default function SettingsPage() {
             <span className="font-label text-sm text-on-surface">v1.0</span>
           </div>
         </div>
-      </div>
+      </Card>
     </div>
   );
 }

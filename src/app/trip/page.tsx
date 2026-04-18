@@ -1,33 +1,39 @@
 "use client";
 
 import { useSession } from "next-auth/react";
+import { Card } from "@/components/ui";
 
 export default function TripPage() {
   const { data: session } = useSession();
 
   return (
     <div className="px-4 py-6 pb-24">
-      <h2 className="font-headline text-3xl text-on-surface mb-2">
-        Trip Info
+      <h2 className="font-display text-4xl text-on-surface leading-none mb-2">
+        TRIP INFO
       </h2>
       <p className="font-label text-xs text-on-surface-variant uppercase tracking-widest mb-6">
         Lake Chelan, WA — May 2026
       </p>
 
       {!session ? (
-        <div className="bg-white/[0.06] backdrop-blur-xl border border-white/[0.08] rounded-2xl p-6 text-center">
-          <span className="material-symbols-outlined text-secondary text-4xl mb-3 block">lock</span>
+        <Card className="text-center py-10">
+          <span
+            className="material-symbols-outlined text-primary text-4xl mb-3 block"
+            style={{ fontVariationSettings: '"FILL" 1' }}
+          >
+            lock
+          </span>
           <p className="font-headline text-lg text-on-surface mb-1">Sign in to view trip details</p>
           <p className="font-label text-sm text-on-surface-variant">
-            Accommodation info, amenities, and more are available once you're signed in.
+            Accommodation info, amenities, and more are available once you&apos;re signed in.
           </p>
-        </div>
+        </Card>
       ) : (
       <>
       {/* Accommodation Card */}
-      <div className="bg-white/[0.06] backdrop-blur-xl border border-white/[0.08] rounded-2xl overflow-hidden mb-4">
-        <div className="bg-secondary px-4 py-2">
-          <h3 className="font-headline text-on-secondary text-sm font-bold uppercase tracking-wider">
+      <Card noPadding className="mb-4 overflow-hidden">
+        <div className="bg-primary px-4 py-2">
+          <h3 className="font-label text-on-primary text-xs font-semibold uppercase tracking-widest">
             Accommodation
           </h3>
         </div>
@@ -39,8 +45,8 @@ export default function TripPage() {
               Large Home with Pool, HotTub & Sweeping Lake Views
             </p>
             <div className="flex items-center gap-1 mt-1">
-              <span className="material-symbols-outlined text-secondary text-sm">star</span>
-              <span className="font-label text-xs text-on-surface-variant">
+              <span className="material-symbols-outlined text-primary text-sm">star</span>
+              <span className="font-label text-xs text-on-surface-variant tabular-nums">
                 4.97 (126 reviews)
               </span>
             </div>
@@ -49,7 +55,7 @@ export default function TripPage() {
           {/* Address */}
           <div className="flex items-start gap-3">
             <span
-              className="material-symbols-outlined text-secondary text-xl mt-0.5"
+              className="material-symbols-outlined text-primary text-xl mt-0.5"
               style={{ fontVariationSettings: '"FILL" 1' }}
             >
               location_on
@@ -67,7 +73,7 @@ export default function TripPage() {
           {/* Dates */}
           <div className="flex items-start gap-3">
             <span
-              className="material-symbols-outlined text-secondary text-xl mt-0.5"
+              className="material-symbols-outlined text-primary text-xl mt-0.5"
               style={{ fontVariationSettings: '"FILL" 1' }}
             >
               calendar_today
@@ -86,7 +92,7 @@ export default function TripPage() {
           <div className="flex gap-6">
             <div className="flex items-start gap-3">
               <span
-                className="material-symbols-outlined text-secondary text-xl mt-0.5"
+                className="material-symbols-outlined text-primary text-xl mt-0.5"
                 style={{ fontVariationSettings: '"FILL" 1' }}
               >
                 bed
@@ -100,7 +106,7 @@ export default function TripPage() {
             </div>
             <div className="flex items-start gap-3">
               <span
-                className="material-symbols-outlined text-secondary text-xl mt-0.5"
+                className="material-symbols-outlined text-primary text-xl mt-0.5"
                 style={{ fontVariationSettings: '"FILL" 1' }}
               >
                 bathroom
@@ -111,12 +117,12 @@ export default function TripPage() {
             </div>
           </div>
         </div>
-      </div>
+      </Card>
 
       {/* Amenities */}
-      <div className="bg-white/[0.06] backdrop-blur-xl border border-white/[0.08] rounded-2xl overflow-hidden mb-4">
-        <div className="bg-secondary px-4 py-2">
-          <h3 className="font-headline text-on-secondary text-sm font-bold uppercase tracking-wider">
+      <Card noPadding className="mb-4 overflow-hidden">
+        <div className="bg-primary px-4 py-2">
+          <h3 className="font-label text-on-primary text-xs font-semibold uppercase tracking-widest">
             Amenities
           </h3>
         </div>
@@ -136,7 +142,7 @@ export default function TripPage() {
           ].map((a) => (
             <div key={a.label} className="flex items-center gap-2">
               <span
-                className="material-symbols-outlined text-secondary text-lg"
+                className="material-symbols-outlined text-primary text-lg"
                 style={{ fontVariationSettings: '"FILL" 1' }}
               >
                 {a.icon}
@@ -145,14 +151,14 @@ export default function TripPage() {
             </div>
           ))}
         </div>
-      </div>
+      </Card>
 
       {/* Airbnb Link */}
       <a
         href="https://www.airbnb.com/rooms/44479675"
         target="_blank"
         rel="noopener noreferrer"
-        className="flex items-center justify-center gap-2 w-full py-3 rounded-xl active:scale-95 transition-transform font-headline text-sm font-bold tracking-wider text-white"
+        className="flex items-center justify-center gap-2 w-full py-3 rounded-lg active:scale-95 transition-transform font-label text-sm font-semibold tracking-wider text-white"
         style={{ backgroundColor: "#FF5A5F" }}
       >
         <svg viewBox="0 0 64 64" width="20" height="20" fill="white">
