@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { TOURNAMENT } from "@/lib/tournament";
+import { Badge } from "@/components/ui";
 
 type TimeLeft = {
   days: number;
@@ -31,13 +32,13 @@ function getTimeLeft(): TimeLeft | "live" | "over" {
 
 function TimeUnit({ value, label }: { value: number; label: string }) {
   return (
-    <div className="flex flex-col items-center">
-      <div className="bg-black/60 backdrop-blur-sm border border-white/20 rounded-xl w-14 h-14 sm:w-16 sm:h-16 flex items-center justify-center">
-        <span className="text-xl sm:text-2xl font-headline font-bold tabular-nums" style={{ color: "#ffffff" }}>
+    <div className="flex flex-col items-center gap-1">
+      <div className="bg-surface-container-high border border-outline-variant/60 rounded-xl px-4 py-3 min-w-[64px] text-center">
+        <span className="font-display text-4xl text-on-surface tabular-nums leading-none">
           {String(value).padStart(2, "0")}
         </span>
       </div>
-      <span className="mt-1.5 text-[9px] font-label font-bold uppercase tracking-widest" style={{ color: "rgba(255,255,255,0.9)" }}>
+      <span className="font-label text-[10px] uppercase tracking-widest text-on-surface-variant">
         {label}
       </span>
     </div>
@@ -56,30 +57,24 @@ export default function Countdown() {
 
   if (timeLeft === "live") {
     return (
-      <div className="text-center">
-        <div className="inline-flex items-center gap-2 bg-primary-container border border-primary/20 rounded-full px-6 py-3">
-          <span className="material-symbols-outlined text-secondary animate-pulse">
-            sports_golf
-          </span>
-          <span className="text-secondary text-sm font-label font-bold uppercase tracking-widest">
-            Tournament In Progress
-          </span>
-        </div>
+      <div className="flex justify-center">
+        <Badge variant="live">
+          <span className="w-1.5 h-1.5 rounded-full bg-red-400 animate-pulse" />
+          Live
+        </Badge>
       </div>
     );
   }
 
   if (timeLeft === "over") {
     return (
-      <div className="text-center">
-        <div className="inline-flex items-center gap-2 bg-secondary-container/20 rounded-full px-6 py-3">
-          <span className="material-symbols-outlined text-secondary" style={{ fontVariationSettings: "'FILL' 1" }}>
+      <div className="flex justify-center">
+        <Badge variant="gold">
+          <span className="material-symbols-outlined text-base" style={{ fontVariationSettings: "'FILL' 1" }}>
             trophy
           </span>
-          <span className="text-secondary text-sm font-label font-bold uppercase tracking-widest">
-            Tournament Complete
-          </span>
-        </div>
+          Tournament Complete
+        </Badge>
       </div>
     );
   }

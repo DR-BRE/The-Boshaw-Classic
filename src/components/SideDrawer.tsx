@@ -44,7 +44,7 @@ export default function SideDrawer({
     <>
       {/* Overlay */}
       <div
-        className={`fixed inset-0 z-50 bg-black/50 transition-opacity duration-300 ${
+        className={`fixed inset-0 z-50 bg-black/60 backdrop-blur-sm transition-opacity duration-300 ${
           isOpen ? "opacity-100" : "opacity-0 pointer-events-none"
         }`}
         onClick={onClose}
@@ -52,18 +52,19 @@ export default function SideDrawer({
 
       {/* Drawer Panel */}
       <div
-        className={`fixed top-0 left-0 z-50 h-full w-72 bg-surface-container-low border-r border-white/[0.06] flex flex-col transition-transform duration-300 ease-out ${
+        className={`fixed top-0 left-0 z-50 h-full w-72 bg-surface-container-high border-r border-outline-variant/60 flex flex-col transition-transform duration-300 ease-out ${
           isOpen ? "translate-x-0" : "-translate-x-full"
         }`}
       >
         {/* Header */}
-        <div className="flex items-center justify-between px-5 pt-14 pb-4 border-b border-white/[0.06]">
+        <div className="flex items-center justify-between px-5 pt-14 pb-4 border-b border-outline-variant/40">
           <h2 className="font-headline text-lg text-on-surface">
             The Boshaw Classic
           </h2>
           <button
             onClick={onClose}
-            className="w-8 h-8 rounded-full bg-white/[0.06] flex items-center justify-center active:scale-90 transition-transform"
+            aria-label="Close navigation"
+            className="w-8 h-8 rounded-full bg-surface-container hover:bg-surface-container-highest flex items-center justify-center active:scale-90 transition-transform"
           >
             <span className="material-symbols-outlined text-on-surface-variant text-lg">
               close
@@ -72,7 +73,7 @@ export default function SideDrawer({
         </div>
 
         {/* Nav Links */}
-        <nav className="flex-1 py-4 px-3 space-y-1 overflow-y-auto">
+        <nav aria-label="Site navigation" className="flex-1 py-4 px-3 space-y-1 overflow-y-auto">
           {[...navLinks, ...(session?.user?.email === ADMIN_EMAIL ? [adminLink] : [])].map((link) => {
             const isActive =
               link.href === "/"
@@ -86,8 +87,8 @@ export default function SideDrawer({
                 onClick={onClose}
                 className={`flex items-center gap-3 px-3 py-3 rounded-xl transition-colors ${
                   isActive
-                    ? "bg-white/[0.1] text-secondary"
-                    : "text-on-surface-variant hover:bg-white/[0.06] hover:text-on-surface"
+                    ? "bg-primary/10 text-primary"
+                    : "text-on-surface hover:bg-surface-container"
                 }`}
               >
                 <span
@@ -109,7 +110,7 @@ export default function SideDrawer({
         </nav>
 
         {/* Footer */}
-        <div className="px-5 py-4 border-t border-white/[0.06]">
+        <div className="px-5 py-4 border-t border-outline-variant/40">
           {session?.user ? (
             <div>
               <p className="text-xs text-on-surface-variant truncate mb-2">
@@ -132,7 +133,7 @@ export default function SideDrawer({
             <Link
               href="/api/auth/signin"
               onClick={onClose}
-              className="flex items-center gap-2 text-secondary font-label font-bold text-xs uppercase tracking-widest"
+              className="flex items-center gap-2 text-primary font-label font-bold text-xs uppercase tracking-widest"
             >
               <span className="material-symbols-outlined text-sm">login</span>
               Sign In

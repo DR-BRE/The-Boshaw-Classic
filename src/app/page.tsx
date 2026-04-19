@@ -1,13 +1,13 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import Image from "next/image";
 import Link from "next/link";
 import Countdown from "@/components/Countdown";
 import Weather from "@/components/Weather";
 import { TOURNAMENT } from "@/lib/tournament";
 import type { LeaderboardEntry } from "@/lib/types/leaderboard";
 import { useLiveRound } from "@/lib/useLiveRound";
+import { Card, Badge } from "@/components/ui";
 
 function formatToPar(toPar: number) {
   if (toPar === 0) return "E";
@@ -39,119 +39,113 @@ export default function Home() {
     return () => clearInterval(interval);
   }, []);
 
+  const heroLocation =
+    typeof TOURNAMENT.location === "string" ? TOURNAMENT.location : "Lake Chelan";
+
   return (
-    <div className="pb-28 -mt-12">
-      {/* Hero Section — takes up the full first screen minus bottom nav + leaderboard heading */}
-      <section className="relative px-6 pb-6 h-[calc(100vh-12rem)] h-[calc(100dvh-12rem)]">
-        {/* Hero background image */}
-        <Image
-          src="/hero-bg.webp"
-          alt=""
-          fill
-          priority
-          sizes="100vw"
-          className="absolute -top-12 left-0 right-0 bottom-0 object-cover object-[center_1rem]"
-        />
-        {/* Dark gradient overlay for text legibility */}
-        <div className="absolute -top-12 left-0 right-0 bottom-0 bg-gradient-to-b from-black/50 via-transparent to-black/70" />
+    <div className="pb-28">
+      {/* Hero */}
+      <div className="relative px-4 pt-8 pb-6">
+        <p className="font-label text-xs uppercase tracking-widest text-on-surface-variant mb-1">
+          {heroLocation} · 2026
+        </p>
+        <h1 className="font-display text-5xl text-on-surface leading-none mb-6">
+          THE BOSHAW<br />CLASSIC
+        </h1>
+        <Countdown />
+      </div>
 
-        <div className="relative z-10 h-full flex flex-col justify-end">
-          {/* Countdown sits at the bottom of the hero */}
-          <div className="mb-0">
-            <Countdown />
-          </div>
-        </div>
-      </section>
-
-      {/* Weather Widget */}
-      <section className="px-6 mt-4">
+      {/* Weather */}
+      <Card className="mx-4 mb-4">
         <div className="flex items-center gap-2 mb-3">
-          <span className="material-symbols-outlined text-secondary text-lg" style={{ fontVariationSettings: '"FILL" 1' }}>
+          <span
+            className="material-symbols-outlined text-primary text-lg"
+            style={{ fontVariationSettings: '"FILL" 1' }}
+          >
             partly_cloudy_day
           </span>
-          <h3 className="font-headline text-2xl text-on-surface">Weather</h3>
+          <h3 className="font-headline text-xl font-semibold text-on-surface">Weather</h3>
         </div>
         <Weather />
-      </section>
+      </Card>
 
       {/* Tee Times */}
-      <section className="px-6 mt-6">
-        <div className="flex items-center gap-2 mb-3">
-          <span className="material-symbols-outlined text-secondary text-lg" style={{ fontVariationSettings: '"FILL" 1' }}>
+      <Card noPadding className="mx-4 mb-4 overflow-hidden">
+        <div className="px-5 pt-5 pb-3 flex items-center gap-2">
+          <span
+            className="material-symbols-outlined text-primary text-lg"
+            style={{ fontVariationSettings: '"FILL" 1' }}
+          >
             schedule
           </span>
-          <h3 className="font-headline text-2xl text-on-surface">Tee Times</h3>
+          <h3 className="font-headline text-xl font-semibold text-on-surface">Tee Times</h3>
         </div>
-        <div className="bg-surface-container-high/60 backdrop-blur-xl border border-outline-variant/15 rounded-xl overflow-hidden">
-          {TOURNAMENT.schedule.map((day, i) => (
-            <div
-              key={day.course}
-              className={`p-4 ${i < TOURNAMENT.schedule.length - 1 ? "border-b border-outline-variant/20" : ""}`}
-            >
-              <div className="flex items-baseline justify-between mb-2">
-                <p className="font-headline text-base font-bold text-on-surface">{day.course}</p>
-                <p className="text-xs font-label text-on-surface-variant uppercase tracking-wider">{day.date}</p>
-              </div>
-              <div className="flex gap-2">
-                {day.teeTimes.map((t) => (
-                  <div
-                    key={t.group}
-                    className="flex-1 bg-white/[0.04] border border-white/[0.06] rounded-lg px-3 py-2 flex items-center justify-between"
-                  >
-                    <span className="font-label text-xs font-bold text-secondary uppercase tracking-wider">
-                      Group {t.group}
-                    </span>
-                    <span className="font-headline text-sm font-bold text-on-surface">{t.time}</span>
-                  </div>
-                ))}
-              </div>
+        {TOURNAMENT.schedule.map((day) => (
+          <div
+            key={day.course}
+            className="px-5 py-4 border-t border-outline-variant/30"
+          >
+            <div className="flex items-baseline justify-between mb-2">
+              <p className="font-headline text-base font-semibold text-on-surface">{day.course}</p>
+              <p className="text-xs font-label text-on-surface-variant uppercase tracking-wider">
+                {day.date}
+              </p>
             </div>
-          ))}
-        </div>
-      </section>
+            <div className="flex gap-2">
+              {day.teeTimes.map((t) => (
+                <div
+                  key={t.group}
+                  className="flex-1 bg-surface-container-high border border-outline-variant/40 rounded-lg px-3 py-2 flex items-center justify-between"
+                >
+                  <span className="font-label text-xs font-semibold text-primary uppercase tracking-wider">
+                    Group {t.group}
+                  </span>
+                  <span className="font-headline text-sm font-semibold text-on-surface tabular-nums">
+                    {t.time}
+                  </span>
+                </div>
+              ))}
+            </div>
+          </div>
+        ))}
+      </Card>
 
-      {/* Leaderboard Preview — Glassmorphism */}
-      <section className="px-6 pb-8 mt-4">
-        <div className="flex justify-between items-end mb-4">
-          <h3 className="font-headline text-2xl text-on-surface">
+      {/* Leaderboard Preview */}
+      <Card noPadding className="mx-4 mb-4 overflow-hidden">
+        <div className="px-5 pt-5 pb-3 flex items-center justify-between">
+          <h3 className="font-headline text-xl font-semibold text-on-surface">
             Leaderboard
           </h3>
-          <span
-            className={`text-xs font-label uppercase tracking-widest px-3 py-1 rounded-full transition-colors ${
-              isLive
-                ? "bg-red-500/15 text-red-400 border border-red-500/60 shadow-[0_0_14px_rgba(239,68,68,0.55)] animate-pulse"
-                : "bg-primary-container text-primary"
-            }`}
-          >
-            {isLive ? (
-              <span className="inline-flex items-center gap-1.5">
-                <span className="w-1.5 h-1.5 rounded-full bg-red-500" />
-                Live
-              </span>
-            ) : (
-              "Live Updates"
-            )}
-          </span>
+          {isLive ? (
+            <Badge variant="live">
+              <span className="w-1.5 h-1.5 rounded-full bg-red-400 animate-pulse" />
+              Live
+            </Badge>
+          ) : (
+            <Badge variant="muted">Live Updates</Badge>
+          )}
         </div>
         {topPlayers.length > 0 ? (
-          <div className="bg-surface-container-high/60 backdrop-blur-xl border border-outline-variant/15 rounded-xl p-4">
-            <div className="space-y-0">
+          <>
+            <div className="border-t border-outline-variant/30">
               {topPlayers.map((player, i) => (
                 <div
                   key={player.playerId}
-                  className={`flex items-center justify-between py-3 ${
+                  className={`flex items-center justify-between px-5 py-3 ${
                     i < topPlayers.length - 1 ? "border-b border-outline-variant/20" : ""
                   }`}
                 >
                   <div className="flex items-center gap-3">
-                    <span className="w-6 text-center font-label font-bold text-sm text-secondary">
+                    <span className="w-6 text-center font-label font-bold text-sm">
                       {i === 0 ? "\u{1F3C6}" : i === 1 ? "\u{1F948}" : "\u{1F949}"}
                     </span>
                     <span className="font-label font-medium text-on-surface text-sm">
                       {player.displayName}
                     </span>
                   </div>
-                  <span className={`font-headline font-bold text-base ${toParColor(player.totalToPar)}`}>
+                  <span
+                    className={`font-headline font-bold text-base tabular-nums ${toParColor(player.totalToPar)}`}
+                  >
                     {formatToPar(player.totalToPar)}
                   </span>
                 </div>
@@ -159,15 +153,15 @@ export default function Home() {
             </div>
             <Link
               href="/leaderboard"
-              className="flex items-center justify-center gap-1 mt-3 pt-3 border-t border-outline-variant/20 text-primary font-label font-bold text-xs uppercase tracking-widest"
+              className="flex items-center justify-center gap-1 px-5 py-3 border-t border-outline-variant/30 text-primary hover:bg-surface-container-high font-label font-bold text-xs uppercase tracking-widest transition-colors"
             >
               View Full Leaderboard
               <span className="material-symbols-outlined text-sm">arrow_forward</span>
             </Link>
-          </div>
+          </>
         ) : (
-          <div className="bg-surface-container-high/60 backdrop-blur-xl border border-outline-variant/15 rounded-xl p-4 text-center">
-            <span className="material-symbols-outlined text-secondary text-3xl mb-2">
+          <div className="px-5 py-8 text-center border-t border-outline-variant/30">
+            <span className="material-symbols-outlined text-primary text-3xl mb-2 block">
               sports_golf
             </span>
             <p className="font-headline text-lg text-on-surface">
@@ -182,7 +176,7 @@ export default function Home() {
             </p>
           </div>
         )}
-      </section>
+      </Card>
     </div>
   );
 }

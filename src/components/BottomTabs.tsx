@@ -4,51 +4,51 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 
 const tabs = [
-  { href: "/", icon: "home", label: "Home", highlight: false },
-  { href: "/leaderboard", icon: "leaderboard", label: "Leaderboard", highlight: false },
-  { href: "/scorecard", icon: "scoreboard", label: "Scorecard", highlight: true },
-  { href: "/trip", icon: "luggage", label: "Trip Info", highlight: false },
-  { href: "/profile", icon: "person", label: "Profile", highlight: false },
+  { href: "/", icon: "home", label: "Home" },
+  { href: "/leaderboard", icon: "leaderboard", label: "Leaderboard" },
+  { href: "/scorecard", icon: "scoreboard", label: "Scorecard" },
+  { href: "/trip", icon: "luggage", label: "Trip Info" },
+  { href: "/profile", icon: "person", label: "Profile" },
 ];
 
 export default function BottomTabs() {
   const pathname = usePathname();
 
   return (
-    <nav className="fixed bottom-0 left-0 w-full z-50 flex justify-around items-end px-2 pb-4 pt-1.5 bg-surface-container-low border-t border-white/[0.06] rounded-t-2xl">
-      {tabs.map((tab) => {
-        const isActive =
-          tab.href === "/"
-            ? pathname === "/"
-            : pathname === tab.href || pathname.startsWith(tab.href + "/");
-        return (
-          <Link
-            key={tab.href}
-            href={tab.href}
-            className={`flex flex-col items-center justify-center active:scale-90 transition-transform duration-200 ${
-              tab.highlight
-                ? "bg-secondary text-on-secondary rounded-xl px-3 py-1.5 shadow-md shadow-secondary/20"
-                : isActive
-                  ? "bg-white/[0.1] text-secondary rounded-lg px-2.5 py-1"
-                  : "text-primary/60 hover:bg-white/[0.06] px-2.5 py-1 rounded-lg"
-            }`}
-          >
-            <span
-              className="material-symbols-outlined text-xl"
-              style={
-                isActive || tab.highlight
-                  ? { fontVariationSettings: "'FILL' 1" }
-                  : undefined
-              }
+    <nav aria-label="Primary" className="fixed bottom-0 left-0 right-0 z-40 bg-surface-container border-t border-outline-variant/40 pb-safe">
+      <div className="flex items-stretch h-16">
+        {tabs.map((tab) => {
+          const active =
+            tab.href === "/"
+              ? pathname === "/"
+              : pathname === tab.href || pathname.startsWith(tab.href + "/");
+          return (
+            <Link
+              key={tab.href}
+              href={tab.href}
+              className={[
+                "relative flex-1 flex flex-col items-center justify-center gap-0.5 transition-colors",
+                "active:bg-surface-container-high",
+                active ? "text-primary" : "text-on-surface-variant",
+              ].join(" ")}
+              aria-current={active ? "page" : undefined}
             >
-              {tab.icon}
-            </span>
-            <span className={`font-label text-[8px] uppercase tracking-wider leading-tight ${tab.highlight ? "font-black" : "font-bold"}`}>
-              {tab.label}
-            </span>
-          </Link>
-        );
-      })}
+              <span
+                className="material-symbols-outlined text-2xl"
+                style={{ fontVariationSettings: active ? '"FILL" 1' : '"FILL" 0' }}
+              >
+                {tab.icon}
+              </span>
+              <span className="text-[10px] font-label font-medium uppercase tracking-wider">
+                {tab.label}
+              </span>
+              {active && (
+                <span className="absolute bottom-0 w-12 h-0.5 bg-primary rounded-full" />
+              )}
+            </Link>
+          );
+        })}
+      </div>
     </nav>
   );
 }

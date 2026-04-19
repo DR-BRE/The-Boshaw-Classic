@@ -42,6 +42,9 @@ function firstName(displayName: string): string {
 }
 
 // Confetti config differs by rarity — bigger blast for rarer scores.
+// Palette reflects new design system:
+//   #C9A227 = primary gold, #3FB950 = score-under green, #FFE088 = warm
+//   accent, #FFFFFF = highlight, #FF6B6B = ace flourish only.
 function confettiConfigFor(kind: ToastKind) {
   if (kind === "ace") {
     return {
@@ -49,7 +52,7 @@ function confettiConfigFor(kind: ToastKind) {
       spread: 140,
       startVelocity: 55,
       scalar: 1.2,
-      colors: ["#e9c349", "#ffe088", "#a9cfbf", "#ffffff", "#ff6b6b"],
+      colors: ["#C9A227", "#FFE088", "#3FB950", "#FFFFFF", "#FF6B6B"],
     };
   }
   if (kind === "eagle") {
@@ -58,7 +61,7 @@ function confettiConfigFor(kind: ToastKind) {
       spread: 110,
       startVelocity: 45,
       scalar: 1.05,
-      colors: ["#e9c349", "#a9cfbf", "#c5ebdb", "#ffe088"],
+      colors: ["#3FB950", "#C9A227", "#FFE088", "#FFFFFF"],
     };
   }
   return {
@@ -66,7 +69,7 @@ function confettiConfigFor(kind: ToastKind) {
     spread: 80,
     startVelocity: 38,
     scalar: 0.95,
-    colors: ["#a9cfbf", "#c5ebdb", "#e9c349"],
+    colors: ["#C9A227", "#FFE088", "#3FB950"],
   };
 }
 
@@ -189,16 +192,16 @@ export default function ScoreToastProvider() {
           t.kind === "ace"
             ? "border-yellow-400/70 bg-gradient-to-b from-yellow-500/25 via-surface-container-high/95 to-surface-container-high/95"
             : t.kind === "eagle"
-            ? "border-primary/60 bg-gradient-to-b from-primary/25 via-surface-container-high/95 to-surface-container-high/95"
-            : "border-secondary/60 bg-gradient-to-b from-secondary/20 via-surface-container-high/95 to-surface-container-high/95";
+            ? "border-score-under/60 bg-gradient-to-b from-score-under/25 via-surface-container-high/95 to-surface-container-high/95"
+            : "border-primary/60 bg-gradient-to-b from-primary/25 via-surface-container-high/95 to-surface-container-high/95";
         const label =
           t.kind === "ace" ? "HOLE IN ONE" : t.kind === "eagle" ? "EAGLE" : "BIRDIE";
         const labelColor =
           t.kind === "ace"
-            ? "text-amber-800"
+            ? "text-yellow-400"
             : t.kind === "eagle"
-            ? "text-primary"
-            : "text-secondary";
+            ? "text-score-under"
+            : "text-primary";
         return (
           <div
             key={t.id}

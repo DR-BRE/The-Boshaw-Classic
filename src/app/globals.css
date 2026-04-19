@@ -1,61 +1,59 @@
 @import "tailwindcss";
 
 :root {
-  /* M3 Surface */
-  --background: #051612;
-  --surface: #051612;
-  --surface-dim: #051612;
-  --surface-container-lowest: #01110d;
-  --surface-container-low: #0d1f1a;
-  --surface-container: #11231e;
-  --surface-container-high: #1b2d29;
-  --surface-container-highest: #263833;
-  --surface-bright: #2b3d38;
-  --surface-variant: #263833;
+  /* Surfaces — dark navy-black */
+  --background: #0D1117;
+  --surface: #0D1117;
+  --surface-dim: #0A0C10;
+  --surface-container-lowest: #090B0F;
+  --surface-container-low: #0F1419;
+  --surface-container: #161B22;
+  --surface-container-high: #1C2128;
+  --surface-container-highest: #21262D;
+  --surface-bright: #2D333B;
+  --surface-variant: #1C2128;
 
-  /* M3 Primary */
-  --primary: #a9cfbf;
-  --primary-container: #062b21;
-  --primary-fixed: #c5ebdb;
-  --primary-fixed-dim: #a9cfbf;
-  --on-primary: #13362c;
-  --on-primary-container: #709486;
-  --on-primary-fixed: #002118;
-  --inverse-primary: #436559;
+  /* Primary — refined gold */
+  --primary: #C9A227;
+  --primary-container: #3D2F00;
+  --primary-fixed: #F0D060;
+  --primary-fixed-dim: #C9A227;
+  --on-primary: #1A1400;
+  --on-primary-container: #F0D060;
+  --inverse-primary: #946D00;
 
-  /* M3 Secondary (Gold) */
-  --secondary: #e9c349;
-  --secondary-container: #af8d11;
-  --secondary-fixed: #ffe088;
-  --on-secondary: #3c2f00;
-  --on-secondary-container: #342800;
-  --on-secondary-fixed: #241a00;
-  --on-secondary-fixed-variant: #574500;
+  /* Secondary — muted slate */
+  --secondary: #8B949E;
+  --secondary-container: #21262D;
+  --secondary-fixed: #B0BAC4;
+  --on-secondary: #0D1117;
+  --on-secondary-container: #E6EDF3;
 
-  /* M3 Tertiary */
-  --tertiary: #c6c6c7;
-  --tertiary-fixed: #e2e2e2;
-  --tertiary-fixed-dim: #c6c6c7;
-  --on-tertiary: #2f3131;
-  --on-tertiary-fixed: #1a1c1c;
-  --on-tertiary-fixed-variant: #454747;
+  /* Tertiary */
+  --tertiary: #58A6FF;
+  --on-tertiary: #0D1117;
 
-  /* M3 Surface text */
-  --on-surface: #d2e7e0;
-  --on-surface-variant: #c1c8c3;
-  --inverse-surface: #d2e7e0;
-  --inverse-on-surface: #22342f;
+  /* Text */
+  --on-surface: #E6EDF3;
+  --on-surface-variant: #8B949E;
+  --inverse-surface: #E6EDF3;
+  --inverse-on-surface: #0D1117;
 
-  /* M3 Outline */
-  --outline: #8b928e;
-  --outline-variant: #414845;
+  /* Outline */
+  --outline: #484F58;
+  --outline-variant: #30363D;
 
-  /* M3 Error */
-  --on-error: #690005;
-  --on-error-container: #ffdad6;
+  /* Score colors */
+  --score-under: #3FB950;
+  --score-over: #F85149;
+  --score-par: #8B949E;
+
+  /* Error */
+  --on-error: #F85149;
+  --on-error-container: #F85149;
 
   /* Surface tint */
-  --surface-tint: #a9cfbf;
+  --surface-tint: #C9A227;
 }
 
 @theme inline {
@@ -72,11 +70,15 @@
 
   --color-primary: var(--primary);
   --color-primary-container: var(--primary-container);
+  --color-primary-fixed: var(--primary-fixed);
+  --color-primary-fixed-dim: var(--primary-fixed-dim);
+  --color-inverse-primary: var(--inverse-primary);
   --color-on-primary: var(--on-primary);
   --color-on-primary-container: var(--on-primary-container);
 
   --color-secondary: var(--secondary);
   --color-secondary-container: var(--secondary-container);
+  --color-secondary-fixed: var(--secondary-fixed);
   --color-on-secondary: var(--on-secondary);
   --color-on-secondary-container: var(--on-secondary-container);
 
@@ -91,65 +93,63 @@
   --color-outline: var(--outline);
   --color-outline-variant: var(--outline-variant);
 
+  --color-score-under: var(--score-under);
+  --color-score-over: var(--score-over);
+  --color-score-par: var(--score-par);
+
   --color-on-error: var(--on-error);
   --color-on-error-container: var(--on-error-container);
 
   --color-surface-tint: var(--surface-tint);
 
-  --font-headline: "Noto Serif", serif;
-  --font-body: "Noto Serif", serif;
-  --font-label: "Noto Serif", serif;
+  --font-display: "Bebas Neue", sans-serif;
+  --font-headline: "Inter", sans-serif;
+  --font-body: "Inter", sans-serif;
+  --font-label: "Inter", sans-serif;
 }
 
-/* Light mode overrides */
 .light {
-  --background: #f5f5f0;
-  --surface: #f5f5f0;
-  --surface-dim: #e8e8e2;
-  --surface-container-lowest: #ffffff;
-  --surface-container-low: #f0f0ea;
-  --surface-container: #eaeae4;
-  --surface-container-high: #e4e4de;
-  --surface-container-highest: #deded8;
-  --surface-bright: #f5f5f0;
-  --surface-variant: #deded8;
+  --background: #F6F8FA;
+  --surface: #FFFFFF;
+  --surface-dim: #EAEEF2;
+  --surface-container-lowest: #FFFFFF;
+  --surface-container-low: #F6F8FA;
+  --surface-container: #EAEEF2;
+  --surface-container-high: #E1E8F0;
+  --surface-container-highest: #D8E1EA;
+  --surface-bright: #FFFFFF;
+  --surface-variant: #E1E8F0;
 
-  --primary: #2d6b56;
-  --primary-container: #b8e6d2;
-  --primary-fixed: #c5ebdb;
-  --primary-fixed-dim: #2d6b56;
-  --on-primary: #ffffff;
-  --on-primary-container: #1a4033;
-  --on-primary-fixed: #002118;
-  --inverse-primary: #a9cfbf;
+  --primary: #946D00;
+  --primary-container: #FFF3C4;
+  --primary-fixed: #FFF3C4;
+  --primary-fixed-dim: #946D00;
+  --inverse-primary: #C9A227;
+  --on-primary: #FFFFFF;
+  --on-primary-container: #3D2F00;
 
-  --secondary: #7a6100;
-  --secondary-container: #ffe088;
-  --secondary-fixed: #ffe088;
-  --on-secondary: #ffffff;
-  --on-secondary-container: #3c2f00;
-  --on-secondary-fixed: #241a00;
-  --on-secondary-fixed-variant: #574500;
+  --secondary: #57606A;
+  --secondary-container: #D8E1EA;
+  --secondary-fixed: #B0BAC4;
+  --on-secondary: #FFFFFF;
+  --on-secondary-container: #0D1117;
 
-  --tertiary: #5c5e5e;
-  --tertiary-fixed: #e2e2e2;
-  --tertiary-fixed-dim: #5c5e5e;
-  --on-tertiary: #ffffff;
-  --on-tertiary-fixed: #1a1c1c;
-  --on-tertiary-fixed-variant: #454747;
+  --on-surface: #0D1117;
+  --on-surface-variant: #57606A;
+  --inverse-surface: #0D1117;
+  --inverse-on-surface: #F6F8FA;
 
-  --on-surface: #1a1c1b;
-  --on-surface-variant: #414845;
-  --inverse-surface: #2e312f;
-  --inverse-on-surface: #eff1ee;
+  --outline: #8C959F;
+  --outline-variant: #D0D7DE;
 
-  --outline: #717973;
-  --outline-variant: #c1c8c3;
+  --score-under: #1A7F37;
+  --score-over: #CF222E;
+  --score-par: #57606A;
 
-  --on-error: #ffffff;
-  --on-error-container: #ba1a1a;
+  --on-error: #CF222E;
+  --on-error-container: #CF222E;
 
-  --surface-tint: #2d6b56;
+  --surface-tint: #946D00;
 }
 
 body {
@@ -166,51 +166,16 @@ body {
   font-variation-settings: "FILL" 0, "wght" 400, "GRAD" 0, "opsz" 24;
 }
 
-/* Glass card utility with Safari fallback */
+/* Card utility — clean surface, subtle border */
 .glass-card {
-  background: rgba(255, 255, 255, 0.06);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  backdrop-filter: blur(24px);
-  -webkit-backdrop-filter: blur(24px);
+  background: var(--surface-container);
+  border: 1px solid var(--outline-variant);
 }
 
-/* Light mode glass overrides */
 .light .glass-card {
-  background: rgba(0, 0, 0, 0.04);
-  border: 1px solid rgba(0, 0, 0, 0.08);
+  background: var(--surface);
+  border: 1px solid var(--outline-variant);
 }
-
-/*
- * Light mode: swap white-opacity Tailwind utilities to black-opacity.
- * These target the exact rgba values that Tailwind generates for
- * bg-white/[X] and border-white/[X] so they work on light backgrounds.
- */
-
-/* Background overrides */
-.light .bg-white\/\[0\.02\] { background-color: rgba(0, 0, 0, 0.03) !important; }
-.light .bg-white\/\[0\.04\] { background-color: rgba(0, 0, 0, 0.04) !important; }
-.light .bg-white\/\[0\.06\] { background-color: rgba(0, 0, 0, 0.05) !important; }
-.light .bg-white\/\[0\.08\] { background-color: rgba(0, 0, 0, 0.06) !important; }
-.light .bg-white\/\[0\.1\] { background-color: rgba(0, 0, 0, 0.08) !important; }
-
-/* Border overrides */
-.light .border-white\/\[0\.04\] { border-color: rgba(0, 0, 0, 0.08) !important; }
-.light .border-white\/\[0\.06\] { border-color: rgba(0, 0, 0, 0.1) !important; }
-.light .border-white\/\[0\.08\] { border-color: rgba(0, 0, 0, 0.12) !important; }
-.light .border-white\/\[0\.1\] { border-color: rgba(0, 0, 0, 0.12) !important; }
-
-/* Border secondary/outline overrides for cards */
-.light .border-secondary\/30 { border-color: rgba(122, 97, 0, 0.3) !important; }
-.light .border-secondary\/40 { border-color: rgba(122, 97, 0, 0.4) !important; }
-.light .border-primary\/20 { border-color: rgba(45, 107, 86, 0.2) !important; }
-.light .border-primary\/30 { border-color: rgba(45, 107, 86, 0.3) !important; }
-
-/* Text on light backgrounds */
-.light .text-white { color: var(--on-surface) !important; }
-
-/* Specific component overrides */
-.light .bg-black\/50 { background-color: rgba(0, 0, 0, 0.3) !important; }
-.light .bg-black\/60 { background-color: rgba(0, 0, 0, 0.4) !important; }
 
 /* Score banner drop animation (birdie/eagle/ace toasts) */
 @keyframes scoreBannerDrop {
