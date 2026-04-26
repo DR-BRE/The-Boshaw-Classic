@@ -44,16 +44,29 @@ function Toggle({
       role="switch"
       aria-checked={enabled}
       aria-label={label}
-      className={[
-        "relative w-11 h-6 rounded-full transition-colors duration-200",
-        enabled ? "bg-secondary" : "bg-white/[0.1]",
-      ].join(" ")}
+      style={{
+        position: "relative",
+        display: "inline-block",
+        width: 44,
+        height: 24,
+        borderRadius: 9999,
+        backgroundColor: enabled ? "var(--color-secondary, #8B949E)" : "rgba(255,255,255,0.1)",
+        transition: "background-color 0.2s",
+        flexShrink: 0,
+      }}
     >
       <span
-        className={[
-          "absolute top-[2px] w-5 h-5 rounded-full bg-white shadow transition-all duration-200",
-          enabled ? "left-[22px]" : "left-[2px]",
-        ].join(" ")}
+        style={{
+          position: "absolute",
+          top: 2,
+          left: enabled ? 22 : 2,
+          width: 20,
+          height: 20,
+          borderRadius: "50%",
+          backgroundColor: "white",
+          boxShadow: "0 1px 3px rgba(0,0,0,0.3)",
+          transition: "left 0.2s",
+        }}
       />
     </button>
   );
