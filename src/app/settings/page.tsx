@@ -45,14 +45,14 @@ function Toggle({
       aria-checked={enabled}
       aria-label={label}
       className={[
-        "relative w-12 h-7 rounded-full transition-colors",
-        enabled ? "bg-primary" : "bg-surface-container-highest",
+        "relative w-11 h-6 rounded-full transition-colors duration-200",
+        enabled ? "bg-secondary" : "bg-white/[0.1]",
       ].join(" ")}
     >
       <span
         className={[
-          "absolute top-1 w-5 h-5 rounded-full bg-white shadow transition-transform",
-          enabled ? "translate-x-6" : "translate-x-1",
+          "absolute top-0.5 left-0.5 w-5 h-5 rounded-full bg-white shadow transition-transform duration-200",
+          enabled ? "translate-x-5" : "",
         ].join(" ")}
       />
     </button>
