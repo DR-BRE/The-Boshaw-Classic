@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Image from "next/image";
 import Link from "next/link";
 import Countdown from "@/components/Countdown";
 import Weather from "@/components/Weather";
@@ -45,7 +46,18 @@ export default function Home() {
   return (
     <div className="pb-28">
       {/* Hero */}
-      <div className="relative px-4 pt-8 pb-6">
+      <div className="relative px-4 pt-8 pb-10 overflow-hidden">
+        <div aria-hidden className="absolute inset-0 -z-10">
+          <Image
+            src="/hero-bg.webp"
+            alt=""
+            fill
+            priority
+            sizes="100vw"
+            className="object-cover opacity-30"
+          />
+          <div className="absolute inset-0 bg-gradient-to-b from-background/60 via-background/40 to-background" />
+        </div>
         <p className="font-label text-xs uppercase tracking-widest text-on-surface-variant mb-1">
           {heroLocation} · 2026
         </p>
