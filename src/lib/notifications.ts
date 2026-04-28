@@ -39,7 +39,7 @@ export function findClearLeader(
   return standings[0].playerId;
 }
 
-function extractHoles(score: Record<string, unknown>): (number | null)[] {
+export function extractHoles(score: Record<string, unknown>): (number | null)[] {
   return Array.from({ length: 18 }, (_, i) => {
     const val = score[`hole${i + 1}`];
     return val !== null && val !== undefined ? (val as number) : null;

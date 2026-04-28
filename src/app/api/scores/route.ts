@@ -3,7 +3,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { COURSE_PARS, TOURNAMENT } from "@/lib/tournament";
-import { detectAndInsertNotifications } from "@/lib/notifications";
+import { detectAndInsertNotifications, extractHoles } from "@/lib/notifications";
 
 const ROUND_COURSES: Record<number, string> = {
   1: TOURNAMENT.courses[0],
@@ -81,15 +81,10 @@ export async function POST(request: Request) {
 
     const prevScore = player.scores[0];
     const prevHoles: (number | null)[] = prevScore
-      ? Array.from({ length: 18 }, (_, i) => {
-          const val = (prevScore as Record<string, unknown>)[`hole${i + 1}`];
-          return val !== null && val !== undefined ? (val as number) : null;
-        })
+      ? extractHoles(prevScore as Record<string, unknown>)
       : Array(18).fill(null);
 
-    const newHoles: (number | null)[] = holes.map((h) =>
-      h !== null && h !== undefined ? h : null
-    );
+    const newHoles = holes as (number | null)[];
 
     const courseKey = courseName as keyof typeof COURSE_PARS;
     const coursePars = COURSE_PARS[courseKey].holes;
