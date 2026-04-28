@@ -3,6 +3,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { COURSE_PARS, TOURNAMENT } from "@/lib/tournament";
+import { detectAndInsertNotifications } from "@/lib/notifications";
 
 const ROUND_COURSES: Record<number, string> = {
   1: TOURNAMENT.courses[0],
@@ -66,6 +67,7 @@ export async function POST(request: Request) {
 
     const player = await prisma.player.findUnique({
       where: { userId: session.user.id },
+      include: { scores: { where: { round } } },
     });
 
     if (!player) {
@@ -77,6 +79,18 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Invalid round" }, { status: 400 });
     }
 
+    const prevScore = player.scores[0];
+    const prevHoles: (number | null)[] = prevScore
+      ? Array.from({ length: 18 }, (_, i) => {
+          const val = (prevScore as Record<string, unknown>)[`hole${i + 1}`];
+          return val !== null && val !== undefined ? (val as number) : null;
+        })
+      : Array(18).fill(null);
+
+    const newHoles: (number | null)[] = holes.map((h) =>
+      h !== null && h !== undefined ? h : null
+    );
+
     const courseKey = courseName as keyof typeof COURSE_PARS;
     const coursePars = COURSE_PARS[courseKey].holes;
     const filledIndices = holes.map((h: number | null, i: number) => h !== null && h !== undefined ? i : -1).filter((i: number) => i >= 0);
@@ -87,34 +101,47 @@ export async function POST(request: Request) {
       ? totalStrokes - filledIndices.reduce((sum: number, i: number) => sum + coursePars[i], 0)
       : null;
 
-    const score = await prisma.score.upsert({
-      where: {
-        playerId_round: { playerId: player.id, round },
-      },
-      update: {
-        course: courseName,
-        hole1: holes[0], hole2: holes[1], hole3: holes[2],
-        hole4: holes[3], hole5: holes[4], hole6: holes[5],
-        hole7: holes[6], hole8: holes[7], hole9: holes[8],
-        hole10: holes[9], hole11: holes[10], hole12: holes[11],
-        hole13: holes[12], hole14: holes[13], hole15: holes[14],
-        hole16: holes[15], hole17: holes[16], hole18: holes[17],
-        totalStrokes,
-        toPar,
-      },
-      create: {
+    const score = await prisma.$transaction(async (tx) => {
+      const upserted = await tx.score.upsert({
+        where: {
+          playerId_round: { playerId: player.id, round },
+        },
+        update: {
+          course: courseName,
+          hole1: holes[0], hole2: holes[1], hole3: holes[2],
+          hole4: holes[3], hole5: holes[4], hole6: holes[5],
+          hole7: holes[6], hole8: holes[7], hole9: holes[8],
+          hole10: holes[9], hole11: holes[10], hole12: holes[11],
+          hole13: holes[12], hole14: holes[13], hole15: holes[14],
+          hole16: holes[15], hole17: holes[16], hole18: holes[17],
+          totalStrokes,
+          toPar,
+        },
+        create: {
+          playerId: player.id,
+          round,
+          course: courseName,
+          hole1: holes[0], hole2: holes[1], hole3: holes[2],
+          hole4: holes[3], hole5: holes[4], hole6: holes[5],
+          hole7: holes[6], hole8: holes[7], hole9: holes[8],
+          hole10: holes[9], hole11: holes[10], hole12: holes[11],
+          hole13: holes[12], hole14: holes[13], hole15: holes[14],
+          hole16: holes[15], hole17: holes[16], hole18: holes[17],
+          totalStrokes,
+          toPar,
+        },
+      });
+
+      await detectAndInsertNotifications(tx, {
         playerId: player.id,
         round,
         course: courseName,
-        hole1: holes[0], hole2: holes[1], hole3: holes[2],
-        hole4: holes[3], hole5: holes[4], hole6: holes[5],
-        hole7: holes[6], hole8: holes[7], hole9: holes[8],
-        hole10: holes[9], hole11: holes[10], hole12: holes[11],
-        hole13: holes[12], hole14: holes[13], hole15: holes[14],
-        hole16: holes[15], hole17: holes[16], hole18: holes[17],
-        totalStrokes,
-        toPar,
-      },
+        displayName: player.displayName,
+        prevHoles,
+        newHoles,
+      });
+
+      return upserted;
     });
 
     return NextResponse.json({ score });
