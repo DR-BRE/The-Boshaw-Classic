@@ -138,7 +138,7 @@ enum NotificationType {
 model Notification {
   id        String           @id @default(cuid())
   type      NotificationType
-  round     Int?
+  round     Int
   playerId  String?
   hole      Int?
   course    String?

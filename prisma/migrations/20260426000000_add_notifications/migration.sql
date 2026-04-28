@@ -8,7 +8,7 @@ ALTER TABLE "Player" ADD COLUMN "notificationsSeenAt" TIMESTAMP(3);
 CREATE TABLE "Notification" (
     "id" TEXT NOT NULL,
     "type" "NotificationType" NOT NULL,
-    "round" INTEGER,
+    "round" INTEGER NOT NULL,
     "playerId" TEXT,
     "hole" INTEGER,
     "course" TEXT,
