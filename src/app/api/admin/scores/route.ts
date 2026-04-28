@@ -3,6 +3,7 @@ import { getServerSession } from "next-auth";
 import { authOptions, ADMIN_EMAIL } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { COURSE_PARS, TOURNAMENT } from "@/lib/tournament";
+import { detectAndInsertNotifications, extractHoles } from "@/lib/notifications";
 
 const ROUND_COURSES: Record<number, string> = {
   1: TOURNAMENT.courses[0],
@@ -66,34 +67,63 @@ export async function PUT(request: Request) {
       ? totalStrokes - filledIndices.reduce((sum: number, i: number) => sum + coursePars[i], 0)
       : null;
 
-    const score = await prisma.score.upsert({
-      where: {
-        playerId_round: { playerId, round },
-      },
-      update: {
-        course: courseName,
-        hole1: holes[0], hole2: holes[1], hole3: holes[2],
-        hole4: holes[3], hole5: holes[4], hole6: holes[5],
-        hole7: holes[6], hole8: holes[7], hole9: holes[8],
-        hole10: holes[9], hole11: holes[10], hole12: holes[11],
-        hole13: holes[12], hole14: holes[13], hole15: holes[14],
-        hole16: holes[15], hole17: holes[16], hole18: holes[17],
-        totalStrokes,
-        toPar,
-      },
-      create: {
+    const player = await prisma.player.findUnique({
+      where: { id: playerId },
+      include: { scores: { where: { round } } },
+    });
+
+    if (!player) {
+      return NextResponse.json({ error: "Player not found" }, { status: 404 });
+    }
+
+    const prevScore = player.scores[0];
+    const prevHoles: (number | null)[] = prevScore
+      ? extractHoles(prevScore as Record<string, unknown>)
+      : Array(18).fill(null);
+
+    const newHoles = holes as (number | null)[];
+
+    const score = await prisma.$transaction(async (tx) => {
+      const upserted = await tx.score.upsert({
+        where: {
+          playerId_round: { playerId, round },
+        },
+        update: {
+          course: courseName,
+          hole1: holes[0], hole2: holes[1], hole3: holes[2],
+          hole4: holes[3], hole5: holes[4], hole6: holes[5],
+          hole7: holes[6], hole8: holes[7], hole9: holes[8],
+          hole10: holes[9], hole11: holes[10], hole12: holes[11],
+          hole13: holes[12], hole14: holes[13], hole15: holes[14],
+          hole16: holes[15], hole17: holes[16], hole18: holes[17],
+          totalStrokes,
+          toPar,
+        },
+        create: {
+          playerId,
+          round,
+          course: courseName,
+          hole1: holes[0], hole2: holes[1], hole3: holes[2],
+          hole4: holes[3], hole5: holes[4], hole6: holes[5],
+          hole7: holes[6], hole8: holes[7], hole9: holes[8],
+          hole10: holes[9], hole11: holes[10], hole12: holes[11],
+          hole13: holes[12], hole14: holes[13], hole15: holes[14],
+          hole16: holes[15], hole17: holes[16], hole18: holes[17],
+          totalStrokes,
+          toPar,
+        },
+      });
+
+      await detectAndInsertNotifications(tx, {
         playerId,
         round,
         course: courseName,
-        hole1: holes[0], hole2: holes[1], hole3: holes[2],
-        hole4: holes[3], hole5: holes[4], hole6: holes[5],
-        hole7: holes[6], hole8: holes[7], hole9: holes[8],
-        hole10: holes[9], hole11: holes[10], hole12: holes[11],
-        hole13: holes[12], hole14: holes[13], hole15: holes[14],
-        hole16: holes[15], hole17: holes[16], hole18: holes[17],
-        totalStrokes,
-        toPar,
-      },
+        displayName: player.displayName,
+        prevHoles,
+        newHoles,
+      });
+
+      return upserted;
     });
 
     return NextResponse.json({ score });

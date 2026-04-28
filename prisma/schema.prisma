@@ -56,18 +56,20 @@ model VerificationToken {
 }
 
 model Player {
-  id          String   @id @default(cuid())
-  userId      String?  @unique
-  displayName String
-  firstName   String
-  lastName    String
-  handicap    Int
-  group       Int
-  avatarUrl   String?
-  user        User?    @relation(fields: [userId], references: [id])
-  scores      Score[]
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id                  String         @id @default(cuid())
+  userId              String?        @unique
+  displayName         String
+  firstName           String
+  lastName            String
+  handicap            Int
+  group               Int
+  avatarUrl           String?
+  user                User?          @relation(fields: [userId], references: [id])
+  scores              Score[]
+  createdAt           DateTime       @default(now())
+  updatedAt           DateTime       @updatedAt
+  notificationsSeenAt DateTime?
+  notifications       Notification[]
 }
 
 model Score {
@@ -123,4 +125,27 @@ model WolfPick {
   updatedAt DateTime @updatedAt
 
   @@unique([round, group, hole])
+}
+
+enum NotificationType {
+  BIRDIE
+  EAGLE
+  DOUBLE_EAGLE
+  HOLE_IN_ONE
+  LEADER_CHANGE
+}
+
+model Notification {
+  id        String           @id @default(cuid())
+  type      NotificationType
+  round     Int
+  playerId  String?
+  hole      Int?
+  course    String?
+  strokes   Int?
+  payload   Json
+  createdAt DateTime         @default(now())
+  player    Player?          @relation(fields: [playerId], references: [id])
+
+  @@index([createdAt])
 }

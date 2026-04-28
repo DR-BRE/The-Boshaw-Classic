@@ -4,9 +4,11 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "prisma generate && next build",
+    "build": "prisma migrate deploy && prisma generate && next build",
     "start": "next start",
     "lint": "eslint",
+    "test": "vitest run",
+    "test:watch": "vitest",
     "lighthouse": "lighthouse http://localhost:3001 --output html --output-path ./lighthouse-report.html --chrome-flags=\"--headless=new\"",
     "lighthouse:view": "lighthouse http://localhost:3001 --view --chrome-flags=\"--headless=new\""
   },
@@ -38,6 +40,7 @@
     "prisma": "^7.6.0",
     "tailwindcss": "^4",
     "tsx": "^4.21.0",
-    "typescript": "^5"
+    "typescript": "^5",
+    "vitest": "^4.1.5"
   }
 }

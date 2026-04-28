@@ -52,3 +52,7 @@ lighthouse-report.html
 # claude config
 .claude/*
 !.claude/skills
+.superpowers/
+
+# git worktrees
+.worktrees/
