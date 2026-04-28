@@ -10,20 +10,17 @@ export async function POST() {
       return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
     }
 
-    const player = await prisma.player.findUnique({
-      where: { userId: session.user.id },
-      select: { id: true },
-    });
+    const seenAt = new Date();
 
-    if (!player) {
+    const updatedPlayer = await prisma.player.update({
+      where: { userId: session.user.id },
+      data: { notificationsSeenAt: seenAt },
+      select: { id: true },
+    }).catch(() => null);
+
+    if (!updatedPlayer) {
       return NextResponse.json({ error: "No player profile found" }, { status: 404 });
     }
-
-    const seenAt = new Date();
-    await prisma.player.update({
-      where: { id: player.id },
-      data: { notificationsSeenAt: seenAt },
-    });
 
     return NextResponse.json({ ok: true, seenAt: seenAt.toISOString() });
   } catch (error) {

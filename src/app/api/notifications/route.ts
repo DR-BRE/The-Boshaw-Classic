@@ -21,17 +21,18 @@ export async function GET() {
       return NextResponse.json({ error: "No player profile found" }, { status: 404 });
     }
 
+    const unreadCount = await prisma.notification.count({
+      where:
+        player.notificationsSeenAt === null
+          ? {}
+          : { createdAt: { gt: player.notificationsSeenAt } },
+    });
+
     const notifications = await prisma.notification.findMany({
       take: 50,
       orderBy: { createdAt: "desc" },
       include: { player: { select: { displayName: true } } },
     });
-
-    const unreadCount = notifications.filter(
-      (n) =>
-        player.notificationsSeenAt === null ||
-        n.createdAt > player.notificationsSeenAt
-    ).length;
 
     return NextResponse.json({
       notifications: notifications.map((n) => ({
