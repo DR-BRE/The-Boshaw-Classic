@@ -1234,6 +1234,29 @@ export default function ScorecardPage() {
   }, [pendingWolfPickHole]);
 
   const savingRef = React.useRef(false);
+  // Per-player debounce timers — score saves wait 2s after the last edit.
+  // Prevents rapid +/- presses from firing one notification per intermediate value.
+  const saveTimersRef = React.useRef<Map<string, ReturnType<typeof setTimeout>>>(new Map());
+
+  // Cleanup pending timers on unmount.
+  React.useEffect(() => {
+    const timers = saveTimersRef.current;
+    return () => {
+      timers.forEach((t) => clearTimeout(t));
+      timers.clear();
+    };
+  }, []);
+
+  const SAVE_DEBOUNCE_MS = 2000;
+  function scheduleSave(playerId: string, doSave: () => void) {
+    const existing = saveTimersRef.current.get(playerId);
+    if (existing) clearTimeout(existing);
+    const timeoutId = setTimeout(() => {
+      saveTimersRef.current.delete(playerId);
+      doSave();
+    }, SAVE_DEBOUNCE_MS);
+    saveTimersRef.current.set(playerId, timeoutId);
+  }
 
   useEffect(() => {
     setLoading(true);
@@ -1286,25 +1309,27 @@ export default function ScorecardPage() {
     });
     setData({ ...data, players: newPlayers });
 
-    // Save to server (debounced-ish: fire and forget)
+    // Debounce server save: wait 2s after the last edit so rapid +/- presses
+    // produce one save (and one notification) for the final value.
     const updatedPlayer = newPlayers.find((p) => p.id === player.id);
     if (!updatedPlayer) return;
     const allScores = updatedPlayer.scores as number[];
-    savingRef.current = true;
     const isOtherPlayer = player.id !== currentUserId;
-    if (isAdmin && isOtherPlayer) {
-      fetch("/api/admin/scores", {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ playerId: player.id, round: Number(round), holes: allScores }),
-      }).finally(() => { setTimeout(() => { savingRef.current = false; }, 500); });
-    } else {
-      fetch("/api/scores", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ round: Number(round), holes: allScores }),
-      }).finally(() => { setTimeout(() => { savingRef.current = false; }, 500); });
-    }
+    scheduleSave(player.id, () => {
+      savingRef.current = true;
+      const request = isAdmin && isOtherPlayer
+        ? fetch("/api/admin/scores", {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ playerId: player.id, round: Number(round), holes: allScores }),
+          })
+        : fetch("/api/scores", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ round: Number(round), holes: allScores }),
+          });
+      request.finally(() => { setTimeout(() => { savingRef.current = false; }, 500); });
+    });
   }
 
   // Handle direct score entry from classic view number pad
@@ -1329,12 +1354,15 @@ export default function ScorecardPage() {
     setData({ ...data, players: newPlayers });
 
     const allScores = newPlayers[playerIdx].scores as number[];
-    savingRef.current = true;
-    fetch("/api/scores", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ round: Number(round), holes: allScores }),
-    }).finally(() => { setTimeout(() => { savingRef.current = false; }, 500); });
+    const playerId = newPlayers[playerIdx].id;
+    scheduleSave(playerId, () => {
+      savingRef.current = true;
+      fetch("/api/scores", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ round: Number(round), holes: allScores }),
+      }).finally(() => { setTimeout(() => { savingRef.current = false; }, 500); });
+    });
   }
 
   const frontPar = data
