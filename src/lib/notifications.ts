@@ -1,12 +1,5 @@
 import { COURSE_PARS, TOURNAMENT } from "@/lib/tournament";
-import type { Prisma } from "@/generated/prisma/client";
-
-export type NotificationType =
-  | "BIRDIE"
-  | "EAGLE"
-  | "DOUBLE_EAGLE"
-  | "HOLE_IN_ONE"
-  | "LEADER_CHANGE";
+import type { Prisma, NotificationType } from "@/generated/prisma/client";
 
 const ACTIVE_ROUNDS = new Set([1, 2]);
 
@@ -94,6 +87,9 @@ export async function detectAndInsertNotifications(
   if (!coursePars) return;
 
   // Hole-level notifications
+  // Per spec: score corrections do not delete prior notifications.
+  // A correction from birdie to par leaves the prior BIRDIE row in place.
+  // notificationTypeForHole returns null for par, so no new notification fires.
   const changedIndices = detectChangedHoleIndices(prevHoles, newHoles);
   for (const i of changedIndices) {
     const strokes = newHoles[i]!;
