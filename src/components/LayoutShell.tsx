@@ -7,6 +7,7 @@ import { useSession } from "next-auth/react";
 import SideDrawer from "@/components/SideDrawer";
 import BottomTabs from "@/components/BottomTabs";
 import ScoreToastProvider from "@/components/ScoreToastProvider";
+import NotificationBell from "@/components/NotificationBell";
 
 export default function LayoutShell({
   children,
@@ -62,6 +63,11 @@ export default function LayoutShell({
           </span>
         </button>
       )}
+
+      {/* Notification Bell */}
+      <div className={`fixed top-3 z-40 ${hideAvatar ? "right-3" : "right-14"}`}>
+        <NotificationBell />
+      </div>
 
       {/* Profile Avatar Button */}
       {!hideAvatar && (
