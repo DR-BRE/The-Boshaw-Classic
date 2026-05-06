@@ -12,6 +12,7 @@ type GameMode = "scorecard" | "wolf";
 const COURSE_HOLE_IMAGES: Record<string, { path: string; ext: string }> = {
   "Echo Falls": { path: "/courses/echo-falls", ext: "jpg" },
   "Desert Canyon": { path: "/courses/desert-canyon", ext: "png" },
+  "Bear Mountain Ranch": { path: "/courses/bear-mountain-ranch", ext: "jpg" },
 };
 
 const GAME_MODES: { label: string; value: GameMode; icon: string }[] = [
