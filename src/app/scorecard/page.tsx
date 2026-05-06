@@ -1346,23 +1346,23 @@ export default function ScorecardPage() {
   return (
     <div className="px-4 py-6">
       {/* Header + Game Mode Dropdown */}
-      <div className="flex items-center justify-between mb-5">
+      <div className="flex items-center justify-between mb-5 pr-12">
         <h2 className="font-headline text-3xl text-on-surface">
           {GAME_MODES.find((m) => m.value === gameMode)?.label}
         </h2>
         <div className="relative">
           <button
             onClick={() => setGameModeOpen(!gameModeOpen)}
-            className="flex items-center gap-1.5 bg-surface-container-high border border-outline-variant/50 rounded-xl px-3 py-2 active:scale-95 transition-transform"
+            className="flex items-center gap-1 bg-surface-container-high border border-outline-variant/50 rounded-lg px-2 py-1.5 active:scale-95 transition-transform"
           >
             {gameMode === "wolf" ? (
-              <img src="/wolf.png" alt="Wolf" className="w-5 h-5 rounded-full object-cover" />
+              <img src="/wolf.png" alt="Wolf" className="w-4 h-4 rounded-full object-cover" />
             ) : (
-              <span className="material-symbols-outlined text-primary text-lg">
+              <span className="material-symbols-outlined text-primary text-base">
                 {GAME_MODES.find((m) => m.value === gameMode)?.icon}
               </span>
             )}
-            <span className="font-label text-xs font-bold text-on-surface uppercase tracking-wider">
+            <span className="font-label text-[11px] font-bold text-on-surface uppercase tracking-wider">
               {GAME_MODES.find((m) => m.value === gameMode)?.label}
             </span>
             <span className="material-symbols-outlined text-on-surface-variant text-sm">

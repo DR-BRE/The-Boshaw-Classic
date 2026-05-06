@@ -82,7 +82,7 @@ export default function LeaderboardPage() {
   return (
     <div className="px-4 py-6">
       {/* Header */}
-      <div className="flex justify-between items-start mb-4">
+      <div className="flex justify-between items-start mb-4 pr-12">
         <div>
           <p className="font-label text-xs uppercase tracking-widest text-primary mb-1">
             The Boshaw Classic
