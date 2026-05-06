@@ -9,8 +9,8 @@ import { Card } from "@/components/ui";
 export default function Home() {
   return (
     <div className="pb-28">
-      {/* Hero — image as backdrop, countdown overlaid */}
-      <div className="relative w-full mb-4">
+      {/* Hero — image as backdrop, countdown overlaid. -mt-6 cancels LayoutShell main's pt-6 so the image is flush to the top. */}
+      <div className="relative w-full -mt-6 mb-4">
         <Image
           src="/hero-bg.png"
           alt="The Boshaw Classic"
@@ -18,8 +18,7 @@ export default function Home() {
           height={1671}
           priority
           sizes="100vw"
-          className="w-full h-auto object-contain"
-          style={{ maxHeight: "85dvh" }}
+          className="w-full h-auto block"
         />
         <div className="absolute inset-x-0 bottom-4 px-4">
           <Countdown />
