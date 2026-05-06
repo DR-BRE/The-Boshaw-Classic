@@ -56,7 +56,8 @@ export default function LayoutShell({
       {!hideHamburger && (
         <button
           onClick={() => setDrawerOpen(true)}
-          className="fixed top-3 left-3 z-40 w-9 h-9 rounded-full bg-white/[0.06] backdrop-blur-xl border border-white/[0.06] flex items-center justify-center active:scale-90 transition-transform"
+          style={{ top: "calc(env(safe-area-inset-top, 0px) + 12px)" }}
+          className="fixed left-3 z-40 w-9 h-9 rounded-full bg-white/[0.06] backdrop-blur-xl border border-white/[0.06] flex items-center justify-center active:scale-90 transition-transform"
         >
           <span className="material-symbols-outlined text-on-surface text-lg">
             menu
@@ -65,7 +66,10 @@ export default function LayoutShell({
       )}
 
       {/* Notification Bell */}
-      <div className={`fixed top-3 z-40 ${hideAvatar ? "right-3" : "right-14"}`}>
+      <div
+        style={{ top: "calc(env(safe-area-inset-top, 0px) + 12px)" }}
+        className={`fixed z-40 ${hideAvatar ? "right-3" : "right-14"}`}
+      >
         <NotificationBell />
       </div>
 
@@ -73,7 +77,8 @@ export default function LayoutShell({
       {!hideAvatar && (
         <Link
           href="/profile"
-          className="fixed top-3 right-3 z-40 w-10 h-10 rounded-full bg-white/[0.06] backdrop-blur-xl border border-white/[0.06] flex items-center justify-center active:scale-90 transition-transform overflow-hidden"
+          style={{ top: "calc(env(safe-area-inset-top, 0px) + 12px)" }}
+          className="fixed right-3 z-40 w-10 h-10 rounded-full bg-white/[0.06] backdrop-blur-xl border border-white/[0.06] flex items-center justify-center active:scale-90 transition-transform overflow-hidden"
         >
           {avatarUrl || session?.user?.image ? (
             <img
