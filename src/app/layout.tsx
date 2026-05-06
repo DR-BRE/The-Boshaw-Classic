@@ -7,6 +7,11 @@ export const metadata: Metadata = {
   metadataBase: new URL("https://the-boshaw-classic.vercel.app"),
   title: "The Boshaw Classic",
   description: "Bachelor party golf tournament — Lake Chelan 2026",
+  appleWebApp: {
+    capable: true,
+    title: "Boshaw",
+    statusBarStyle: "black-translucent",
+  },
   openGraph: {
     title: "The Boshaw Classic",
     description: "Bachelor party golf tournament — Lake Chelan 2026",
