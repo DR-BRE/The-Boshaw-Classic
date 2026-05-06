@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Image from "next/image";
 import Link from "next/link";
 import Countdown from "@/components/Countdown";
 import Weather from "@/components/Weather";
@@ -39,19 +40,24 @@ export default function Home() {
     return () => clearInterval(interval);
   }, []);
 
-  const heroLocation =
-    typeof TOURNAMENT.location === "string" ? TOURNAMENT.location : "Lake Chelan";
-
   return (
     <div className="pb-28">
-      {/* Hero */}
-      <div className="relative px-4 pt-8 pb-6">
-        <p className="font-label text-xs uppercase tracking-widest text-on-surface-variant mb-1">
-          {heroLocation} · 2026
-        </p>
-        <h1 className="font-display text-5xl text-on-surface leading-none mb-6">
-          THE BOSHAW<br />CLASSIC
-        </h1>
+      {/* Hero image (logo + figure baked into artwork) */}
+      <div className="relative w-full">
+        <Image
+          src="/hero-bg.png"
+          alt="The Boshaw Classic"
+          width={940}
+          height={1671}
+          priority
+          sizes="100vw"
+          className="w-full h-auto object-contain"
+          style={{ maxHeight: "85dvh" }}
+        />
+      </div>
+
+      {/* Countdown */}
+      <div className="px-4 pt-4 pb-6">
         <Countdown />
       </div>
 
