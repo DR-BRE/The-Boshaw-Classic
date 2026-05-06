@@ -20,7 +20,7 @@ export default function Home() {
           sizes="100vw"
           className="w-full h-auto block"
         />
-        <div className="absolute inset-x-0 bottom-4 px-4">
+        <div className="absolute inset-x-0 bottom-16 px-4">
           <Countdown />
         </div>
       </div>
