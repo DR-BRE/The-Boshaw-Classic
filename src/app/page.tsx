@@ -42,8 +42,8 @@ export default function Home() {
 
   return (
     <div className="pb-28">
-      {/* Hero image (logo + figure baked into artwork) */}
-      <div className="relative w-full">
+      {/* Hero — image as backdrop, countdown overlaid */}
+      <div className="relative w-full mb-4">
         <Image
           src="/hero-bg.png"
           alt="The Boshaw Classic"
@@ -54,11 +54,9 @@ export default function Home() {
           className="w-full h-auto object-contain"
           style={{ maxHeight: "85dvh" }}
         />
-      </div>
-
-      {/* Countdown */}
-      <div className="px-4 pt-4 pb-6">
-        <Countdown />
+        <div className="absolute inset-x-0 bottom-4 px-4">
+          <Countdown />
+        </div>
       </div>
 
       {/* Weather */}
