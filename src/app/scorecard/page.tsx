@@ -1233,6 +1233,32 @@ export default function ScorecardPage() {
   }, [pendingWolfPickHole]);
 
   const savingRef = React.useRef(false);
+  const pendingSaveRef = React.useRef<Map<string, { timer: ReturnType<typeof setTimeout>; scores: number[]; isOther: boolean }>>(new Map());
+
+  const flushPendingSave = React.useCallback((playerId: string) => {
+    const pending = pendingSaveRef.current.get(playerId);
+    if (!pending) return;
+    clearTimeout(pending.timer);
+    pendingSaveRef.current.delete(playerId);
+    savingRef.current = true;
+    const url = pending.isOther ? "/api/admin/scores" : "/api/scores";
+    const body = pending.isOther
+      ? { playerId, round: Number(round), holes: pending.scores }
+      : { round: Number(round), holes: pending.scores };
+    fetch(url, {
+      method: pending.isOther ? "PUT" : "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(body),
+    }).finally(() => {
+      setTimeout(() => { savingRef.current = false; }, 500);
+    });
+  }, [round]);
+
+  React.useEffect(() => {
+    return () => {
+      pendingSaveRef.current.forEach((_, pid) => flushPendingSave(pid));
+    };
+  }, [flushPendingSave]);
 
   useEffect(() => {
     setLoading(true);
@@ -1285,25 +1311,21 @@ export default function ScorecardPage() {
     });
     setData({ ...data, players: newPlayers });
 
-    // Save to server (debounced-ish: fire and forget)
+    // Debounce save so rapid +/- presses only commit (and fire notifications)
+    // on the final value the user lands on.
     const updatedPlayer = newPlayers.find((p) => p.id === player.id);
     if (!updatedPlayer) return;
     const allScores = updatedPlayer.scores as number[];
-    savingRef.current = true;
     const isOtherPlayer = player.id !== currentUserId;
-    if (isAdmin && isOtherPlayer) {
-      fetch("/api/admin/scores", {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ playerId: player.id, round: Number(round), holes: allScores }),
-      }).finally(() => { setTimeout(() => { savingRef.current = false; }, 500); });
-    } else {
-      fetch("/api/scores", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ round: Number(round), holes: allScores }),
-      }).finally(() => { setTimeout(() => { savingRef.current = false; }, 500); });
-    }
+    savingRef.current = true;
+    const existing = pendingSaveRef.current.get(player.id);
+    if (existing) clearTimeout(existing.timer);
+    const timer = setTimeout(() => flushPendingSave(player.id), 1500);
+    pendingSaveRef.current.set(player.id, {
+      timer,
+      scores: allScores,
+      isOther: Boolean(isAdmin && isOtherPlayer),
+    });
   }
 
   // Handle direct score entry from classic view number pad
