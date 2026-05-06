@@ -56,9 +56,9 @@ export default function LayoutShell({
       {!hideHamburger && (
         <button
           onClick={() => setDrawerOpen(true)}
-          className="fixed top-3 left-3 z-40 w-10 h-10 rounded-full bg-white/[0.06] backdrop-blur-xl border border-white/[0.06] flex items-center justify-center active:scale-90 transition-transform"
+          className="fixed top-3 left-3 z-40 w-9 h-9 rounded-full bg-white/[0.06] backdrop-blur-xl border border-white/[0.06] flex items-center justify-center active:scale-90 transition-transform"
         >
-          <span className="material-symbols-outlined text-on-surface text-xl">
+          <span className="material-symbols-outlined text-on-surface text-lg">
             menu
           </span>
         </button>
