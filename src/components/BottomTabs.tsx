@@ -15,7 +15,11 @@ export default function BottomTabs() {
   const pathname = usePathname();
 
   return (
-    <nav aria-label="Primary" className="fixed bottom-0 left-0 right-0 z-40 bg-surface-container border-t border-outline-variant/40 pb-safe">
+    <nav
+      aria-label="Primary"
+      style={{ paddingBottom: "env(safe-area-inset-bottom, 0px)" }}
+      className="fixed bottom-0 left-0 right-0 z-40 bg-surface-container border-t border-outline-variant/40"
+    >
       <div className="flex items-stretch h-16">
         {tabs.map((tab) => {
           const active =
