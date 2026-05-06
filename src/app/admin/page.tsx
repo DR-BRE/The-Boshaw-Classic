@@ -220,7 +220,7 @@ export default function AdminPage() {
   const holePars = courseName ? [...COURSE_PARS[courseName].holes] : [];
 
   return (
-    <div className="px-4 py-6 pb-24">
+    <div className="px-4 py-6">
       <div className="flex items-center justify-between mb-6">
         <div>
           <p className="font-label text-xs uppercase tracking-widest text-secondary mb-1">
