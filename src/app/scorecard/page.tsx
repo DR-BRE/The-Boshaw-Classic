@@ -7,7 +7,7 @@ import { COURSE_PARS } from "@/lib/tournament";
 import { getWolfForHole, calculateWolfStandings } from "@/lib/wolf";
 
 type ViewMode = "card" | "classic";
-type GameMode = "scorecard" | "wolf" | "high-low";
+type GameMode = "scorecard" | "wolf";
 
 const COURSE_HOLE_IMAGES: Record<string, { path: string; ext: string }> = {
   "Echo Falls": { path: "/courses/echo-falls", ext: "jpg" },
@@ -17,7 +17,6 @@ const COURSE_HOLE_IMAGES: Record<string, { path: string; ext: string }> = {
 const GAME_MODES: { label: string; value: GameMode; icon: string }[] = [
   { label: "Scorecard", value: "scorecard", icon: "scoreboard" },
   { label: "Wolf", value: "wolf", icon: "pets" },
-  { label: "High-Low", value: "high-low", icon: "swap_vert" },
 ];
 
 const ROUNDS = [
