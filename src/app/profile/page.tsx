@@ -180,7 +180,7 @@ export default function ProfilePage() {
   }
 
   return (
-    <div className="px-4 py-6 pb-24">
+    <div className="px-4 py-6">
       <h2 className="font-display text-4xl text-on-surface mb-6 leading-none">PROFILE</h2>
 
       {/* User Card with Avatar */}

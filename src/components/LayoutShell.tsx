@@ -99,8 +99,12 @@ export default function LayoutShell({
 
       {/* Main Content */}
       <main
-        style={hideHamburger ? { paddingTop: "env(safe-area-inset-top, 0px)" } : undefined}
-        className={`${hideHamburger ? "pt-0" : "pt-6"} pb-32`}
+        style={{
+          paddingTop: hideHamburger
+            ? "env(safe-area-inset-top, 0px)"
+            : "calc(env(safe-area-inset-top, 0px) + 4rem)",
+        }}
+        className="pb-28"
       >
         {children}
       </main>

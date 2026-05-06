@@ -8,11 +8,14 @@ import { Card } from "@/components/ui";
 
 export default function Home() {
   return (
-    <div className="pb-28">
-      {/* Hero — fills from top of screen down to just above the bottom tab bar. -mt-6 cancels LayoutShell main's pt-6 so the image is flush to the top. */}
+    <div>
+      {/* Hero — full-bleed: cancels the safe-area + button reservation that LayoutShell adds, then fills down to just above the bottom tab bar. */}
       <div
-        className="relative w-full -mt-6 mb-4 overflow-hidden"
-        style={{ height: "calc(100dvh - 64px - env(safe-area-inset-bottom, 0px))" }}
+        className="relative w-full mb-4 overflow-hidden"
+        style={{
+          marginTop: "calc(-1 * (env(safe-area-inset-top, 0px) + 4rem))",
+          height: "calc(100dvh - 64px - env(safe-area-inset-bottom, 0px))",
+        }}
       >
         <Image
           src="/hero-bg.png"
