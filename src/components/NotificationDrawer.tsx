@@ -92,11 +92,13 @@ function NotificationCard({
 export default function NotificationDrawer({
   isOpen,
   onClose,
+  onClear,
   notifications,
   lastSeenAt,
 }: {
   isOpen: boolean;
   onClose: () => void;
+  onClear: () => void;
   notifications: NotificationItem[];
   lastSeenAt: string | null;
 }) {
@@ -130,15 +132,26 @@ export default function NotificationDrawer({
         {/* Header */}
         <div className="flex items-center justify-between px-5 pt-14 pb-4 border-b border-outline-variant/40">
           <h2 className="font-headline text-lg text-on-surface">Notifications</h2>
-          <button
-            onClick={onClose}
-            aria-label="Close notifications"
-            className="w-8 h-8 rounded-full bg-surface-container hover:bg-surface-container-highest flex items-center justify-center active:scale-90 transition-transform"
-          >
-            <span className="material-symbols-outlined text-on-surface-variant text-lg">
-              close
-            </span>
-          </button>
+          <div className="flex items-center gap-2">
+            {notifications.length > 0 && (
+              <button
+                onClick={onClear}
+                aria-label="Clear notifications"
+                className="px-3 h-8 rounded-full bg-surface-container hover:bg-surface-container-highest font-label text-xs font-bold uppercase tracking-wider text-on-surface-variant active:scale-95 transition-transform"
+              >
+                Clear
+              </button>
+            )}
+            <button
+              onClick={onClose}
+              aria-label="Close notifications"
+              className="w-8 h-8 rounded-full bg-surface-container hover:bg-surface-container-highest flex items-center justify-center active:scale-90 transition-transform"
+            >
+              <span className="material-symbols-outlined text-on-surface-variant text-lg">
+                close
+              </span>
+            </button>
+          </div>
         </div>
 
         {/* Body */}

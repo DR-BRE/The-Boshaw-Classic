@@ -6,6 +6,9 @@ import NotificationDrawer, { type NotificationItem } from "@/components/Notifica
 
 const POLL_MS = 30000;
 const AUTO_OPEN_KEY = "boshaw-notif-auto-opened";
+const CLEARED_AT_KEY = "boshaw-notif-cleared-at";
+const DRAWER_OPEN_EVENT = "boshaw-notif-drawer-open";
+const DRAWER_CLOSE_EVENT = "boshaw-notif-drawer-close";
 
 type NotificationsResponse = {
   notifications: NotificationItem[];
@@ -13,12 +16,38 @@ type NotificationsResponse = {
   lastSeenAt: string | null;
 };
 
+function readClearedAt(): string | null {
+  if (typeof window === "undefined") return null;
+  try {
+    return localStorage.getItem(CLEARED_AT_KEY);
+  } catch {
+    return null;
+  }
+}
+
+function isAfter(iso: string, threshold: string | null): boolean {
+  if (!threshold) return true;
+  return new Date(iso) > new Date(threshold);
+}
+
 export default function NotificationBell() {
   const { status } = useSession();
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [notifications, setNotifications] = useState<NotificationItem[]>([]);
-  const [unreadCount, setUnreadCount] = useState(0);
   const [lastSeenAt, setLastSeenAt] = useState<string | null>(null);
+  const [clearedAt, setClearedAt] = useState<string | null>(null);
+
+  useEffect(() => {
+    setClearedAt(readClearedAt());
+  }, []);
+
+  useEffect(() => {
+    if (drawerOpen) {
+      window.dispatchEvent(new Event(DRAWER_OPEN_EVENT));
+    } else {
+      window.dispatchEvent(new Event(DRAWER_CLOSE_EVENT));
+    }
+  }, [drawerOpen]);
 
   const fetchNotifications = useCallback(async (): Promise<NotificationsResponse | undefined> => {
     if (status !== "authenticated") return;
@@ -27,7 +56,6 @@ export default function NotificationBell() {
       if (!res.ok) return;
       const data = (await res.json()) as NotificationsResponse;
       setNotifications(data.notifications);
-      setUnreadCount(data.unreadCount);
       setLastSeenAt(data.lastSeenAt);
       return data;
     } catch {}
@@ -35,7 +63,6 @@ export default function NotificationBell() {
 
   const openDrawer = useCallback(async () => {
     setDrawerOpen(true);
-    setUnreadCount(0);
     try {
       const res = await fetch("/api/notifications/seen", { method: "POST" });
       if (res.ok) {
@@ -45,13 +72,27 @@ export default function NotificationBell() {
     } catch {}
   }, []);
 
+  const clearNotifications = useCallback(() => {
+    const now = new Date().toISOString();
+    try {
+      localStorage.setItem(CLEARED_AT_KEY, now);
+    } catch {}
+    setClearedAt(now);
+  }, []);
+
   // Initial fetch + auto-open once per session when unread items exist
   useEffect(() => {
     if (status !== "authenticated") return;
     fetchNotifications().then((data) => {
       if (!data) return;
+      const cleared = readClearedAt();
+      const visibleUnread = data.notifications.filter(
+        (n) =>
+          isAfter(n.createdAt, cleared) &&
+          (data.lastSeenAt === null || new Date(n.createdAt) > new Date(data.lastSeenAt))
+      ).length;
       const alreadyOpened = sessionStorage.getItem(AUTO_OPEN_KEY);
-      if (!alreadyOpened && data.unreadCount > 0) {
+      if (!alreadyOpened && visibleUnread > 0) {
         sessionStorage.setItem(AUTO_OPEN_KEY, "1");
         openDrawer();
       }
@@ -75,6 +116,15 @@ export default function NotificationBell() {
 
   if (status !== "authenticated") return null;
 
+  const visibleNotifications = notifications.filter((n) =>
+    isAfter(n.createdAt, clearedAt)
+  );
+  const unreadCount = drawerOpen
+    ? 0
+    : visibleNotifications.filter((n) =>
+        lastSeenAt === null ? true : new Date(n.createdAt) > new Date(lastSeenAt)
+      ).length;
+
   return (
     <>
       <button
@@ -97,7 +147,8 @@ export default function NotificationBell() {
       <NotificationDrawer
         isOpen={drawerOpen}
         onClose={() => setDrawerOpen(false)}
-        notifications={notifications}
+        onClear={clearNotifications}
+        notifications={visibleNotifications}
         lastSeenAt={lastSeenAt}
       />
     </>

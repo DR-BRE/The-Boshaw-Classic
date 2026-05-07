@@ -18,8 +18,21 @@ export default function LayoutShell({
   const { data: session } = useSession();
   const pathname = usePathname();
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
-  const hideAvatar = ["/leaderboard", "/scorecard", "/trip"].includes(pathname);
+  const [notifDrawerOpen, setNotifDrawerOpen] = useState(false);
+  const hideAvatarByRoute = ["/leaderboard", "/scorecard", "/trip"].includes(pathname);
+  const hideAvatar = hideAvatarByRoute || notifDrawerOpen;
   const hideHamburger = ["/leaderboard", "/scorecard", "/trip"].includes(pathname);
+
+  useEffect(() => {
+    const onOpen = () => setNotifDrawerOpen(true);
+    const onClose = () => setNotifDrawerOpen(false);
+    window.addEventListener("boshaw-notif-drawer-open", onOpen);
+    window.addEventListener("boshaw-notif-drawer-close", onClose);
+    return () => {
+      window.removeEventListener("boshaw-notif-drawer-open", onOpen);
+      window.removeEventListener("boshaw-notif-drawer-close", onClose);
+    };
+  }, []);
 
   // Apply saved theme on mount (after React hydration)
   useEffect(() => {
