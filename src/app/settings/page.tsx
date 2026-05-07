@@ -81,12 +81,6 @@ const GROUP_LABELS = ["Unassigned", "Group 1", "Group 2"] as const;
 
 type PlayerGroup = { id: string; displayName: string; group: number };
 
-type PlayerWithScores = {
-  id: string;
-  displayName: string;
-  scores: unknown[];
-};
-
 export default function SettingsPage() {
   const [settings, setSettings] = useState<Settings>(DEFAULT_SETTINGS);
   const [mounted, setMounted] = useState(false);
@@ -96,8 +90,6 @@ export default function SettingsPage() {
   const [players, setPlayers] = useState<PlayerGroup[]>([]);
   const [groupsDirty, setGroupsDirty] = useState(false);
   const [groupsSaving, setGroupsSaving] = useState(false);
-  const [confirmClear, setConfirmClear] = useState(false);
-  const [clearing, setClearing] = useState(false);
 
   // Add player
   const [showAddPlayer, setShowAddPlayer] = useState(false);
@@ -105,13 +97,6 @@ export default function SettingsPage() {
   const [newLast, setNewLast] = useState("");
   const [newHandicap, setNewHandicap] = useState("0");
   const [addingPlayer, setAddingPlayer] = useState(false);
-
-  // For refreshing after add player
-  const [allPlayers, setAllPlayers] = useState<PlayerWithScores[]>([]);
-
-  // Clear scores for a single player
-  const [confirmClearScoreId, setConfirmClearScoreId] = useState<string | null>(null);
-  const [clearingScoreId, setClearingScoreId] = useState<string | null>(null);
 
   useEffect(() => {
     setSettings(loadSettings());
@@ -124,12 +109,6 @@ export default function SettingsPage() {
         .then((res) => res.json())
         .then((data) => {
           if (data.players) setPlayers(data.players);
-        })
-        .catch(() => {});
-      fetch("/api/admin/scores")
-        .then((res) => res.json())
-        .then((data) => {
-          if (data.players) setAllPlayers(data.players);
         })
         .catch(() => {});
     }
@@ -285,15 +264,9 @@ export default function SettingsPage() {
                         group: 0,
                       }),
                     });
-                    // Refresh player lists
-                    const [groupsRes, scoresRes] = await Promise.all([
-                      fetch("/api/groups"),
-                      fetch("/api/admin/scores"),
-                    ]);
+                    const groupsRes = await fetch("/api/groups");
                     const groupsData = await groupsRes.json();
-                    const scoresData = await scoresRes.json();
                     if (groupsData.players) setPlayers(groupsData.players);
-                    if (scoresData.players) setAllPlayers(scoresData.players);
                     setNewFirst("");
                     setNewLast("");
                     setNewHandicap("0");
@@ -400,121 +373,6 @@ export default function SettingsPage() {
             </button>
           )}
         </div>
-      )}
-
-      {/* Clear Scores (admin only) */}
-      {isAdmin && allPlayers.length > 0 && (
-        <Card className="mb-5 border-on-error-container/30 p-5">
-          <h3 className="font-headline text-lg text-on-surface mb-2">
-            Clear Scores
-          </h3>
-          <p className="text-[11px] text-on-surface-variant mb-4">
-            Delete all scores for a player while keeping their account.
-          </p>
-
-          <div className="space-y-2">
-            {allPlayers.map((p) => (
-              <div key={p.id} className="flex items-center gap-2">
-                <span className="flex-1 font-label text-sm font-bold text-on-surface px-4 py-3 rounded-xl bg-surface-container border border-outline-variant/40">
-                  {p.displayName}
-                  <span className="ml-2 text-xs font-normal text-on-surface-variant">
-                    ({p.scores.length} {p.scores.length === 1 ? "round" : "rounds"})
-                  </span>
-                </span>
-                {confirmClearScoreId === p.id ? (
-                  <div className="flex gap-1.5">
-                    <button
-                      onClick={() => setConfirmClearScoreId(null)}
-                      className="px-3 py-2.5 rounded-xl bg-surface-container-high text-on-surface-variant font-label text-xs font-bold uppercase tracking-wider active:scale-[0.97] transition-transform"
-                    >
-                      Cancel
-                    </button>
-                    <button
-                      onClick={async () => {
-                        setClearingScoreId(p.id);
-                        try {
-                          await fetch(`/api/admin/scores?playerId=${p.id}`, { method: "DELETE" });
-                          const res = await fetch("/api/admin/scores");
-                          const data = await res.json();
-                          if (data.players) setAllPlayers(data.players);
-                        } catch {}
-                        setClearingScoreId(null);
-                        setConfirmClearScoreId(null);
-                      }}
-                      disabled={clearingScoreId === p.id}
-                      className="px-3 py-2.5 rounded-xl bg-red-500 text-white font-label text-xs font-bold uppercase tracking-wider active:scale-[0.97] transition-transform disabled:opacity-50"
-                    >
-                      {clearingScoreId === p.id ? "Clearing…" : "Confirm"}
-                    </button>
-                  </div>
-                ) : (
-                  <button
-                    onClick={() => setConfirmClearScoreId(p.id)}
-                    disabled={p.scores.length === 0}
-                    className="px-3 py-2.5 rounded-xl bg-red-500/15 text-red-400 font-label text-xs font-bold uppercase tracking-wider active:scale-[0.97] transition-transform disabled:opacity-30"
-                  >
-                    Clear
-                  </button>
-                )}
-              </div>
-            ))}
-          </div>
-        </Card>
-      )}
-
-      {/* Clear Players (admin only) */}
-      {isAdmin && (
-        <Card className="mb-5 border-on-error-container/30 p-5">
-          <h3 className="font-headline text-lg text-on-surface mb-2">
-            Clear Players
-          </h3>
-          <p className="text-[11px] text-on-surface-variant mb-4">
-            Delete all player accounts and scores except yours. Use this before going live.
-          </p>
-          {!confirmClear ? (
-            <button
-              onClick={() => setConfirmClear(true)}
-              className="w-full py-3 rounded-xl bg-red-500/20 text-red-400 font-label text-sm font-bold uppercase tracking-wider active:scale-[0.97] transition-transform"
-            >
-              Clear All Players
-            </button>
-          ) : (
-            <div className="flex gap-3">
-              <button
-                onClick={() => setConfirmClear(false)}
-                className="flex-1 py-3 rounded-xl bg-surface-container-high text-on-surface-variant font-label text-sm font-bold uppercase tracking-wider active:scale-[0.97] transition-transform"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={async () => {
-                  setClearing(true);
-                  try {
-                    await fetch("/api/groups", { method: "DELETE" });
-                    setPlayers((prev) =>
-                      prev.filter(
-                        (p) =>
-                          players.find(
-                            (pl) => pl.id === p.id && pl.displayName === session?.user?.name
-                          ) !== undefined
-                      )
-                    );
-                    // Re-fetch to get accurate state
-                    const res = await fetch("/api/groups");
-                    const data = await res.json();
-                    if (data.players) setPlayers(data.players);
-                  } catch {}
-                  setClearing(false);
-                  setConfirmClear(false);
-                }}
-                disabled={clearing}
-                className="flex-1 py-3 rounded-xl bg-red-500 text-white font-label text-sm font-bold uppercase tracking-wider active:scale-[0.97] transition-transform disabled:opacity-50"
-              >
-                {clearing ? "Clearing…" : "Confirm"}
-              </button>
-            </div>
-          )}
-        </Card>
       )}
 
       {/* About */}

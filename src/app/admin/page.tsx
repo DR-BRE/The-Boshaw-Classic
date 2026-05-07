@@ -68,6 +68,14 @@ export default function AdminPage() {
   const [newHandicap, setNewHandicap] = useState("0");
   const [adding, setAdding] = useState(false);
 
+  // Clear scores for a single player
+  const [confirmClearScoreId, setConfirmClearScoreId] = useState<string | null>(null);
+  const [clearingScoreId, setClearingScoreId] = useState<string | null>(null);
+
+  // Clear all players
+  const [confirmClear, setConfirmClear] = useState(false);
+  const [clearing, setClearing] = useState(false);
+
   useEffect(() => {
     if (isAdmin) fetchPlayers();
   }, [isAdmin]);
@@ -476,6 +484,106 @@ export default function AdminPage() {
             </div>
           );
         })}
+      </div>
+
+      {/* Clear Scores */}
+      {players.length > 0 && (
+        <div className="bg-white/[0.06] backdrop-blur-xl border border-on-error-container/30 rounded-2xl p-5 mt-5">
+          <h3 className="font-headline text-lg text-on-surface mb-2">
+            Clear Scores
+          </h3>
+          <p className="text-[11px] text-on-surface-variant mb-4">
+            Delete all scores for a player while keeping their account.
+          </p>
+
+          <div className="space-y-2">
+            {players.map((p) => (
+              <div key={p.id} className="flex items-center gap-2">
+                <span className="flex-1 font-label text-sm font-bold text-on-surface px-4 py-3 rounded-xl bg-white/[0.06] border border-white/[0.06]">
+                  {p.displayName}
+                  <span className="ml-2 text-xs font-normal text-on-surface-variant">
+                    ({p.scores.length} {p.scores.length === 1 ? "round" : "rounds"})
+                  </span>
+                </span>
+                {confirmClearScoreId === p.id ? (
+                  <div className="flex gap-1.5">
+                    <button
+                      onClick={() => setConfirmClearScoreId(null)}
+                      className="px-3 py-2.5 rounded-xl bg-white/[0.06] text-on-surface-variant font-label text-xs font-bold uppercase tracking-wider active:scale-[0.97] transition-transform"
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      onClick={async () => {
+                        setClearingScoreId(p.id);
+                        try {
+                          await fetch(`/api/admin/scores?playerId=${p.id}`, { method: "DELETE" });
+                          await fetchPlayers();
+                        } catch {}
+                        setClearingScoreId(null);
+                        setConfirmClearScoreId(null);
+                      }}
+                      disabled={clearingScoreId === p.id}
+                      className="px-3 py-2.5 rounded-xl bg-red-500 text-white font-label text-xs font-bold uppercase tracking-wider active:scale-[0.97] transition-transform disabled:opacity-50"
+                    >
+                      {clearingScoreId === p.id ? "Clearing…" : "Confirm"}
+                    </button>
+                  </div>
+                ) : (
+                  <button
+                    onClick={() => setConfirmClearScoreId(p.id)}
+                    disabled={p.scores.length === 0}
+                    className="px-3 py-2.5 rounded-xl bg-red-500/15 text-red-400 font-label text-xs font-bold uppercase tracking-wider active:scale-[0.97] transition-transform disabled:opacity-30"
+                  >
+                    Clear
+                  </button>
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Clear Players */}
+      <div className="bg-white/[0.06] backdrop-blur-xl border border-on-error-container/30 rounded-2xl p-5 mt-5">
+        <h3 className="font-headline text-lg text-on-surface mb-2">
+          Clear Players
+        </h3>
+        <p className="text-[11px] text-on-surface-variant mb-4">
+          Delete all player accounts and scores except yours. Use this before going live.
+        </p>
+        {!confirmClear ? (
+          <button
+            onClick={() => setConfirmClear(true)}
+            className="w-full py-3 rounded-xl bg-red-500/20 text-red-400 font-label text-sm font-bold uppercase tracking-wider active:scale-[0.97] transition-transform"
+          >
+            Clear All Players
+          </button>
+        ) : (
+          <div className="flex gap-3">
+            <button
+              onClick={() => setConfirmClear(false)}
+              className="flex-1 py-3 rounded-xl bg-white/[0.06] text-on-surface-variant font-label text-sm font-bold uppercase tracking-wider active:scale-[0.97] transition-transform"
+            >
+              Cancel
+            </button>
+            <button
+              onClick={async () => {
+                setClearing(true);
+                try {
+                  await fetch("/api/groups", { method: "DELETE" });
+                  await fetchPlayers();
+                } catch {}
+                setClearing(false);
+                setConfirmClear(false);
+              }}
+              disabled={clearing}
+              className="flex-1 py-3 rounded-xl bg-red-500 text-white font-label text-sm font-bold uppercase tracking-wider active:scale-[0.97] transition-transform disabled:opacity-50"
+            >
+              {clearing ? "Clearing…" : "Confirm"}
+            </button>
+          </div>
+        )}
       </div>
     </div>
   );
