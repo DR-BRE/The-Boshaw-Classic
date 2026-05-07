@@ -7,13 +7,11 @@ import { Card } from "@/components/ui";
 type Settings = {
   theme: "dark" | "light";
   notifyLeaderboard: boolean;
-  notifyScores: boolean;
 };
 
 const DEFAULT_SETTINGS: Settings = {
   theme: "dark",
   notifyLeaderboard: true,
-  notifyScores: true,
 };
 
 function loadSettings(): Settings {
@@ -181,29 +179,13 @@ export default function SettingsPage() {
                 Leaderboard Updates
               </p>
               <p className="text-xs text-on-surface-variant">
-                When someone takes the lead
+                When someone takes the lead or shoots under par
               </p>
             </div>
             <Toggle
               enabled={settings.notifyLeaderboard}
               onChange={(v) => update({ notifyLeaderboard: v })}
               label="Leaderboard Updates"
-            />
-          </div>
-
-          <div className="flex items-center justify-between py-3 border-b border-outline-variant/30">
-            <div>
-              <p className="text-sm font-medium text-on-surface">
-                Score Submissions
-              </p>
-              <p className="text-xs text-on-surface-variant">
-                When a player submits their round
-              </p>
-            </div>
-            <Toggle
-              enabled={settings.notifyScores}
-              onChange={(v) => update({ notifyScores: v })}
-              label="Score Submissions"
             />
           </div>
         </div>
