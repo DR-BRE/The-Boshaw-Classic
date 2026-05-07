@@ -17,6 +17,20 @@ const ACTIVE_ROUNDS = [1, 2];
 const POLL_MS = 5000;
 const VISIBLE_MS = 4500;
 const EXIT_MS = 300;
+const SETTINGS_KEY = "boshaw-settings";
+const SETTINGS_EVENT = "boshaw-settings-changed";
+
+function readNotifyLeaderboard(): boolean {
+  if (typeof window === "undefined") return true;
+  try {
+    const raw = localStorage.getItem(SETTINGS_KEY);
+    if (!raw) return true;
+    const parsed = JSON.parse(raw) as { notifyLeaderboard?: boolean };
+    return parsed.notifyLeaderboard !== false;
+  } catch {
+    return true;
+  }
+}
 // Delay between observing a birdie-or-better score and actually firing the
 // banner — gives players a window to correct a mis-tap without triggering a
 // false celebration. If the score on that hole changes within the window,
@@ -107,11 +121,31 @@ export default function ScoreToastProvider() {
   // If the score on that hole changes again inside the window, we clear the
   // timer and (re)schedule based on the new score.
   const pendingRef = useRef<Map<string, ReturnType<typeof setTimeout>>>(new Map());
+  const enabledRef = useRef<boolean>(true);
+
+  useEffect(() => {
+    enabledRef.current = readNotifyLeaderboard();
+    const sync = () => {
+      enabledRef.current = readNotifyLeaderboard();
+      if (!enabledRef.current) {
+        for (const timer of pendingRef.current.values()) clearTimeout(timer);
+        pendingRef.current.clear();
+        setToasts([]);
+      }
+    };
+    window.addEventListener("storage", sync);
+    window.addEventListener(SETTINGS_EVENT, sync);
+    return () => {
+      window.removeEventListener("storage", sync);
+      window.removeEventListener(SETTINGS_EVENT, sync);
+    };
+  }, []);
 
   useEffect(() => {
     let cancelled = false;
 
     function pushToast(playerName: string, hole: number, kind: ToastKind) {
+      if (!enabledRef.current) return;
       const id = ++toastIdRef.current;
       setToasts((prev) => [...prev, { id, playerName, hole, kind, exiting: false }]);
       void fireConfetti(kind);
