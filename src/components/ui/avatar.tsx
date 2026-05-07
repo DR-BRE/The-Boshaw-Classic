@@ -1,5 +1,3 @@
-import Image from "next/image";
-
 interface AvatarProps {
   src?: string | null;
   name?: string | null;
@@ -8,13 +6,13 @@ interface AvatarProps {
 }
 
 const sizes = {
-  sm: { px: 32, class: "w-8 h-8 text-xs" },
-  md: { px: 40, class: "w-10 h-10 text-sm" },
-  lg: { px: 56, class: "w-14 h-14 text-base" },
+  sm: "w-8 h-8 text-xs",
+  md: "w-10 h-10 text-sm",
+  lg: "w-14 h-14 text-base",
 };
 
 export function Avatar({ src, name, size = "md", className = "" }: AvatarProps) {
-  const { px, class: sizeClass } = sizes[size];
+  const sizeClass = sizes[size];
   const initials = name
     ? name
         .split(" ")
@@ -33,7 +31,8 @@ export function Avatar({ src, name, size = "md", className = "" }: AvatarProps) 
       ].join(" ")}
     >
       {src ? (
-        <Image src={src} alt={name ?? "Avatar"} width={px} height={px} className="object-cover w-full h-full" />
+        // eslint-disable-next-line @next/next/no-img-element
+        <img src={src} alt={name ?? "Avatar"} className="object-cover w-full h-full" />
       ) : (
         <span className="font-label font-semibold text-on-surface-variant">{initials}</span>
       )}
