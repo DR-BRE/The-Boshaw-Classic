@@ -19,7 +19,6 @@ export default function BottomTabs() {
       aria-label="Primary"
       style={{
         bottom: "calc(0px - env(safe-area-inset-bottom, 0px))",
-        paddingBottom: "env(safe-area-inset-bottom, 0px)",
       }}
       className="fixed left-0 right-0 z-40 bg-surface-container border-t border-outline-variant/40"
     >
