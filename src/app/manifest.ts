@@ -7,8 +7,8 @@ export default function manifest(): MetadataRoute.Manifest {
     description: "Bachelor party golf tournament — Lake Chelan 2026",
     start_url: "/",
     display: "standalone",
-    background_color: "#0D1117",
-    theme_color: "#0D1117",
+    background_color: "#161B22",
+    theme_color: "#161B22",
     orientation: "portrait",
     icons: [
       {
