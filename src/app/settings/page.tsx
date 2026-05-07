@@ -25,6 +25,7 @@ function loadSettings(): Settings {
 
 function saveSettings(settings: Settings) {
   localStorage.setItem("boshaw-settings", JSON.stringify(settings));
+  window.dispatchEvent(new Event("boshaw-settings-changed"));
 }
 
 function Toggle({
