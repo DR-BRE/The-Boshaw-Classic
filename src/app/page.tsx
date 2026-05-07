@@ -14,7 +14,7 @@ export default function Home() {
         className="relative w-full mb-4 overflow-hidden"
         style={{
           marginTop: "calc(-1 * (env(safe-area-inset-top, 0px) + 4rem))",
-          height: "calc(100dvh - 64px - env(safe-area-inset-bottom, 0px))",
+          height: "calc(100dvh - 56px - env(safe-area-inset-bottom, 0px))",
         }}
       >
         <Image

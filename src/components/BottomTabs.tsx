@@ -20,7 +20,7 @@ export default function BottomTabs() {
       style={{ paddingBottom: "env(safe-area-inset-bottom, 0px)" }}
       className="fixed bottom-0 left-0 right-0 z-40 bg-surface-container border-t border-outline-variant/40"
     >
-      <div className="flex items-stretch h-16">
+      <div className="flex items-stretch h-14">
         {tabs.map((tab) => {
           const active =
             tab.href === "/"
@@ -31,7 +31,7 @@ export default function BottomTabs() {
               key={tab.href}
               href={tab.href}
               className={[
-                "relative flex-1 flex flex-col items-center justify-center gap-0.5 transition-colors",
+                "relative flex-1 flex flex-col items-center justify-end pb-1 gap-0.5 transition-colors",
                 "active:bg-surface-container-high",
                 active ? "text-primary" : "text-on-surface-variant",
               ].join(" ")}
