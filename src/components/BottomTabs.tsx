@@ -17,7 +17,6 @@ export default function BottomTabs() {
   return (
     <nav
       aria-label="Primary"
-      style={{ paddingBottom: "env(safe-area-inset-bottom, 0px)" }}
       className="fixed bottom-0 left-0 right-0 z-40 bg-surface-container border-t border-outline-variant/40"
     >
       <div className="flex items-stretch h-14">
