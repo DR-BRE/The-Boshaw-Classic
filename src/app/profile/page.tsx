@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useSession, signOut } from "next-auth/react";
 import Link from "next/link";
 import { Avatar, Input, Button, Card } from "@/components/ui";
+import { resizeImage } from "@/lib/resizeImage";
 
 type Player = {
   id: string;
@@ -92,8 +93,9 @@ export default function ProfilePage() {
         }
       }
 
+      const resized = await resizeImage(file).catch(() => file);
       const formData = new FormData();
-      formData.append("file", file);
+      formData.append("file", resized);
       const res = await fetch("/api/upload", { method: "POST", body: formData });
       const data = await res.json();
       if (data.url) {
