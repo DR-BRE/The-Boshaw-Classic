@@ -10,13 +10,15 @@ interface LeaderboardRowProps {
   today: number | null;
   total: number;
   isCurrentUser?: boolean;
+  isLast?: boolean;
   onPress?: () => void;
 }
 
-const rankIcon = (rank: number) => {
+const rankIcon = (rank: number, isLast: boolean) => {
   if (rank === 1) return "🏆";
   if (rank === 2) return "🥈";
   if (rank === 3) return "🥉";
+  if (isLast) return "💩";
   return null;
 };
 
@@ -29,9 +31,10 @@ export function LeaderboardRow({
   today,
   total,
   isCurrentUser = false,
+  isLast = false,
   onPress,
 }: LeaderboardRowProps) {
-  const icon = rankIcon(rank);
+  const icon = rankIcon(rank, isLast);
 
   return (
     <button

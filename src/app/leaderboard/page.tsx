@@ -156,28 +156,33 @@ export default function LeaderboardPage() {
           </div>
 
           <Card noPadding className="overflow-hidden">
-            {entries.map((entry) => {
-              const isExpanded = expandedId === entry.playerId;
-              return (
-                <div key={entry.playerId}>
-                  <LeaderboardRow
-                    rank={entry.rank}
-                    name={entry.displayName}
-                    avatarUrl={entry.avatarUrl}
-                    scoreToPar={entry.totalToPar}
-                    thru={null}
-                    today={null}
-                    total={entry.totalStrokes}
-                    onPress={() => setExpandedId(isExpanded ? null : entry.playerId)}
-                  />
-                  {isExpanded && (
-                    <div className="px-4 py-3 bg-surface-container-low border-b border-outline-variant/30">
-                      <ExpandedDetail entry={entry} />
-                    </div>
-                  )}
-                </div>
-              );
-            })}
+            {(() => {
+              const maxRank = entries.length > 1 ? Math.max(...entries.map((e) => e.rank)) : 0;
+              return entries.map((entry) => {
+                const isExpanded = expandedId === entry.playerId;
+                const isLast = maxRank > 0 && entry.rank === maxRank;
+                return (
+                  <div key={entry.playerId}>
+                    <LeaderboardRow
+                      rank={entry.rank}
+                      name={entry.displayName}
+                      avatarUrl={entry.avatarUrl}
+                      scoreToPar={entry.totalToPar}
+                      thru={null}
+                      today={null}
+                      total={entry.totalStrokes}
+                      isLast={isLast}
+                      onPress={() => setExpandedId(isExpanded ? null : entry.playerId)}
+                    />
+                    {isExpanded && (
+                      <div className="px-4 py-3 bg-surface-container-low border-b border-outline-variant/30">
+                        <ExpandedDetail entry={entry} />
+                      </div>
+                    )}
+                  </div>
+                );
+              });
+            })()}
           </Card>
         </>
       )}
