@@ -3,10 +3,17 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
-const tabs = [
+type Tab = {
+  href: string;
+  icon: string;
+  label: string;
+  featured?: boolean;
+};
+
+const tabs: Tab[] = [
   { href: "/", icon: "home", label: "Home" },
   { href: "/leaderboard", icon: "leaderboard", label: "Leaderboard" },
-  { href: "/scorecard", icon: "scoreboard", label: "Scorecard" },
+  { href: "/scorecard", icon: "scoreboard", label: "Scorecard", featured: true },
   { href: "/trip", icon: "luggage", label: "Trip Info" },
   { href: "/profile", icon: "person", label: "Profile" },
 ];
@@ -29,6 +36,39 @@ export default function BottomTabs() {
             tab.href === "/"
               ? pathname === "/"
               : pathname === tab.href || pathname.startsWith(tab.href + "/");
+
+          if (tab.featured) {
+            return (
+              <Link
+                key={tab.href}
+                href={tab.href}
+                aria-label={tab.label}
+                aria-current={active ? "page" : undefined}
+                className="relative flex-1 flex items-start justify-center"
+              >
+                <span
+                  className={[
+                    "absolute -top-5 flex items-center justify-center",
+                    "w-14 h-14 rounded-full bg-primary-fixed-dim text-on-primary",
+                    "shadow-lg shadow-primary-fixed-dim/30 transition-transform",
+                    "active:scale-95",
+                    active ? "ring-2 ring-primary-fixed/60 ring-offset-2 ring-offset-surface-container" : "",
+                  ].join(" ")}
+                >
+                  <span
+                    className="material-symbols-outlined text-[28px]"
+                    style={{ fontVariationSettings: '"FILL" 1' }}
+                  >
+                    {tab.icon}
+                  </span>
+                </span>
+                <span className="absolute bottom-1 text-[10px] font-label font-medium uppercase tracking-wider text-on-surface-variant">
+                  {tab.label}
+                </span>
+              </Link>
+            );
+          }
+
           return (
             <Link
               key={tab.href}
